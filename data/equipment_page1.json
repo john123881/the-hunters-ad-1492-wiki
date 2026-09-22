@@ -9,14 +9,20 @@
     "usage_limit_type": "unlimited",
     "description": "投槍。具備投擲遠程與近身肉搏雙行動模式。",
     "original_effect_text": "Agility: 3 dice, 0 mod, Range 1-2. Strength: 2 dice, +1 mod, Range 0.",
-    "image_url": "/images/javelins.svg",
+    "image_url": "/images/items/javelins.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 1,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -60,7 +66,7 @@
     "usage_limit_type": "unlimited",
     "description": "火把。照明與燃燒打擊。",
     "original_effect_text": "Strength: 2 dice, 0 mod, Range 0. 燃燒效果。",
-    "image_url": "/images/torch.svg",
+    "image_url": "/images/items/torch.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
@@ -107,14 +113,20 @@
     "usage_limit_type": "unlimited",
     "description": "手半劍／短劍。帶近戰接口與輕武器特性。",
     "original_effect_text": "Strength: 2 dice, 0 mod, Range 0. 輕武器。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/katzbalger.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 3,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -157,14 +169,20 @@
     "usage_limit_type": "unlimited",
     "description": "彎刃砍刀。3 骰威力，-1 命中修正，具備輕武器特性。",
     "original_effect_text": "Strength: 3 dice, -1 mod, Range 0. 輕武器。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/falchion.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 4,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -207,14 +225,20 @@
     "usage_limit_type": "unlimited",
     "description": "長劍。標準均衡近戰武器，雙近戰接口。",
     "original_effect_text": "Strength: 3 dice, +1 mod, Range 0.",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/long-sword.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 5,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -244,15 +268,24 @@
     "usage_limit_type": "unlimited",
     "description": "雙手巨劍。強大的 6 骰攻擊，具備範圍攻擊、破防與洞察 -1 懲罰。",
     "original_effect_text": "Strength: 6 dice, +1 mod, Range 0. 範圍攻擊。破防。裝備時洞察 -1。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/zweihander.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 6,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" },
-      { "slot_index": 3, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -319,14 +352,20 @@
     "usage_limit_type": "unlimited",
     "description": "重釘頭錘。4 骰強擊鈍兵。",
     "original_effect_text": "Strength: 4 dice, 0 mod, Range 0.",
-    "image_url": "/images/mace.svg",
+    "image_url": "/images/items/mace.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 7,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -356,15 +395,24 @@
     "usage_limit_type": "unlimited",
     "description": "雙手戰斧。7 骰毀滅性打擊，破防且裝備時洞察 -2。",
     "original_effect_text": "Strength: 7 dice, 0 mod, Range 0. 破防。裝備時洞察 -2。",
-    "image_url": "/images/axe.svg",
+    "image_url": "/images/items/two-handed-axe.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 8,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" },
-      { "slot_index": 3, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -419,14 +467,20 @@
     "usage_limit_type": "unlimited",
     "description": "單手戰斧。4 骰攻擊，-1 命中修正。",
     "original_effect_text": "Strength: 4 dice, -1 mod, Range 0.",
-    "image_url": "/images/axe.svg",
+    "image_url": "/images/items/axe.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 9,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -456,14 +510,20 @@
     "usage_limit_type": "unlimited",
     "description": "騎兵破甲錐。3 骰攻擊，具備穿甲效果（-2 防禦值）。",
     "original_effect_text": "Strength: 3 dice, 0 mod, Range 0. 穿甲：-2 防禦值。",
-    "image_url": "/images/pick.svg",
+    "image_url": "/images/items/horseman-pick.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 10,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -506,13 +566,16 @@
     "usage_limit_type": "unlimited",
     "description": "匕首。敏捷輕便的 1 格短刃，具備輕武器特性。",
     "original_effect_text": "Agility: 1 die, -1 mod, Range 0. 輕武器。",
-    "image_url": "/images/dagger.svg",
+    "image_url": "/images/items/dagger.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 11,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -555,13 +618,16 @@
     "usage_limit_type": "unlimited",
     "description": "五指寬刃短劍。1 格近戰短兵，力量 1 骰，具備輕武器特性。",
     "original_effect_text": "Strength: 1 die, 0 mod, Range 0. 輕武器。",
-    "image_url": "/images/dagger.svg",
+    "image_url": "/images/items/cinquedea.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.1",
     "is_published": 1,
     "sort_order": 12,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
