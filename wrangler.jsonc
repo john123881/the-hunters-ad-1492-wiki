@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "the-hunters-ad-1492",
+  "main": "server/index.ts",
+  "compatibility_date": "2025-09-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api", "/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hunters-db",
+      // 本機識別碼，並非已建立的雲端資料庫。部署時必須改為平台配置。
+      "database_id": "local-hunters-db",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

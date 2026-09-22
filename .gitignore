@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.wrangler/
+.tools/
+.cache/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+*.log
+*.tsbuildinfo
+.DS_Store
+
+# 未公開的原始圖鑑與先前擷取產物
+/Equipment_compendium.pdf
+/public/images/compendium/
+/data/compendium.json
+/seeds/compendium.sql

@@ -1,0 +1,40 @@
+{
+  "name": "the-hunters-ad-1492",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0 <23 || >=24.0.0"
+  },
+  "scripts": {
+    "dev": "WRANGLER_LOG_PATH=.cache/wrangler vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && WRANGLER_LOG_PATH=.cache/wrangler vite build",
+    "preview": "WRANGLER_LOG_PATH=.cache/wrangler vite preview --host 127.0.0.1 --port 4173",
+    "db:migrate": "WRANGLER_LOG_PATH=.cache/wrangler wrangler d1 migrations apply hunters-db --local",
+    "data:seed": "node scripts/build-seed.mjs",
+    "db:seed": "WRANGLER_LOG_PATH=.cache/wrangler wrangler d1 execute hunters-db --local --file seeds/equipment_page1.sql",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "check": "npm run build"
+  },
+  "dependencies": {
+    "hono": "^4.9.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.9.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.13.0",
+    "@cloudflare/workers-types": "^5.20260921.1",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.18.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "sharp": "^0.35.4",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.0",
+    "wrangler": "^4.38.0"
+  }
+}
