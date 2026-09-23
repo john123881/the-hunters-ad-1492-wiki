@@ -1,0 +1,663 @@
+[
+  {
+    "code": "item_javelins",
+    "slug": "javelins",
+    "name": "Javelins",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "投槍。具備投擲遠程與近身肉搏雙行動模式。",
+    "original_effect_text": "Agility: 3 dice, 0 mod, Range 1-2. Strength: 2 dice, +1 mod, Range 0.",
+    "image_url": "/images/items/javelins.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 1,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 3,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 2,
+        "description": "敏捷投擲"
+      },
+      {
+        "display_order": 2,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 2,
+        "check_modifier": 1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "力量近戰"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_torch",
+    "slug": "torch",
+    "name": "Torch",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "火把。照明與燃燒打擊。",
+    "original_effect_text": "Strength: 2 dice, 0 mod, Range 0. 燃燒效果。",
+    "image_url": "/images/items/torch.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 2,
+    "sockets": [],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 2,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "火把揮擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "burning",
+        "action_mode_display_order": 1,
+        "target_type": "enemy",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "combat",
+        "is_negative": 0,
+        "description": "攻擊命中時附加燃燒效果",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_katzbalger",
+    "slug": "katzbalger",
+    "name": "Katzbalger",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "手半劍／短劍。帶近戰接口與輕武器特性。",
+    "original_effect_text": "Strength: 2 dice, 0 mod, Range 0. 輕武器。",
+    "image_url": "/images/items/katzbalger.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 3,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 2,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "近戰揮砍"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "light_weapon",
+        "action_mode_display_order": null,
+        "target_type": "weapon",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "輕武器特性",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_falchion",
+    "slug": "falchion",
+    "name": "Falchion",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "彎刃砍刀。3 骰威力，-1 命中修正，具備輕武器特性。",
+    "original_effect_text": "Strength: 3 dice, -1 mod, Range 0. 輕武器。",
+    "image_url": "/images/items/falchion.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 4,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 3,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "劈砍"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "light_weapon",
+        "action_mode_display_order": null,
+        "target_type": "weapon",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "輕武器特性",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_long_sword",
+    "slug": "long-sword",
+    "name": "Long Sword",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "長劍。標準均衡近戰武器，雙近戰接口。",
+    "original_effect_text": "Strength: 3 dice, +1 mod, Range 0.",
+    "image_url": "/images/items/long-sword.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 5,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 3,
+        "check_modifier": 1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "長劍突刺／揮斬"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_zweihander",
+    "slug": "zweihander",
+    "name": "Zweihänder",
+    "category_code": "weapon",
+    "slot_count": 3,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "雙手巨劍。強大的 6 骰攻擊，具備範圍攻擊、破防與洞察 -1 懲罰。",
+    "original_effect_text": "Strength: 6 dice, +1 mod, Range 0. 範圍攻擊。破防。裝備時洞察 -1。",
+    "image_url": "/images/items/zweihander.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 6,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 6,
+        "check_modifier": 1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "巨劍重斬"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "area_attack",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "此武器的攻擊具有範圍攻擊效果",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "armor_break",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "此武器的攻擊具有破防效果",
+        "sort_order": 2
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "add",
+        "trigger_timing": "passive",
+        "duration_type": "while_equipped",
+        "is_negative": 1,
+        "description": "裝備時洞察基礎數值 -1",
+        "sort_order": 3
+      }
+    ]
+  },
+  {
+    "code": "item_mace",
+    "slug": "mace",
+    "name": "Mace",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "重釘頭錘。4 骰強擊鈍兵。",
+    "original_effect_text": "Strength: 4 dice, 0 mod, Range 0.",
+    "image_url": "/images/items/mace.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 7,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 4,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "鈍擊重砸"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_two_handed_axe",
+    "slug": "two-handed-axe",
+    "name": "Two-handed Axe",
+    "category_code": "weapon",
+    "slot_count": 3,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "雙手戰斧。7 骰毀滅性打擊，破防且裝備時洞察 -2。",
+    "original_effect_text": "Strength: 7 dice, 0 mod, Range 0. 破防。裝備時洞察 -2。",
+    "image_url": "/images/items/two-handed-axe.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 8,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 7,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "雙手劈碎"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "armor_break",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "此武器的攻擊具有破防效果",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -2,
+        "operation": "add",
+        "trigger_timing": "passive",
+        "duration_type": "while_equipped",
+        "is_negative": 1,
+        "description": "裝備時洞察基礎數值 -2",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_axe",
+    "slug": "axe",
+    "name": "Axe",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "單手戰斧。4 骰攻擊，-1 命中修正。",
+    "original_effect_text": "Strength: 4 dice, -1 mod, Range 0.",
+    "image_url": "/images/items/axe.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 9,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 4,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "單手斧劈"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_horseman_pick",
+    "slug": "horseman-pick",
+    "name": "Horseman's Pick",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "騎兵破甲錐。3 骰攻擊，具備穿甲效果（-2 防禦值）。",
+    "original_effect_text": "Strength: 3 dice, 0 mod, Range 0. 穿甲：-2 防禦值。",
+    "image_url": "/images/items/horseman-pick.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 10,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 3,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "錐刺破甲"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "armor_piercing",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 2,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "穿甲效果：目標防禦值 -2",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_dagger",
+    "slug": "dagger",
+    "name": "Dagger",
+    "category_code": "weapon",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "匕首。敏捷輕便的 1 格短刃，具備輕武器特性。",
+    "original_effect_text": "Agility: 1 die, -1 mod, Range 0. 輕武器。",
+    "image_url": "/images/items/dagger.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 11,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 1,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "敏捷近身短刺"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "light_weapon",
+        "action_mode_display_order": null,
+        "target_type": "weapon",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "輕武器特性",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_cinquedea",
+    "slug": "cinquedea",
+    "name": "Cinquedea",
+    "category_code": "weapon",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "五指寬刃短劍。1 格近戰短兵，力量 1 骰，具備輕武器特性。",
+    "original_effect_text": "Strength: 1 die, 0 mod, Range 0. 輕武器。",
+    "image_url": "/images/items/cinquedea.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.1",
+    "is_published": 1,
+    "sort_order": 12,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 1,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "寬刃刺擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "light_weapon",
+        "action_mode_display_order": null,
+        "target_type": "weapon",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "輕武器特性",
+        "sort_order": 1
+      }
+    ]
+  }
+]
