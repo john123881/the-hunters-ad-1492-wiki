@@ -6,7 +6,6 @@ import { useApi } from '../lib/useApi';
 import { ItemTile } from '../components/ItemTile';
 import { ItemFilters } from '../components/ItemFilters';
 import { CardSkeletons, EmptyState, ErrorState } from '../components/States';
-import { Emblem } from '../components/Emblem';
 
 
 export function CatalogPage() {
@@ -24,7 +23,7 @@ export function CatalogPage() {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setDraft(q); }, [q]);
-  useEffect(() => { document.title = '獵人檔案館｜The Hunters AD 1492'; }, []);
+  useEffect(() => { document.title = 'THE HUNTERS A.D. 1492 WIKI'; }, []);
 
   function update(changes: Record<string, string>) {
     const next = new URLSearchParams(params);
@@ -45,23 +44,14 @@ export function CatalogPage() {
 
   return <>
     <section className="hero" aria-labelledby="hero-title">
+      <img className="hero-keyart" src="/images/hero-keyart.png" alt="" />
       <div className="hero-copy">
-        <p className="eyebrow"><span /> THE HUNTERS · ANNO DOMINI 1492</p>
-        <h1 id="hero-title">整裝。<br />迎向<span>長夜。</span></h1>
-        <p className="hero-description">每一件裝備，都有它的故事。<br />翻開獵人檔案，為下一場狩獵做好準備。</p>
-        <a className="hero-link" href="#catalog">探索物品圖鑑 <ArrowDown size={16} /></a>
+        <p className="eyebrow"><span /> UNOFFICIAL ITEM COMPENDIUM</p>
+        <h1 id="hero-title"><span>THE HUNTERS</span><small>A.D. 1492 WIKI</small></h1>
+        <a className="hero-link" href="#catalog">BROWSE ITEMS <ArrowDown size={16} /></a>
       </div>
-      <div className="hero-seal" aria-hidden="true">
-        <div className="seal-orbit orbit-outer" /><div className="seal-orbit orbit-inner" />
-        <span className="seal-top">IN TENEBRIS · LUX</span>
-        <div className="seal-cross" /><Emblem className="seal-emblem" />
-        <span className="seal-year">M C C C C X C I I</span>
-        <span className="seal-caption">長夜將至，獵人未眠。</span>
-        <span className="seal-star star-one">✦</span><span className="seal-star star-two">✦</span>
-      </div>
-      <div className="hero-foot"><span>獵人手札 / 卷一</span><span>THE ARCHIVES <span className="tiny-diamond">◆</span> 武器 · 防具 · 道具</span></div>
+      <div className="hero-foot"><span>EST. 1492</span><span>WEAPONS · ARMOR · EQUIPMENT</span></div>
     </section>
-
     <section id="catalog" className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
         <div><p className="eyebrow">THE HUNTER'S ARCHIVE</p><h2 id="catalog-title">物品圖鑑<span className="heading-dot">.</span></h2></div>
