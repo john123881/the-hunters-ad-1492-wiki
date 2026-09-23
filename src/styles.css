@@ -199,8 +199,8 @@ svg { flex-shrink: 0; }
 .brand-type { color: #ead5a9; font-family: Georgia, 'Times New Roman', serif; font-size: 1.35rem; letter-spacing: .08em; line-height: 1; text-shadow: 0 2px 18px #000; }
 .brand-type small { margin-top: 8px; color: #b9955d; font-size: .56rem; letter-spacing: .32em; }
 .hero { min-height: clamp(500px, 64vw, 680px); margin-inline: -40px; padding-inline: 40px; isolation: isolate; align-items: flex-end; border-bottom-color: #9e7b4b66; background: #050607; }
-.hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #050708f2 0%, #07090aa8 31%, transparent 62%), linear-gradient(0deg, #050708e8 0%, transparent 45%), linear-gradient(180deg, #02030466, transparent 26%); }
-.hero-keyart { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; filter: saturate(.78) contrast(1.08) brightness(.72); }
+.hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #050708f2 0%, #07090ac2 25%, #07090a33 45%, transparent 58%), linear-gradient(0deg, #050708a8 0%, transparent 32%), linear-gradient(180deg, #02030466, transparent 26%); }
+.hero-keyart { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; filter: saturate(.82) contrast(1.06) brightness(.84); }
 .hero-copy { max-width: 510px; padding: 0 0 88px; }
 .hero .eyebrow { margin-bottom: 22px; color: #d9b46c; font-family: Georgia, serif; font-size: .68rem; letter-spacing: .28em; }
 .hero h1 { display: flex; flex-direction: column; gap: 6px; margin: 0 0 34px; color: #f0dfb9; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2.7rem, 5.2vw, 5.2rem); line-height: .92; letter-spacing: .025em; text-shadow: 0 5px 28px #000; }
@@ -217,8 +217,8 @@ svg { flex-shrink: 0; }
   .brand-type { font-size: 1rem; }
   .brand-type small { font-size: .45rem; letter-spacing: .2em; }
   .hero { min-height: 520px; margin-inline: -28px; padding-inline: 28px; }
-  .hero::before { background: linear-gradient(0deg, #050708f5 0%, #0608097d 56%, #02030452 100%); }
-  .hero-keyart { object-position: 54% center; filter: saturate(.72) contrast(1.08) brightness(.68); }
+  .hero::before { background: linear-gradient(90deg, #050708cf 0%, #05070870 55%, transparent 100%), linear-gradient(0deg, #050708a8 0%, transparent 38%); }
+  .hero-keyart { object-position: 50% bottom; filter: saturate(.78) contrast(1.06) brightness(.8); }
   .hero-copy { align-self: end; width: 100%; padding: 0 0 82px; }
   .hero .eyebrow { font-size: .58rem; }
   .hero h1 { max-width: 330px; font-size: clamp(2.3rem, 12vw, 3.8rem); }
