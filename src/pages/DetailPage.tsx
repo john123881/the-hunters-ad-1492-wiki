@@ -23,7 +23,7 @@ export function DetailPage() {
   const result = useApi<DetailResponse>(`/api/items/${encodeURIComponent(slug ?? '')}`);
   const item = result.data?.data;
   const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => { document.title = `${item?.name ?? '物品詳情'}｜獵人檔案館`; }, [item?.name]);
+  useEffect(() => { document.title = `${item?.name ?? '物品詳情'}｜THE HUNTERS A.D. 1492 WIKI`; }, [item?.name]);
 
   return <div className="detail-page">
     <Link className="back-link" to={`/${catalogSearch}`}><ArrowLeft size={16} />返回物品圖鑑</Link>
