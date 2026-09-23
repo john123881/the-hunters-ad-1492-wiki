@@ -9,14 +9,20 @@
     "usage_limit_type": "unlimited",
     "description": "長矛。人物基礎力量判定，3 骰，命中 +2，距離 0。具備 2 個近戰接口。",
     "original_effect_text": "Strength: 3 dice, +2 mod, Range 0.",
-    "image_url": "/images/spear.svg",
+    "image_url": "/images/items/spear.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
     "sort_order": 13,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -46,14 +52,20 @@
     "usage_limit_type": "unlimited",
     "description": "戟。人物基礎力量判定，4 骰，命中 +2，距離 0。具備破防效果，裝備時洞察 -1。",
     "original_effect_text": "Strength: 4 dice, +2 mod, Range 0. 破防。裝備時洞察 -1。",
-    "image_url": "/images/spear.svg",
+    "image_url": "/images/items/halberd.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
     "sort_order": 14,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -108,15 +120,24 @@
     "usage_limit_type": "unlimited",
     "description": "連枷。人物基礎力量判定，6 骰，命中 0，距離 0。具備範圍攻擊與破防效果。",
     "original_effect_text": "Strength: 6 dice, 0 mod, Range 0. 範圍攻擊。破防。",
-    "image_url": "/images/mace.svg",
+    "image_url": "/images/items/flail.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
     "sort_order": 15,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" },
-      { "slot_index": 3, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -171,14 +192,20 @@
     "usage_limit_type": "unlimited",
     "description": "琉森錘（擴充裝備）。人物基礎力量判定，4 骰，命中 +2，距離 0。穿甲 -1 防禦值、破防，裝備時洞察 -1。",
     "original_effect_text": "Strength: 4 dice, +2 mod, Range 0. 穿甲：-1 防禦值。破防。裝備時洞察 -1。",
-    "image_url": "/images/pick.svg",
+    "image_url": "/images/items/lucerne-hammer.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
     "sort_order": 16,
     "sockets": [
-      { "slot_index": 1, "connector_type_code": "melee" },
-      { "slot_index": 2, "connector_type_code": "melee" }
+      {
+        "slot_index": 1,
+        "connector_type_code": "melee"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "melee"
+      }
     ],
     "action_modes": [
       {
@@ -245,7 +272,7 @@
     "usage_limit_type": "unlimited",
     "description": "特殊武器：獵網。範圍打擊；擲 1 顆 D6 大於敵方力量基礎數值時施加束縛狀態。",
     "original_effect_text": "特殊判定：D6 > 目標力量，成功時附加束縛狀態。範圍效果。",
-    "image_url": "/images/net.svg",
+    "image_url": "/images/items/net.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -307,7 +334,7 @@
     "usage_limit_type": "single_use",
     "description": "金剛石打磨。近戰接口附件，本場戰鬥力量基礎數值 +1。",
     "original_effect_text": "安裝於近戰接口。本場戰鬥力量 +1。使用後戰鬥結束時消耗。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/diamond-sharpening.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -340,7 +367,7 @@
     "usage_limit_type": "unlimited",
     "description": "銀質刀刃。近戰接口附件，對特殊種族（怪獸、惡魔）時力量基礎數值 +2。",
     "original_effect_text": "安裝於近戰接口。對怪獸、惡魔力量 +2。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/silver-blade.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -373,7 +400,7 @@
     "usage_limit_type": "unlimited",
     "description": "皮革握柄。近戰接口附件，攻擊時允許重擲 1 顆骰子。",
     "original_effect_text": "安裝於近戰接口。攻擊時可重擲 1 顆骰子。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/leather-handle.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -406,7 +433,7 @@
     "usage_limit_type": "unlimited",
     "description": "淬硬刀刃。近戰接口附件，攻擊骰數 +1 顆。",
     "original_effect_text": "安裝於近戰接口。攻擊骰數 +1 顆。",
-    "image_url": "/images/sword.svg",
+    "image_url": "/images/items/hardened-blade.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -439,7 +466,7 @@
     "usage_limit_type": "single_use",
     "description": "人形油脂。塗抹於近戰武器，對人形生物附加中毒效果。戰鬥後消耗。",
     "original_effect_text": "安裝於近戰接口。對人形生物造成中毒。戰鬥結束後消耗。",
-    "image_url": "/images/oil.svg",
+    "image_url": "/images/items/humanoid-grease.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -472,7 +499,7 @@
     "usage_limit_type": "single_use",
     "description": "怪物油脂。塗抹於近戰武器，對怪物生物附加中毒效果。戰鬥後消耗。",
     "original_effect_text": "安裝於近戰接口。對怪物造成中毒。戰鬥結束後消耗。",
-    "image_url": "/images/oil.svg",
+    "image_url": "/images/items/monster-grease.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -505,7 +532,7 @@
     "usage_limit_type": "single_use",
     "description": "惡魔油脂。塗抹於近戰武器，對惡魔生物附加中毒效果。戰鬥後消耗。",
     "original_effect_text": "安裝於近戰接口。對惡魔造成中毒。戰鬥結束後消耗。",
-    "image_url": "/images/oil.svg",
+    "image_url": "/images/items/demonic-grease.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
@@ -538,7 +565,7 @@
     "usage_limit_type": "single_use",
     "description": "變形怪油脂。塗抹於近戰武器，對變形怪生物附加中毒效果。戰鬥後消耗。",
     "original_effect_text": "安裝於近戰接口。對變形怪造成中毒。戰鬥結束後消耗。",
-    "image_url": "/images/oil.svg",
+    "image_url": "/images/items/shapeshifter-grease.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,

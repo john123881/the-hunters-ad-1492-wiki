@@ -22,25 +22,25 @@ const outputDir = path.resolve('public/images/items');
 const items = [
   // --- 頂部 3 格長柄武器 (依 Page 1 的 Zweihänder / Two-handed Axe 高度標準 top ~48, height ~470 估計) ---
   // 先以 Spear 為首張基準進行測試
-  { name: 'spear', left: 13, top: 43, width: 180, height: 470 },
-  // { name: 'halberd', left: 225, top: 48, width: 177, height: 470 },
-  // { name: 'flail', left: 450, top: 48, width: 160, height: 470 },
-  // { name: 'lucerne-hammer', left: 632, top: 48, width: 177, height: 470 },
+  // { name: 'spear', left: 17, top: 55, width: 180, height: 470 },
+  // { name: 'halberd', left: 227, top: 57, width:180, height: 470 },
+  // { name: 'flail', left: 457, top: 57, width: 159, height: 470 },
+  // { name: 'lucerne-hammer', left: 634, top: 58, width: 179, height: 470 },
 
   // --- 中段 Net (2格) ---
-  // { name: 'net', left: 35, top: 575, width: 160, height: 315 },
+  // { name: 'net', left: 38, top: 576, width: 159, height: 315 },
 
   // --- Improvements (1格強化，含右凹槽，寬約 150，高約 155) ---
-  // { name: 'diamond-sharpening', left: 550, top: 590, width: 155, height: 155 },
-  // { name: 'silver-blade', left: 745, top: 590, width: 155, height: 155 },
-  // { name: 'leather-handle', left: 550, top: 780, width: 155, height: 155 },
-  // { name: 'hardened-blade', left: 745, top: 780, width: 155, height: 155 },
+    // { name: 'diamond-sharpening', left: 463, top: 600, width: 155, height: 155 },
+  // { name: 'silver-blade', left: 659, top: 599, width: 155, height: 155 },
+  // { name: 'leather-handle', left: 460, top: 790, width: 155, height: 155 },
+  // { name: 'hardened-blade', left: 660, top: 790, width: 155, height: 155 },
 
   // --- Grease (1格油膏，底排 4 張) ---
-  // { name: 'humanoid-grease', left: 40, top: 970, width: 160, height: 155 },
-  // { name: 'monster-grease', left: 250, top: 970, width: 160, height: 155 },
-  // { name: 'demonic-grease', left: 460, top: 970, width: 160, height: 155 },
-  // { name: 'shapeshifter-grease', left: 670, top: 970, width: 160, height: 155 },
+  // { name: 'humanoid-grease', left: 43, top: 980, width: 155, height: 155 },
+  // { name: 'monster-grease', left: 252, top: 980, width: 155, height: 155 },
+  // { name: 'demonic-grease', left: 459, top: 980, width: 155, height: 155 },
+  { name: 'shapeshifter-grease', left: 657, top: 980, width: 155, height: 155 },
 ];
 
 async function cropPage2() {
