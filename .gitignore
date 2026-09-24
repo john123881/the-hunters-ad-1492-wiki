@@ -24,3 +24,7 @@ playwright-report/
 /AGENTS.md
 cut_equipment_method.md
 Equipment_Diagrams.pdf
+equipment_diagrams_layout.txt
+equipment_diagrams_text.txt
+tmp/
+scripts/locate_offense_icon.py

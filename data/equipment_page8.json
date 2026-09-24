@@ -152,8 +152,8 @@
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
     "usage_limit_type": "single_use",
-    "description": "精準藥劑。道具區消耗品，佔用 1 格。戰鬥後消耗（循環箭頭）。飲用後本場戰鬥敏捷判定骰數 +1 顆，受到 1 點傷害（血量 -1）。",
-    "original_effect_text": "持續至戰鬥結束（循環標記）。敏捷判定骰數 +1 顆。受到 1 點傷害（血量 -1）。",
+    "description": "精準藥劑。道具區消耗品，佔用 1 格。任務結束後消耗（循環箭頭）。飲用後本次任務敏捷判定骰數 +1 顆，受到 1 點傷害（血量 -1）。",
+    "original_effect_text": "啟用後持續至任務結束（循環標記）。敏捷判定骰數 +1 顆。受到 1 點傷害（血量 -1）。",
     "image_url": "/images/items/accuracy-infusion.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.8",
@@ -169,9 +169,9 @@
         "numeric_value": 1,
         "operation": "add",
         "trigger_timing": "on_use",
-        "duration_type": "combat",
+        "duration_type": "quest",
         "is_negative": 0,
-        "description": "本場戰鬥敏捷判定擲骰顆數 +1",
+        "description": "本次任務敏捷判定擲骰顆數 +1",
         "sort_order": 1
       },
       {
@@ -197,8 +197,8 @@
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
     "usage_limit_type": "single_use",
-    "description": "強效藥劑。道具區消耗品，佔用 1 格。戰鬥後消耗（循環箭頭）。飲用後本場戰鬥力量判定骰數 +1 顆，受到 1 點傷害（血量 -1）。",
-    "original_effect_text": "持續至戰鬥結束（循環標記）。力量判定骰數 +1 顆。受到 1 點傷害（血量 -1）。",
+    "description": "強效藥劑。道具區消耗品，佔用 1 格。任務結束後消耗（循環箭頭）。飲用後本次任務力量判定骰數 +1 顆，受到 1 點傷害（血量 -1）。",
+    "original_effect_text": "啟用後持續至任務結束（循環標記）。力量判定骰數 +1 顆。受到 1 點傷害（血量 -1）。",
     "image_url": "/images/items/kicker-infusion.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.8",
@@ -214,9 +214,9 @@
         "numeric_value": 1,
         "operation": "add",
         "trigger_timing": "on_use",
-        "duration_type": "combat",
+        "duration_type": "quest",
         "is_negative": 0,
-        "description": "本場戰鬥力量判定擲骰顆數 +1",
+        "description": "本次任務力量判定擲骰顆數 +1",
         "sort_order": 1
       },
       {
@@ -242,8 +242,8 @@
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
     "usage_limit_type": "single_use",
-    "description": "防護藥劑。道具區消耗品，佔用 1 格。戰鬥後消耗（循環箭頭）。飲用後本場戰鬥全防禦提升：近戰 +1、遠程 +1、魔法 +1，受到 1 點傷害（血量 -1）。",
-    "original_effect_text": "持續至戰鬥結束（循環標記）。防禦加成：近戰 +1, 遠程 +1, 魔法 +1。受到 1 點傷害（血量 -1）。",
+    "description": "防護藥劑。道具區消耗品，佔用 1 格。任務結束後消耗（循環箭頭）。飲用後本次任務全防禦提升：近戰 +1、遠程 +1、魔法 +1，受到 1 點傷害（血量 -1）。",
+    "original_effect_text": "啟用後持續至任務結束（循環標記）。防禦加成：近戰 +1, 遠程 +1, 魔法 +1。受到 1 點傷害（血量 -1）。",
     "image_url": "/images/items/protection-infusion.png",
     "edition_code": "all-in",
     "source_reference": "Equipment Compendium p.8",
@@ -257,9 +257,9 @@
         "numeric_value": 1,
         "operation": "add",
         "trigger_timing": "on_use",
-        "duration_type": "combat",
+        "duration_type": "quest",
         "is_negative": 0,
-        "description": "本場戰鬥近戰防禦 +1",
+        "description": "本次任務近戰防禦 +1",
         "sort_order": 1
       },
       {
@@ -269,9 +269,9 @@
         "numeric_value": 1,
         "operation": "add",
         "trigger_timing": "on_use",
-        "duration_type": "combat",
+        "duration_type": "quest",
         "is_negative": 0,
-        "description": "本場戰鬥遠程防禦 +1",
+        "description": "本次任務遠程防禦 +1",
         "sort_order": 2
       },
       {
@@ -281,9 +281,9 @@
         "numeric_value": 1,
         "operation": "add",
         "trigger_timing": "on_use",
-        "duration_type": "combat",
+        "duration_type": "quest",
         "is_negative": 0,
-        "description": "本場戰鬥魔法防禦 +1",
+        "description": "本次任務魔法防禦 +1",
         "sort_order": 3
       },
       {

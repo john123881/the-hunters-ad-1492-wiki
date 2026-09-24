@@ -13,12 +13,13 @@ export function ItemFilters({ params, catalog, update, reset }: Props) {
     return <label className="filter-field" key={name}><span>{label}</span><input type="number" min={min} max={1000} step={1} inputMode="numeric" placeholder="不限" value={params.get(name) ?? ''} onChange={e => update({ [name]: e.target.value, page: '' })} /></label>;
   }
   const options = (labels: Record<string, string>) => Object.entries(labels).map(([code, name]) => ({ code, name }));
+  const usageOptions = options(usageLabels).filter(option => option.code !== 'single_use');
   return <details className="advanced-filters" open={activeCount > 0 || undefined}>
     <summary>進階篩選 <span>{activeCount ? `${activeCount} 項條件` : '格數、面板與效果'}</span></summary>
     <div className="filter-groups">
       <fieldset><legend>攜帶與使用</legend><div className="filter-fields">
         {select('slotCount','占用格數',[1,2,3,4].map(n => ({ code: String(n), name: `${n} 格` })))}
-        {select('consumption','消耗方式', options(consumptionLabels))}{select('usage','使用限制', options(usageLabels))}
+        {select('consumption','消耗方式', options(consumptionLabels))}{select('usage','使用限制', usageOptions)}
         {select('connector','附件接口',catalog?.connectors ?? [])}
       </div></fieldset>
       <fieldset><legend>攻擊與判定</legend><div className="filter-fields">

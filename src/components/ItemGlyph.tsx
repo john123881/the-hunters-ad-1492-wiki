@@ -10,7 +10,7 @@ const iconFiles: Record<string, string> = {
   insight_modifier: 'perception', movement_modifier: 'movement', dice_modifier: 'attack_dice',
   enemy_dice_modifier: 'attack_dice', hit_modifier: 'attack_modifier', range_modifier: 'attack_range',
   reroll_die: 'reroll_die', offense_token_modifier: 'offense_token', permanent: 'permanent',
-  consumed_on_use: 'single_use', single_use: 'single_use', connector_melee: 'connector_melee',
+  consumed_on_use: 'single_use', single_use: 'single_use', once_per_combat: 'once_per_combat', connector_melee: 'connector_melee',
   connector_rune: 'connector_rune',
 };
 

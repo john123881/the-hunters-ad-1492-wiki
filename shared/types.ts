@@ -1,14 +1,15 @@
 export const categoryCodes = ['weapon', 'shield', 'weapon_attachment', 'helmet', 'armor', 'accessory', 'utility', 'consumable', 'trap', 'grenade', 'material'] as const;
 export type CategoryCode = (typeof categoryCodes)[number];
-export const consumptionLabels = { permanent: '永久保留', consumed_on_use: '使用後消耗', consumed_after_combat: '戰鬥後消耗' } as const;
-export const usageLabels = { unlimited: '不限次數', single_use: '單次使用', once_per_combat: '每場戰鬥一次' } as const;
+// consumed_after_combat 與 once_per_combat 是早期 schema 的相容代碼；規則書正式語意皆以 quest（任務）為單位。
+export const consumptionLabels = { permanent: '永久保留', consumed_on_use: '使用後消耗', consumed_after_combat: '任務結束後消耗' } as const;
+export const usageLabels = { unlimited: '不限次數', single_use: '單次使用', once_per_combat: '每個任務一次' } as const;
 export const attackLabels = { melee: '近戰', physical_ranged: '物理遠程', magic: '魔法', trap: '陷阱' } as const;
 export const attributeLabels = { strength: '力量', agility: '敏捷', wisdom: '智慧', insight: '洞察' } as const;
 export const actionLabels = { damage: '傷害', control: '控制', healing: '治療', defense: '防禦', other: '其他判定' } as const;
 export const resolutionLabels = { normal_attack: '一般攻擊', dice_check: '擲骰判定', automatic: '自動生效' } as const;
 export const targetLabels: Record<string, string> = { self: '自身', weapon: '武器', attack: '本次攻擊', ally: '同伴', enemy: '敵人', area: '區域' };
 export const timingLabels: Record<string, string> = { passive: '被動', on_use: '使用時', on_attack: '攻擊時', on_action_success: '判定成功時' };
-export const durationLabels: Record<string, string> = { instant: '立即', this_attack: '本次攻擊', combat: '本場戰鬥', while_equipped: '裝備期間', while_installed: '安裝期間', permanent: '永久' };
+export const durationLabels: Record<string, string> = { instant: '立即', this_attack: '本次攻擊', combat: '本場戰鬥', quest: '本次任務', while_equipped: '裝備期間', while_installed: '安裝期間', permanent: '永久' };
 export const operationLabels: Record<string, string> = { add: '增加', subtract: '減少', set: '設為', apply: '施加', reroll: '重擲' };
 export type ConsumptionType = keyof typeof consumptionLabels;
 export type UsageLimitType = keyof typeof usageLabels;

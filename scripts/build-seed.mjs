@@ -93,10 +93,13 @@ for (const [code, [name, group, description]] of Object.entries(effectDefinition
 
 for (const item of items) {
   const itemId = `(SELECT id FROM items WHERE code = ${quote(item.code)})`;
+  // single_use 是舊資料對消耗品的佔位值；× 與循環箭頭由 consumption_type 表達。
+  // 只有獨立的使用限制（例如方框 1：每個任務一次）才標記為已核對。
+  const usageVerified = item.usage_verified ?? item.usage_limit_type !== 'single_use';
   const data = {
     code: quote(item.code), slug: quote(item.slug), name: quote(item.name), original_name: quote(item.original_name ?? ''),
     category_id: lookup('item_categories', item.category_code), slot_count: item.slot_count,
-    consumption_type: quote(item.consumption_type), usage_limit_type: quote(item.usage_limit_type), usage_verified: 1,
+    consumption_type: quote(item.consumption_type), usage_limit_type: quote(item.usage_limit_type), usage_verified: Number(usageVerified),
     description: quote(item.description ?? ''), original_effect_text: quote(item.original_effect_text), image_url: quote(item.image_url),
     image_alt: quote(`${item.name} 物品圖片`), language_code: quote('zh-TW'), edition_code: quote(item.edition_code),
     source_kind: quote('reference'), source_reference: quote(item.source_reference ?? 'Equipment Compendium'),
