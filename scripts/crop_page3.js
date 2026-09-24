@@ -13,9 +13,16 @@ const outputDir = path.resolve('public/images/items');
 // { name: 'agilitas', left: 39, top: 319, width: 160, height: 160 },
 // { name: 'formido', left: 247, top: 319, width: 160, height: 160 },
 // { name: 'sling', left: 38, top: 591, width: 160, height: 160 },
+// { name: 'hunting-crossbow', left: 16, top: 805, width: 180, height: 310 },
+// { name: 'arbalest', left: 225, top: 596, width: 180, height: 470 },
+// { name: 'hunting-bow', left: 432, top: 596, width: 180, height: 310 },
 
-// 目前審查目標：Hunting Crossbow (獵弩，2格，左側含雙鋸齒槍弩接口)
-const currentItem = { name: 'hunting-crossbow', left: 18, top: 765, width: 190, height: 330 };
+// 目前審查目標：Recurve Bow (反曲弓，3格長弓，Page 3 最後一張，左側含單三角弓類接口)
+const currentItem = { name: 'recurve-bow', left: 630, top: 596, width: 180, height: 310 };
+
+
+
+
 
 
 

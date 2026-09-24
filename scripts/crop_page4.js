@@ -2,30 +2,23 @@ import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
 
-const inputImagePath = path.resolve('.cache/pdf/page-3.png');
+const inputImagePath = path.resolve('.cache/pdf/page-4.png');
 const outputDir = path.resolve('public/images/items');
 
 // 已確認合格並鎖定
-// { name: 'ignis', left: 40, top: 89, width: 160, height: 160 },
-// { name: 'ira', left: 247, top: 89, width: 160, height: 160 },
-// { name: 'vita', left: 454, top: 89, width: 160, height: 160 },
-// { name: 'sagacitate', left: 654, top: 89, width: 160, height: 160 },
-// { name: 'agilitas', left: 39, top: 319, width: 160, height: 160 },
-// { name: 'formido', left: 247, top: 319, width: 160, height: 160 },
-// { name: 'sling', left: 38, top: 591, width: 160, height: 160 },
+// { name: 'long-bow', left: 339, top: 85, width: 190, height: 500 },
+// { name: 'stun-arrows', left: 31, top: 698, width: 170, height: 170 },
+// { name: 'slowing-arrows', left: 257, top: 698, width: 170, height: 170 },
+// { name: 'bodkin-arrows', left: 481, top: 699, width: 170, height: 170 },
+// { name: 'reinforced-limb', left: 695, top: 700, width: 170, height: 170 },
 
-// 目前審查目標：Hunting Crossbow (獵弩，2格，左側含雙鋸齒槍弩接口)
-const currentItem = { name: 'hunting-crossbow', left: 18, top: 765, width: 190, height: 330 };
-
-
-
-
-
-
-
-
-
-
+// Page 4 第三排：4 款弓用塗油（一次全部裁切與去背）
+const row3Items = [
+  { name: 'humanoid-grease-bow', left: 33, top: 975, width: 170, height: 170 },
+  { name: 'monster-grease-bow', left: 260, top: 975, width: 170, height: 170 },
+  { name: 'demonic-grease-bow', left: 481, top: 975, width: 170, height: 170 },
+  { name: 'shapeshifter-grease-bow', left: 696, top: 975, width: 170, height: 170 }
+];
 
 async function makeTransparent(filePath) {
   const { data, info } = await sharp(filePath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -71,12 +64,14 @@ async function makeTransparent(filePath) {
 }
 
 async function run() {
-  const targetPath = path.join(outputDir, `${currentItem.name}.png`);
-  await sharp(inputImagePath)
-    .extract({ left: currentItem.left, top: currentItem.top, width: currentItem.width, height: currentItem.height })
-    .toFile(targetPath);
-  await makeTransparent(targetPath);
-  console.log(`✅ 成功裁切並去背: ${currentItem.name}`);
+  for (const item of row3Items) {
+    const targetPath = path.join(outputDir, `${item.name}.png`);
+    await sharp(inputImagePath)
+      .extract({ left: item.left, top: item.top, width: item.width, height: item.height })
+      .toFile(targetPath);
+    await makeTransparent(targetPath);
+    console.log(`✅ 成功裁切並去背: ${item.name}`);
+  }
 }
 
 run().catch(console.error);

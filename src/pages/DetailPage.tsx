@@ -5,6 +5,7 @@ import { actionLabels, attackLabels, attributeLabels, consumptionLabels, usageLa
 import { useApi } from '../lib/useApi';
 import { CardImage } from '../components/CardImage';
 import { ErrorState } from '../components/States';
+import { connectorGlyphCode, ItemGlyph } from '../components/ItemGlyph';
 
 function rangeLabel(mode: ActionMode) {
   return mode.rangeType === 'action_card' ? '依行動卡 *' : mode.rangeType === 'none' ? '不適用' : mode.rangeMin === mode.rangeMax ? String(mode.rangeMin) : `${mode.rangeMin}–${mode.rangeMax}`;
@@ -43,40 +44,40 @@ export function DetailPage() {
           <div className="source-note"><ShieldCheck size={17} /><div><strong>{item.sourceKind === 'reference' ? '使用者整理資料 · 待核對' : item.sourceKind === 'demo' ? '虛構測試資料' : '資料來源'}</strong><p>{item.sourceReference}</p><p className="preserve-lines">{item.sourceNote}</p></div></div>
         </aside>
         <article className="detail-content">
-          <div className="detail-kicker"><span>{item.categoryName}</span><span>{item.slotCount} 格</span><span>{item.cardNumber ?? item.code}</span></div>
+          <div className="detail-kicker"><span><ItemGlyph code={item.categoryCode} label={item.categoryName} size={18} />{item.categoryName}</span><span>{item.slotCount} 格</span><span>{item.cardNumber ?? item.code}</span></div>
           <h1>{item.name}</h1>{item.originalName && <p className="original-name" lang="en">{item.originalName}</p>}
           <p className="detail-summary">{item.description}</p>
           <section className="detail-section" aria-labelledby="stats-heading">
             <h2 id="stats-heading"><span>01</span>物品面板</h2>
             <dl className="item-basics">
               <div><dt>占用格數</dt><dd>{item.slotCount} 格</dd></div><div><dt>裝備區域</dt><dd>{item.slotZone ?? '未指定'}</dd></div>
-              <div><dt>消耗方式</dt><dd>{item.consumptionType ? consumptionLabels[item.consumptionType] : '待核對'}</dd></div>
-              <div><dt>使用限制</dt><dd>{item.usageLimitType ? usageLabels[item.usageLimitType] : '待核對'}</dd></div>
+              <div><dt>消耗方式</dt><dd>{item.consumptionType && <ItemGlyph code={item.consumptionType} label={consumptionLabels[item.consumptionType]} size={19} />}{item.consumptionType ? consumptionLabels[item.consumptionType] : '待核對'}</dd></div>
+              <div><dt>使用限制</dt><dd>{item.usageLimitType && <ItemGlyph code={item.usageLimitType} label={usageLabels[item.usageLimitType]} size={19} />}{item.usageLimitType ? usageLabels[item.usageLimitType] : '待核對'}</dd></div>
             </dl>
             {item.defense && <div className="profile-block"><h3>固定防禦</h3><dl className="stat-grid defense-grid">
               <div><dt>近戰防禦</dt><dd>{item.defense.meleeDefense}</dd></div><div><dt>遠程防禦</dt><dd>{item.defense.rangedDefense}</dd></div><div><dt>魔法防禦</dt><dd>{item.defense.magicDefense}</dd></div>
             </dl></div>}
             {item.shieldRules.length > 0 && <div className="profile-block"><h3>盾牌牌面數值</h3><div className="table-scroll"><table><thead><tr><th>屬性</th><th>固定值</th><th>骰數</th></tr></thead><tbody>{item.shieldRules.map(rule => <tr key={rule.attributeCode}><th>{attributeLabels[rule.attributeCode]}</th><td>{rule.fixedValue}</td><td>{rule.diceCount}</td></tr>)}</tbody></table></div><p className="filter-hint">僅呈現牌面兩側數值，判定流程請以規則書為準。</p></div>}
             {item.actionModes.map((mode, index) => <div className="mode-panel" key={mode.id}>
-              <h3><span>模式 {index+1}</span>{mode.attackType ? attackLabels[mode.attackType] : actionLabels[mode.actionType]}</h3>
+              <h3><span>模式 {index+1}</span><ItemGlyph code={mode.attackType} label={mode.attackType ? attackLabels[mode.attackType] : actionLabels[mode.actionType]} size={24} />{mode.attackType ? attackLabels[mode.attackType] : actionLabels[mode.actionType]}</h3>
               <dl className="mode-stats"><div><dt>數值來源</dt><dd>{sourceValue(mode)}</dd></div><div><dt>骰數</dt><dd>{mode.diceCount ?? '—'}</dd></div><div><dt>判定修正</dt><dd>{mode.checkModifier > 0 ? '+' : ''}{mode.checkModifier}</dd></div><div><dt>距離</dt><dd>{rangeLabel(mode)}</dd></div></dl>
               <p className="mode-description">{resolutionLabels[mode.resolutionMethod]} · {mode.description}</p>
             </div>)}
-            {item.traits.map(trait => <p className="trait" key={trait.code}><strong>{trait.code === 'reload' ? '裝填' : trait.code}</strong>{trait.description}</p>)}
+            {item.traits.map(trait => <p className="trait" key={trait.code}><ItemGlyph code={trait.code} label={trait.code === 'reload' ? '裝填' : trait.code} size={24} /><strong>{trait.code === 'reload' ? '裝填' : trait.code}</strong>{trait.description}</p>)}
           </section>
           <section className="detail-section" aria-labelledby="effects-heading">
             <h2 id="effects-heading"><span>02</span>效果與牌面轉錄 <ScrollText size={17} /></h2>
             <div className="original-text"><h3>來源文字與圖示轉錄</h3><p className="preserve-lines">{item.originalEffectText || '尚未轉錄，請查看左側原圖。'}</p></div>
             {item.effects.length > 0 ? <div className="effects">{item.effects.map(effect => <div className="effect" key={effect.id}>
-              <h3>{effect.name}{effect.isNegative && <span className="negative-badge">負面</span>}</h3><p>{effect.description}</p>
+              <h3><ItemGlyph code={effect.code} label={effect.name} size={25} />{effect.name}{effect.isNegative && <span className="negative-badge">負面</span>}</h3><p>{effect.description}</p>
               <dl className="effect-meta"><div><dt>對象</dt><dd>{label(targetLabels,effect.targetType)}</dd></div>{effect.numericValue !== null && <div><dt>{label(operationLabels,effect.operation)}</dt><dd>{effect.numericValue}</dd></div>}<div><dt>時機</dt><dd>{label(timingLabels,effect.triggerTiming)}</dd></div><div><dt>期間</dt><dd>{label(durationLabels,effect.durationType)}</dd></div></dl>
               {effect.actionModeId !== null && <p className="mode-scope">僅作用於模式 {item.actionModes.findIndex(mode => mode.id === effect.actionModeId)+1}</p>}
             </div>)}</div> : <p className="filter-hint">目前沒有已整理的結構化效果，並不代表牌面沒有其他能力。</p>}
           </section>
           {(item.sockets.length > 0 || item.attachment) && <section className="detail-section" aria-labelledby="connectors-heading">
             <h2 id="connectors-heading"><span>03</span>附件接口</h2>
-            {item.attachment && <div className="connector-row"><div><strong>{item.attachment.name}</strong><small>{item.attachment.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon&connector=${item.attachment.code}`}>查詢相容武器 →</Link></div>}
-            {item.sockets.map(socket => <div className="connector-row" key={`${socket.slotIndex}-${socket.socketIndex}`}><div><strong>第 {socket.slotIndex} 格 · {socket.name}</strong><small>{socket.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon_attachment&connector=${socket.code}`}>查詢附件 →</Link></div>)}
+            {item.attachment && <div className="connector-row"><ItemGlyph code={connectorGlyphCode(item.attachment.code)} label={item.attachment.name} size={28} /><div><strong>{item.attachment.name}</strong><small>{item.attachment.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon&connector=${item.attachment.code}`}>查詢相容武器 →</Link></div>}
+            {item.sockets.map(socket => <div className="connector-row" key={`${socket.slotIndex}-${socket.socketIndex}`}><ItemGlyph code={connectorGlyphCode(socket.code)} label={socket.name} size={28} /><div><strong>第 {socket.slotIndex} 格 · {socket.name}</strong><small>{socket.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon_attachment&connector=${socket.code}`}>查詢附件 →</Link></div>)}
           </section>}
         </article>
       </div>
