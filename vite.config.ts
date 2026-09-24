@@ -13,7 +13,7 @@ function sitesArtifact() {
       await rm(metadataDirectory, { recursive: true, force: true });
       await mkdir(metadataDirectory, { recursive: true });
       await cp('.openai/hosting.json', resolve(metadataDirectory, 'hosting.json'));
-      await cp('drizzle', resolve(metadataDirectory, 'drizzle'), { recursive: true });
+      await cp('migrations', resolve(metadataDirectory, 'drizzle'), { recursive: true });
       await mkdir(resolve('dist/server'), { recursive: true });
       await cp(resolve('dist/the_hunters_ad_1492/index.js'), resolve('dist/server/index.js'));
     },
