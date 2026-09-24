@@ -2,7 +2,7 @@
   {
     "code": "item_spear",
     "slug": "spear",
-    "name": "Spear",
+    "name": "長矛",
     "category_code": "weapon",
     "slot_count": 3,
     "consumption_type": "permanent",
@@ -40,12 +40,13 @@
         "description": "長矛突刺"
       }
     ],
-    "effects": []
+    "effects": [],
+    "original_name": "Spear"
   },
   {
     "code": "item_halberd",
     "slug": "halberd",
-    "name": "Halberd",
+    "name": "戟",
     "category_code": "weapon",
     "slot_count": 3,
     "consumption_type": "permanent",
@@ -85,7 +86,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "armor_break",
+        "effect_definition_code": "mighty",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -108,12 +109,13 @@
         "description": "裝備時洞察基礎數值 -1",
         "sort_order": 2
       }
-    ]
+    ],
+    "original_name": "Halberd"
   },
   {
     "code": "item_flail",
     "slug": "flail",
-    "name": "Flail",
+    "name": "連枷",
     "category_code": "weapon",
     "slot_count": 3,
     "consumption_type": "permanent",
@@ -157,7 +159,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "area_attack",
+        "effect_definition_code": "area",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -169,7 +171,7 @@
         "sort_order": 1
       },
       {
-        "effect_definition_code": "armor_break",
+        "effect_definition_code": "mighty",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -180,12 +182,13 @@
         "description": "此武器的攻擊具有破防效果",
         "sort_order": 2
       }
-    ]
+    ],
+    "original_name": "Flail"
   },
   {
     "code": "item_lucerne_hammer",
     "slug": "lucerne-hammer",
-    "name": "Lucerne Hammer",
+    "name": "琉森錘",
     "category_code": "weapon",
     "slot_count": 3,
     "consumption_type": "permanent",
@@ -225,7 +228,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "armor_piercing",
+        "effect_definition_code": "pierce",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": 1,
@@ -237,7 +240,7 @@
         "sort_order": 1
       },
       {
-        "effect_definition_code": "armor_break",
+        "effect_definition_code": "mighty",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -260,12 +263,13 @@
         "description": "裝備時洞察基礎數值 -1",
         "sort_order": 3
       }
-    ]
+    ],
+    "original_name": "Lucerne Hammer"
   },
   {
     "code": "item_net",
     "slug": "net",
-    "name": "Net",
+    "name": "網",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -299,7 +303,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "area_attack",
+        "effect_definition_code": "area",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -311,7 +315,7 @@
         "sort_order": 1
       },
       {
-        "effect_definition_code": "controlled",
+        "effect_definition_code": "immobilize",
         "action_mode_display_order": 1,
         "target_type": "enemy",
         "numeric_value": 1,
@@ -319,15 +323,16 @@
         "trigger_timing": "on_action_success",
         "duration_type": "combat",
         "is_negative": 0,
-        "description": "判定成功時附加束縛效果",
+        "description": "判定成功時附加束縛效果（藤蔓/繩網）",
         "sort_order": 2
       }
-    ]
+    ],
+    "original_name": "Net"
   },
   {
     "code": "item_diamond_sharpening",
     "slug": "diamond-sharpening",
-    "name": "Diamond Sharpening",
+    "name": "金剛石打磨",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
@@ -355,12 +360,13 @@
         "description": "裝備此附件時力量基礎數值 +1",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Diamond Sharpening"
   },
   {
     "code": "item_silver_blade",
     "slug": "silver-blade",
-    "name": "Silver Blade",
+    "name": "銀刃",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "permanent",
@@ -388,12 +394,13 @@
         "description": "對怪獸與惡魔攻擊時力量基礎數值 +2",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Silver Blade"
   },
   {
     "code": "item_leather_handle",
     "slug": "leather-handle",
-    "name": "Leather Handle",
+    "name": "皮質手柄",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "permanent",
@@ -421,12 +428,13 @@
         "description": "攻擊檢定時允許重擲 1 顆骰子",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Leather Handle"
   },
   {
     "code": "item_hardened_blade",
     "slug": "hardened-blade",
-    "name": "Hardened Blade",
+    "name": "硬化刀刃",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "permanent",
@@ -454,12 +462,13 @@
         "description": "攻擊檢定擲骰數 +1",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Hardened Blade"
   },
   {
     "code": "item_humanoid_grease",
     "slug": "humanoid-grease",
-    "name": "Humanoid Grease",
+    "name": "油脂",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
@@ -476,7 +485,7 @@
     "action_modes": [],
     "effects": [
       {
-        "effect_definition_code": "poisoned",
+        "effect_definition_code": "poison",
         "action_mode_display_order": null,
         "target_type": "enemy",
         "numeric_value": null,
@@ -487,12 +496,13 @@
         "description": "命中人形生物時附加中毒狀態",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Humanoid Grease"
   },
   {
     "code": "item_monster_grease",
     "slug": "monster-grease",
-    "name": "Monster Grease",
+    "name": "怪獸油",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
@@ -509,7 +519,7 @@
     "action_modes": [],
     "effects": [
       {
-        "effect_definition_code": "poisoned",
+        "effect_definition_code": "poison",
         "action_mode_display_order": null,
         "target_type": "enemy",
         "numeric_value": null,
@@ -520,12 +530,13 @@
         "description": "命中怪物生物時附加中毒狀態",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Monster Grease"
   },
   {
     "code": "item_demonic_grease",
     "slug": "demonic-grease",
-    "name": "Demonic Grease",
+    "name": "惡魔油",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
@@ -542,7 +553,7 @@
     "action_modes": [],
     "effects": [
       {
-        "effect_definition_code": "poisoned",
+        "effect_definition_code": "poison",
         "action_mode_display_order": null,
         "target_type": "enemy",
         "numeric_value": null,
@@ -553,12 +564,13 @@
         "description": "命中惡魔生物時附加中毒狀態",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Demonic Grease"
   },
   {
     "code": "item_shapeshifter_grease",
     "slug": "shapeshifter-grease",
-    "name": "Shapeshifter Grease",
+    "name": "變形怪油",
     "category_code": "weapon_attachment",
     "slot_count": 1,
     "consumption_type": "consumed_after_combat",
@@ -575,7 +587,7 @@
     "action_modes": [],
     "effects": [
       {
-        "effect_definition_code": "poisoned",
+        "effect_definition_code": "poison",
         "action_mode_display_order": null,
         "target_type": "enemy",
         "numeric_value": null,
@@ -586,6 +598,7 @@
         "description": "命中變形怪生物時附加中毒狀態",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Shapeshifter Grease"
   }
 ]

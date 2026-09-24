@@ -1,0 +1,437 @@
+[
+  {
+    "code": "item_ignis",
+    "slug": "ignis",
+    "name": "火焰符文",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_after_combat",
+    "usage_limit_type": "single_use",
+    "description": "火符文。符文接口附件，攻擊時為目標附加燃燒狀態。單次使用，戰鬥後消耗。",
+    "original_effect_text": "安裝於符文接口。單次使用（1）。攻擊附加燃燒狀態。戰鬥結束後消耗。",
+    "image_url": "/images/items/ignis.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 26,
+    "attachment_connector_type_code": "rune",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "burn",
+        "action_mode_display_order": null,
+        "target_type": "enemy",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "combat",
+        "is_negative": 0,
+        "description": "攻擊命中時附加燃燒狀態",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_ira",
+    "slug": "ira",
+    "name": "憤怒符文",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "憤怒符文。符文接口附件，提供護甲穿透 +1（穿甲 1）。常駐生效。",
+    "original_effect_text": "安裝於符文接口。常駐效果（∞）。護甲穿透 +1（Armor Piercing +1）。",
+    "image_url": "/images/items/ira.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 27,
+    "attachment_connector_type_code": "rune",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": null,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "裝備此符文時攻擊具備穿甲效果：目標防禦值 -1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_vita",
+    "slug": "vita",
+    "name": "生命符文",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_after_combat",
+    "usage_limit_type": "single_use",
+    "description": "生命符文。符文接口附件，恢復 2 點生命值。單次使用，戰鬥後消耗。",
+    "original_effect_text": "安裝於符文接口。單次使用（1）。恢復 2 點生命。戰鬥結束後消耗。",
+    "image_url": "/images/items/vita.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 28,
+    "attachment_connector_type_code": "rune",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "heal_health",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": 2,
+        "operation": "add",
+        "trigger_timing": "on_use",
+        "duration_type": "instant",
+        "is_negative": 0,
+        "description": "使用時恢復 2 點生命值",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_sagacitate",
+    "slug": "sagacitate",
+    "name": "智慧符文",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_after_combat",
+    "usage_limit_type": "single_use",
+    "description": "智慧符文。符文接口附件，本次攻擊加入束縛效果。單次使用，戰鬥後消耗。",
+    "original_effect_text": "安裝於符文接口。單次使用（1）。判定成功時附加束縛效果。戰鬥結束後消耗。",
+    "image_url": "/images/items/sagacitate.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 29,
+    "attachment_connector_type_code": "rune",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "immobilize",
+        "action_mode_display_order": null,
+        "target_type": "enemy",
+        "numeric_value": 1,
+        "operation": "apply",
+        "trigger_timing": "on_action_success",
+        "duration_type": "combat",
+        "is_negative": 0,
+        "description": "判定成功時附加束縛效果（藤蔓/繩網）",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_agilitas",
+    "slug": "agilitas",
+    "name": "敏捷符文",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_after_combat",
+    "usage_limit_type": "single_use",
+    "description": "敏捷符文。符文接口附件，獲得 +1 進攻標記（Offense token）。單次使用，戰鬥後消耗。",
+    "original_effect_text": "安裝於符文接口。單次使用（1）。獲得 +1 Offense token。戰鬥結束後消耗。",
+    "image_url": "/images/items/agilitas.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 30,
+    "attachment_connector_type_code": "rune",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "offense_token_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": 1,
+        "operation": "add",
+        "trigger_timing": "on_use",
+        "duration_type": "combat",
+        "is_negative": 0,
+        "description": "獲得 +1 個進攻標記（Offense token）",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_formido",
+    "slug": "formido",
+    "name": "恐懼符文",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "恐懼符文。符文接口附件，使敵人骰數 -1 顆。常駐生效。",
+    "original_effect_text": "安裝於符文接口。常駐效果（∞）。-1 敵人骰數（-1 Dice Enemy）。",
+    "image_url": "/images/items/formido.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 31,
+    "attachment_connector_type_code": "rune",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "enemy_dice_modifier",
+        "action_mode_display_order": null,
+        "target_type": "enemy",
+        "numeric_value": 1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "常駐使敵人攻擊骰數減少 1 顆",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_sling",
+    "slug": "sling",
+    "name": "投石索",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "投石索。遠程武器，佔用 2 格。人物基礎敏捷判定，2 骰，命中 0，射程 1-2。",
+    "original_effect_text": "Agility: 2 dice, 0 mod, Range 1-2.",
+    "image_url": "/images/items/sling.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 32,
+    "sockets": [],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 2,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 2,
+        "description": "投石索射擊"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_hunting_crossbow",
+    "slug": "hunting-crossbow",
+    "name": "獵弩",
+    "category_code": "weapon",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "獵用十字弓。填充型遠程武器，佔用 1 格。人物基礎敏捷判定，4 骰，命中 +2，射程 1-4。具備裝填特性（攻擊後，下次攻擊前需要裝填），擁有 1 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "Agility: 4 dice, +2 mod, Range 1-4. 裝填（Reload）。",
+    "image_url": "/images/items/hunting-crossbow.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 33,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 4,
+        "check_modifier": 2,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 4,
+        "description": "弩矢狙擊"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_arbalest",
+    "slug": "arbalest",
+    "name": "勁弩",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "重型弩。填充型遠程武器，佔用 2 格。人物基礎敏捷判定，5 骰，命中 +1，射程 1-5。具備裝填特性（攻擊後需裝填）、破防、護甲穿透 +1 特性。擁有 2 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "Agility: 5 dice, +1 mod, Range 1-5. 裝填（Reload）。破防（Armor Break）。護甲穿透 +1（Armor Piercing +1）。",
+    "image_url": "/images/items/arbalest.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 34,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 5,
+        "check_modifier": 1,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 5,
+        "description": "重弩射擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "mighty",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "此武器的攻擊具有破防效果",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "護甲穿透 +1：目標防禦值 -1",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_hunting_bow",
+    "slug": "hunting-bow",
+    "name": "獵弓",
+    "category_code": "weapon",
+    "slot_count": 3,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "獵弓。遠程武器，佔用 3 格。人物基礎敏捷判定，2 骰，命中 0，射程 1-3。擁有 1 個弓類接口。",
+    "original_effect_text": "Agility: 2 dice, 0 mod, Range 1-3.",
+    "image_url": "/images/items/hunting-bow.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 35,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "bow"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 2,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 3,
+        "description": "獵弓速射"
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_recurve_bow",
+    "slug": "recurve-bow",
+    "name": "反曲弓",
+    "category_code": "weapon",
+    "slot_count": 3,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "反曲弓。優良遠程武器，佔用 3 格。人物基礎敏捷判定，3 骰，命中 0，射程 1-3。擁有 2 個弓類接口。",
+    "original_effect_text": "Agility: 3 dice, 0 mod, Range 1-3.",
+    "image_url": "/images/items/recurve-bow.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.3",
+    "is_published": 1,
+    "sort_order": 36,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "bow"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "bow"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 3,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 3,
+        "description": "反曲弓射擊"
+      }
+    ],
+    "effects": []
+  }
+]

@@ -271,3 +271,20 @@ svg { flex-shrink: 0; }
   .home-hero .hero-foot span:first-child { display: none; }
   .coming-soon { padding-inline: 14px; }
 }
+
+/* Equipment iconography extracted from the rules glossary and equipment appendix. */
+.item-glyph { display: inline-block; flex: 0 0 auto; object-fit: contain; filter: invert(89%) sepia(20%) saturate(465%) hue-rotate(355deg) brightness(91%); }
+.card-category { display: inline-flex; align-items: center; gap: 5px; }
+.card-category .item-glyph { margin: -2px 0; }
+.card-meta > span { display: inline-flex; align-items: center; gap: 5px; }
+.detail-kicker > span:first-child, .item-basics dd, .effect h3, .trait { display: flex; align-items: center; gap: 8px; }
+.mode-panel h3 > .item-glyph { margin-left: -3px; }
+.effect h3 > .item-glyph { margin-right: 2px; }
+.trait > strong { margin-right: 6px; }
+.connector-row > div { flex: 1; min-width: 0; }
+.connector-row > .item-glyph { width: 28px; }
+@media (max-width: 560px) {
+  .card-meta > span:nth-child(n+3) { flex-basis: 100%; }
+  .connector-row { align-items: flex-start; flex-wrap: wrap; }
+  .connector-row .text-link { flex-basis: 100%; margin-left: 36px; }
+}

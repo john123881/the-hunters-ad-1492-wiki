@@ -16,6 +16,11 @@ playwright-report/
 
 # 未公開的原始圖鑑與先前擷取產物
 /Equipment_compendium.pdf
+/Rules_Compendium_EN_small.pdf
 /public/images/compendium/
 /data/compendium.json
 /seeds/compendium.sql
+/drizzle
+/AGENTS.md
+cut_equipment_method.md
+Equipment_Diagrams.pdf

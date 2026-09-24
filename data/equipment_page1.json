@@ -2,7 +2,7 @@
   {
     "code": "item_javelins",
     "slug": "javelins",
-    "name": "Javelins",
+    "name": "標槍",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -54,12 +54,13 @@
         "description": "力量近戰"
       }
     ],
-    "effects": []
+    "effects": [],
+    "original_name": "Javelins"
   },
   {
     "code": "item_torch",
     "slug": "torch",
-    "name": "Torch",
+    "name": "火把",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -90,7 +91,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "burning",
+        "effect_definition_code": "burn",
         "action_mode_display_order": 1,
         "target_type": "enemy",
         "numeric_value": null,
@@ -101,12 +102,13 @@
         "description": "攻擊命中時附加燃燒效果",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Torch"
   },
   {
     "code": "item_katzbalger",
     "slug": "katzbalger",
-    "name": "Katzbalger",
+    "name": "斗劍",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -146,7 +148,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "light_weapon",
+        "effect_definition_code": "light",
         "action_mode_display_order": null,
         "target_type": "weapon",
         "numeric_value": null,
@@ -157,12 +159,13 @@
         "description": "輕武器特性",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Katzbalger"
   },
   {
     "code": "item_falchion",
     "slug": "falchion",
-    "name": "Falchion",
+    "name": "彎刀",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -202,7 +205,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "light_weapon",
+        "effect_definition_code": "light",
         "action_mode_display_order": null,
         "target_type": "weapon",
         "numeric_value": null,
@@ -213,12 +216,13 @@
         "description": "輕武器特性",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Falchion"
   },
   {
     "code": "item_long_sword",
     "slug": "long-sword",
-    "name": "Long Sword",
+    "name": "長劍",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -256,12 +260,13 @@
         "description": "長劍突刺／揮斬"
       }
     ],
-    "effects": []
+    "effects": [],
+    "original_name": "Long Sword"
   },
   {
     "code": "item_zweihander",
     "slug": "zweihander",
-    "name": "Zweihänder",
+    "name": "雙手大劍",
     "category_code": "weapon",
     "slot_count": 3,
     "consumption_type": "permanent",
@@ -305,7 +310,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "area_attack",
+        "effect_definition_code": "area",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -317,7 +322,7 @@
         "sort_order": 1
       },
       {
-        "effect_definition_code": "armor_break",
+        "effect_definition_code": "mighty",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -340,12 +345,13 @@
         "description": "裝備時洞察基礎數值 -1",
         "sort_order": 3
       }
-    ]
+    ],
+    "original_name": "Zweihänder"
   },
   {
     "code": "item_mace",
     "slug": "mace",
-    "name": "Mace",
+    "name": "錘矛",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -383,12 +389,13 @@
         "description": "鈍擊重砸"
       }
     ],
-    "effects": []
+    "effects": [],
+    "original_name": "Mace"
   },
   {
     "code": "item_two_handed_axe",
     "slug": "two-handed-axe",
-    "name": "Two-handed Axe",
+    "name": "雙手斧",
     "category_code": "weapon",
     "slot_count": 3,
     "consumption_type": "permanent",
@@ -432,7 +439,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "armor_break",
+        "effect_definition_code": "mighty",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": null,
@@ -455,12 +462,13 @@
         "description": "裝備時洞察基礎數值 -2",
         "sort_order": 2
       }
-    ]
+    ],
+    "original_name": "Two-handed Axe"
   },
   {
     "code": "item_axe",
     "slug": "axe",
-    "name": "Axe",
+    "name": "斧頭",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -498,12 +506,13 @@
         "description": "單手斧劈"
       }
     ],
-    "effects": []
+    "effects": [],
+    "original_name": "Axe"
   },
   {
     "code": "item_horseman_pick",
     "slug": "horseman-pick",
-    "name": "Horseman's Pick",
+    "name": "鶴嘴錘",
     "category_code": "weapon",
     "slot_count": 2,
     "consumption_type": "permanent",
@@ -543,7 +552,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "armor_piercing",
+        "effect_definition_code": "pierce",
         "action_mode_display_order": 1,
         "target_type": "attack",
         "numeric_value": 2,
@@ -554,12 +563,13 @@
         "description": "穿甲效果：目標防禦值 -2",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Horseman's Pick"
   },
   {
     "code": "item_dagger",
     "slug": "dagger",
-    "name": "Dagger",
+    "name": "匕首",
     "category_code": "weapon",
     "slot_count": 1,
     "consumption_type": "permanent",
@@ -595,7 +605,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "light_weapon",
+        "effect_definition_code": "light",
         "action_mode_display_order": null,
         "target_type": "weapon",
         "numeric_value": null,
@@ -606,12 +616,13 @@
         "description": "輕武器特性",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Dagger"
   },
   {
     "code": "item_cinquedea",
     "slug": "cinquedea",
-    "name": "Cinquedea",
+    "name": "五指劍",
     "category_code": "weapon",
     "slot_count": 1,
     "consumption_type": "permanent",
@@ -647,7 +658,7 @@
     ],
     "effects": [
       {
-        "effect_definition_code": "light_weapon",
+        "effect_definition_code": "light",
         "action_mode_display_order": null,
         "target_type": "weapon",
         "numeric_value": null,
@@ -658,6 +669,7 @@
         "description": "輕武器特性",
         "sort_order": 1
       }
-    ]
+    ],
+    "original_name": "Cinquedea"
   }
 ]

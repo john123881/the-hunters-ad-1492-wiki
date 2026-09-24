@@ -1,0 +1,538 @@
+[
+  {
+    "code": "item_plate_armor",
+    "slug": "plate-armor",
+    "name": "板甲",
+    "category_code": "armor",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "板甲。重型金屬護甲，佔用 2 格。提供強大固定防禦：近戰 +4、遠程 +4、魔法 +2。沉重的裝甲使人物智慧 -2、洞察 -1、敏捷 -2、移動步數 -1。",
+    "original_effect_text": "固定防禦：近戰 +4, 遠程 +4, 魔法 +2。屬性減益：智慧 -2, 洞察 -1, 敏捷 -2, 移動步數 -1。",
+    "image_url": "/images/items/plate-armor.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 56,
+    "defense": {
+      "melee_defense": 4,
+      "ranged_defense": 4,
+      "magic_defense": 2
+    },
+    "effects": [
+      {
+        "effect_definition_code": "wisdom_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -2,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時智慧 -2",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時洞察 -1",
+        "sort_order": 2
+      },
+      {
+        "effect_definition_code": "agility_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -2,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時敏捷 -2",
+        "sort_order": 3
+      },
+      {
+        "effect_definition_code": "movement_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時移動步數 -1",
+        "sort_order": 4
+      }
+    ]
+  },
+  {
+    "code": "item_breastplate",
+    "slug": "breastplate",
+    "name": "胸甲",
+    "category_code": "armor",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "胸甲。金屬胸身防具，佔用 2 格。提供固定防禦：近戰 +3、遠程 +3、魔法 +1。穿戴時智慧 -1、洞察 -1、敏捷 -1。",
+    "original_effect_text": "固定防禦：近戰 +3, 遠程 +3, 魔法 +1。屬性減益：智慧 -1, 洞察 -1, 敏捷 -1。",
+    "image_url": "/images/items/breastplate.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 57,
+    "defense": {
+      "melee_defense": 3,
+      "ranged_defense": 3,
+      "magic_defense": 1
+    },
+    "effects": [
+      {
+        "effect_definition_code": "wisdom_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時智慧 -1",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時洞察 -1",
+        "sort_order": 2
+      },
+      {
+        "effect_definition_code": "agility_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時敏捷 -1",
+        "sort_order": 3
+      }
+    ]
+  },
+  {
+    "code": "item_brigandine",
+    "slug": "brigandine",
+    "name": "鑲釘甲",
+    "category_code": "armor",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "鑲釘甲。內襯鉚接金屬板的護甲，佔用 2 格。提供固定防禦：近戰 +2、遠程 +2、魔法 0。穿戴時智慧 -1、洞察 -1。",
+    "original_effect_text": "固定防禦：近戰 +2, 遠程 +2, 魔法 0。屬性減益：智慧 -1, 洞察 -1。",
+    "image_url": "/images/items/brigandine.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 58,
+    "defense": {
+      "melee_defense": 2,
+      "ranged_defense": 2,
+      "magic_defense": 0
+    },
+    "effects": [
+      {
+        "effect_definition_code": "wisdom_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時智慧 -1",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時洞察 -1",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_chain_mail",
+    "slug": "chain-mail",
+    "name": "鎖子甲",
+    "category_code": "armor",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "鎖子甲。交織鐵環打造的長身防具，佔用 2 格。提供固定防禦：近戰 +2、遠程 +1、魔法 0。穿戴時智慧 -1、洞察 -1。",
+    "original_effect_text": "固定防禦：近戰 +2, 遠程 +1, 魔法 0。屬性減益：智慧 -1, 洞察 -1。",
+    "image_url": "/images/items/chain-mail.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 59,
+    "defense": {
+      "melee_defense": 2,
+      "ranged_defense": 1,
+      "magic_defense": 0
+    },
+    "effects": [
+      {
+        "effect_definition_code": "wisdom_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時智慧 -1",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時洞察 -1",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_gambeson",
+    "slug": "gambeson",
+    "name": "軟甲",
+    "category_code": "armor",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "軟甲。厚實棉麻夾層護甲，佔用 1 格。提供固定防禦：近戰 +1、遠程 +1、魔法 0。無額外屬性懲罰，輕便靈活。",
+    "original_effect_text": "固定防禦：近戰 +1, 遠程 +1, 魔法 0。",
+    "image_url": "/images/items/gambeson.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 60,
+    "defense": {
+      "melee_defense": 1,
+      "ranged_defense": 1,
+      "magic_defense": 0
+    },
+    "effects": []
+  },
+  {
+    "code": "item_cervelliere",
+    "slug": "cervelliere",
+    "name": "內盔",
+    "category_code": "helmet",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "內盔（圓頂便帽盔）。輕便金屬頭盔，佔用 1 格。提供固定防禦：近戰 +1、遠程 +1、魔法 0。無負面屬性減益。",
+    "original_effect_text": "固定防禦：近戰 +1, 遠程 +1, 魔法 0。",
+    "image_url": "/images/items/cervelliere.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 61,
+    "defense": {
+      "melee_defense": 1,
+      "ranged_defense": 1,
+      "magic_defense": 0
+    },
+    "effects": []
+  },
+  {
+    "code": "item_kettle_hat",
+    "slug": "kettle-hat",
+    "name": "水壺盔",
+    "category_code": "helmet",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "水壺盔。具備寬帽簷的金屬頭盔，佔用 1 格。提供固定防禦：近戰 +2、遠程 +1、魔法 0。穿戴時智慧 -1。",
+    "original_effect_text": "固定防禦：近戰 +2, 遠程 +1, 魔法 0。屬性減益：智慧 -1。",
+    "image_url": "/images/items/kettle-hat.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 62,
+    "defense": {
+      "melee_defense": 2,
+      "ranged_defense": 1,
+      "magic_defense": 0
+    },
+    "effects": [
+      {
+        "effect_definition_code": "wisdom_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時智慧 -1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_armet",
+    "slug": "armet",
+    "name": "武裝盔",
+    "category_code": "helmet",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "武裝盔。全包覆式金屬重盔，佔用 1 格。提供固定防禦：近戰 +2、遠程 +2、魔法 +1。穿戴時智慧 -1、洞察 -1。",
+    "original_effect_text": "固定防禦：近戰 +2, 遠程 +2, 魔法 +1。屬性減益：智慧 -1, 洞察 -1。",
+    "image_url": "/images/items/armet.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 63,
+    "defense": {
+      "melee_defense": 2,
+      "ranged_defense": 2,
+      "magic_defense": 1
+    },
+    "effects": [
+      {
+        "effect_definition_code": "wisdom_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時智慧 -1",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "insight_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時洞察 -1",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_aurillac_beret",
+    "slug": "aurillac-beret",
+    "name": "歐里亞克貝雷帽",
+    "category_code": "helmet",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "歐里亞克貝雷帽。優雅且附有神秘防護的軟帽，佔用 1 格。提供固定防禦：近戰 +2、遠程 +2、魔法 +1。輕便舒適，無任何負面屬性減益。",
+    "original_effect_text": "固定防禦：近戰 +2, 遠程 +2, 魔法 +1。",
+    "image_url": "/images/items/aurillac-beret.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 64,
+    "defense": {
+      "melee_defense": 2,
+      "ranged_defense": 2,
+      "magic_defense": 1
+    },
+    "effects": []
+  },
+  {
+    "code": "item_headscarf_of_anglesey",
+    "slug": "headscarf-of-anglesey",
+    "name": "安格爾西頭巾",
+    "category_code": "helmet",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "安格爾西頭巾。古老島嶼流傳的神聖織物頭巾，佔用 1 格。固定防禦均為 0。具備常駐效果（∞）：每回合回復血量 +1。",
+    "original_effect_text": "固定防禦：近戰 0, 遠程 0, 魔法 0。常駐效果（∞）：每回合回復（heal）血量 +1。",
+    "image_url": "/images/items/headscarf-of-anglesey.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 65,
+    "defense": {
+      "melee_defense": 0,
+      "ranged_defense": 0,
+      "magic_defense": 0
+    },
+    "effects": [
+      {
+        "effect_definition_code": "heal_health",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": 1,
+        "operation": "add",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "每回合回復血量 +1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_buckler",
+    "slug": "buckler",
+    "name": "圓盾",
+    "category_code": "shield",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "圓盾（小圓盾）。輕便金屬手盾，佔用 1 格。裝備於武器／盾牌區。防禦擲骰檢定：力量 1 固定值轉為 1 顆骰子；敏捷 1 固定值轉為 1 顆骰子。",
+    "original_effect_text": "盾牌檢定：力量 1 轉 1 骰；敏捷 1 轉 1 骰。",
+    "image_url": "/images/items/buckler.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 66,
+    "shield_rules": [
+      {
+        "attribute_code": "strength",
+        "fixed_value": 1,
+        "dice_count": 1
+      },
+      {
+        "attribute_code": "agility",
+        "fixed_value": 1,
+        "dice_count": 1
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_wooden_shield",
+    "slug": "wooden-shield",
+    "name": "木盾",
+    "category_code": "shield",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "木盾。傳統圓形木質包鐵盾，佔用 2 格。裝備於武器／盾牌區。防禦擲骰檢定：力量 1 固定值轉為 1 顆骰子；敏捷 1 固定值轉為 1 顆骰子。",
+    "original_effect_text": "盾牌檢定：力量 1 轉 1 骰；敏捷 1 轉 1 骰。",
+    "image_url": "/images/items/wooden-shield.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 67,
+    "shield_rules": [
+      {
+        "attribute_code": "strength",
+        "fixed_value": 1,
+        "dice_count": 1
+      },
+      {
+        "attribute_code": "agility",
+        "fixed_value": 1,
+        "dice_count": 1
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_steel_shield",
+    "slug": "steel-shield",
+    "name": "鋼盾",
+    "category_code": "shield",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "鋼盾（黑鷹鳶盾）。堅固的全鋼防禦盾牌，佔用 2 格。裝備於武器／盾牌區。防禦擲骰檢定：力量 2 固定值轉為 2 顆骰子；敏捷 1 固定值轉為 1 顆骰子。",
+    "original_effect_text": "盾牌檢定：力量 2 轉 2 骰；敏捷 1 轉 1 骰。",
+    "image_url": "/images/items/steel-shield.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 68,
+    "shield_rules": [
+      {
+        "attribute_code": "strength",
+        "fixed_value": 2,
+        "dice_count": 2
+      },
+      {
+        "attribute_code": "agility",
+        "fixed_value": 1,
+        "dice_count": 1
+      }
+    ],
+    "effects": []
+  },
+  {
+    "code": "item_pavise",
+    "slug": "pavise",
+    "name": "大盾",
+    "category_code": "shield",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "大盾（帕維斯塔盾）。高大的重型直立大盾，佔用 2 格。裝備於武器／盾牌區。防禦擲骰檢定：力量 1 固定值轉為 1 顆骰子；敏捷 3 固定值轉為 3 顆骰子。巨大沉重的盾身影響機動性，裝備時移動步數 -1。",
+    "original_effect_text": "盾牌檢定：力量 1 轉 1 骰；敏捷 3 轉 3 骰。屬性減益：移動步數（腳印） -1。",
+    "image_url": "/images/items/pavise.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.6",
+    "is_published": 1,
+    "sort_order": 69,
+    "shield_rules": [
+      {
+        "attribute_code": "strength",
+        "fixed_value": 1,
+        "dice_count": 1
+      },
+      {
+        "attribute_code": "agility",
+        "fixed_value": 3,
+        "dice_count": 3
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "movement_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": -1,
+        "operation": "subtract",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 1,
+        "description": "裝備時移動步數 -1",
+        "sort_order": 1
+      }
+    ]
+  }
+]

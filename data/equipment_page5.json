@@ -1,0 +1,544 @@
+[
+  {
+    "code": "item_petronel",
+    "slug": "petronel",
+    "name": "手槍",
+    "category_code": "weapon",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "胸用短火銃。遠程火器，佔用 1 格。人物基礎敏捷判定，3 骰，命中 -1，射程 1-2。具備裝填（Reload）、護甲穿透 +1（Armor Piercing 1）特性。擁有 1 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "Agility: 3 dice, -1 mod, Range 1-2. 裝填（Reload）。護甲穿透 +1（Armor Piercing 1）。",
+    "image_url": "/images/items/petronel.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 46,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 3,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 2,
+        "description": "短火銃射擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "護甲穿透 +1：目標防禦值 -1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_wheellock_pistol",
+    "slug": "wheellock_pistol",
+    "name": "簧輪手槍",
+    "category_code": "weapon",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "燧發手槍。遠程火器，佔用 1 格。人物基礎敏捷判定，3 骰，命中 0，射程 1-2。具備裝填（Reload）、護甲穿透 +1（Armor Piercing 1）特性。擁有 1 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "Agility: 3 dice, 0 mod, Range 1-2. 裝填（Reload）。護甲穿透 +1（Armor Piercing 1）。",
+    "image_url": "/images/items/wheellock-pistol.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 47,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 3,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 2,
+        "description": "燧發手槍射擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "護甲穿透 +1：目標防禦值 -1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_arquebus",
+    "slug": "arquebus",
+    "name": "火繩槍",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "火繩槍。雙手火器，佔用 2 格。具備敏捷射擊與力量槍托近戰雙行動模式。具備裝填（Reload）、護甲穿透 +2（Armor Piercing 2）特性。擁有 2 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "射擊模式：Agility: 4 dice, -1 mod, Range 1-3. 槍托打擊：Strength: 1 die, 0 mod, Range 0. 裝填（Reload）。護甲穿透 +2（Armor Piercing 2）。",
+    "image_url": "/images/items/arquebus.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 48,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 4,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 3,
+        "description": "火繩槍射擊"
+      },
+      {
+        "display_order": 2,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 1,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "槍托近身打擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 2,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "護甲穿透 +2：目標防禦值 -2",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_blunderbuss",
+    "slug": "blunderbuss",
+    "name": "雷銃",
+    "category_code": "weapon",
+    "slot_count": 2,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "喇叭口霰彈槍。雙手火器，佔用 2 格。具備範圍射擊與槍托近身雙模式。具備範圍攻擊（Area Attack）、裝填（Reload）、護甲穿透 +1（Armor Piercing 1）特性。擁有 2 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "射擊模式：Agility: 4 dice, +1 mod, Range 1-2. 槍托打擊：Strength: 1 die, -1 mod, Range 0. 範圍攻擊。裝填（Reload）。護甲穿透 +1（Armor Piercing 1）。",
+    "image_url": "/images/items/blunderbuss.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 49,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 4,
+        "check_modifier": 1,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 2,
+        "description": "散彈面散射擊"
+      },
+      {
+        "display_order": 2,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 1,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "槍托近身揮擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "area",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": null,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "射擊模式具有範圍攻擊效果",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "護甲穿透 +1：目標防禦值 -1",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_musket",
+    "slug": "musket",
+    "name": "滑膛槍",
+    "category_code": "weapon",
+    "slot_count": 3,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "重型滑膛槍。巨大火器，佔用 3 格。具備長程狙擊與槍托近身雙模式。具備裝填（Reload）、破防（Armor Break）、護甲穿透 +3（Armor Piercing 3）特性。擁有 3 個槍械接口（雙鋸齒）。",
+    "original_effect_text": "射擊模式：Agility: 5 dice, -1 mod, Range 1-4. 槍托打擊：Strength: 1 die, 0 mod, Range 0. 裝填（Reload）。破防（Armor Break）。護甲穿透 +3（Armor Piercing 3）。",
+    "image_url": "/images/items/musket.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 50,
+    "sockets": [
+      {
+        "slot_index": 1,
+        "connector_type_code": "firearm"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "firearm"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "firearm"
+      }
+    ],
+    "traits": [
+      {
+        "trait_code": "reload",
+        "numeric_value": null,
+        "description": "攻擊後，下次攻擊前需要填充動作。"
+      }
+    ],
+    "action_modes": [
+      {
+        "display_order": 1,
+        "action_type": "damage",
+        "attack_type": "physical_ranged",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "agility",
+        "dice_count": 5,
+        "check_modifier": -1,
+        "range_type": "fixed",
+        "range_min": 1,
+        "range_max": 4,
+        "description": "滑膛槍長程狙擊"
+      },
+      {
+        "display_order": 2,
+        "action_type": "damage",
+        "attack_type": "melee",
+        "resolution_method": "normal_attack",
+        "value_source": "character_attribute",
+        "attribute_code": "strength",
+        "dice_count": 1,
+        "check_modifier": 0,
+        "range_type": "fixed",
+        "range_min": 0,
+        "range_max": 0,
+        "description": "重槍托近身砸擊"
+      }
+    ],
+    "effects": [
+      {
+        "effect_definition_code": "mighty",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "apply",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "射擊模式具有破防效果",
+        "sort_order": 1
+      },
+      {
+        "effect_definition_code": "pierce",
+        "action_mode_display_order": 1,
+        "target_type": "attack",
+        "numeric_value": 3,
+        "operation": "subtract",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "護甲穿透 +3：目標防禦值 -3",
+        "sort_order": 2
+      }
+    ]
+  },
+  {
+    "code": "item_elongated_barrel",
+    "slug": "elongated-barrel",
+    "name": "加長槍管",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "加長槍管。槍械接口附件，常駐提升遠程射程 +1。常駐生效。",
+    "original_effect_text": "安裝於槍械接口。常駐效果（∞）。射程 +1（Range +1）。",
+    "image_url": "/images/items/elongated-barrel.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 51,
+    "attachment_connector_type_code": "firearm",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "range_modifier",
+        "action_mode_display_order": null,
+        "target_type": "weapon",
+        "numeric_value": 1,
+        "operation": "add",
+        "trigger_timing": "passive",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "裝備此槍管時射程最大值 +1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_lead_balls",
+    "slug": "lead-balls",
+    "name": "鉛彈",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_on_use",
+    "usage_limit_type": "single_use",
+    "description": "鉛彈丸。槍械接口附件，本次攻擊敏捷基礎數值 +1。使用後立即消耗。",
+    "original_effect_text": "安裝於槍械接口。單次使用立即消耗（1）。敏捷基礎數值 +1。使用後立即消耗。",
+    "image_url": "/images/items/lead-balls.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 52,
+    "attachment_connector_type_code": "firearm",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "agility_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": 1,
+        "operation": "add",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "本次攻擊敏捷基礎數值 +1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_silver_balls",
+    "slug": "silver-balls",
+    "name": "銀彈",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_on_use",
+    "usage_limit_type": "single_use",
+    "description": "純銀彈丸。槍械接口附件，對特殊種族（怪獸、惡魔）攻擊時敏捷基礎數值 +2。使用後立即消耗。",
+    "original_effect_text": "安裝於槍械接口。單次使用立即消耗（1）。對怪獸、惡魔攻擊時敏捷基礎數值 +2。使用後立即消耗。",
+    "image_url": "/images/items/silver-balls.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 53,
+    "attachment_connector_type_code": "firearm",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "agility_modifier",
+        "action_mode_display_order": null,
+        "target_type": "self",
+        "numeric_value": 2,
+        "operation": "add",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "對怪獸與惡魔攻擊時敏捷基礎數值 +2",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_improved_gunpowder",
+    "slug": "improved-gunpowder",
+    "name": "改良火藥",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "consumed_on_use",
+    "usage_limit_type": "single_use",
+    "description": "精煉火藥。槍械接口附件，攻擊擲骰顆數 +1。使用後立即消耗。",
+    "original_effect_text": "安裝於槍械接口。單次使用立即消耗（1）。攻擊骰數 +1 顆（+1 Dice）。使用後立即消耗。",
+    "image_url": "/images/items/improved-gunpowder.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 54,
+    "attachment_connector_type_code": "firearm",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "dice_modifier",
+        "action_mode_display_order": null,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "add",
+        "trigger_timing": "on_attack",
+        "duration_type": "this_attack",
+        "is_negative": 0,
+        "description": "本次攻擊擲骰顆數 +1",
+        "sort_order": 1
+      }
+    ]
+  },
+  {
+    "code": "item_modern_lock",
+    "slug": "modern-lock",
+    "name": "新式槍機",
+    "category_code": "weapon_attachment",
+    "slot_count": 1,
+    "consumption_type": "permanent",
+    "usage_limit_type": "unlimited",
+    "description": "改良機鎖。槍械接口附件，常駐提供命中判定 +1 修正。常駐生效。",
+    "original_effect_text": "安裝於槍械接口。常駐效果（∞）。命中加成 +1（Hit Modifier +1）。",
+    "image_url": "/images/items/modern-lock.png",
+    "edition_code": "all-in",
+    "source_reference": "Equipment Compendium p.5",
+    "is_published": 1,
+    "sort_order": 55,
+    "attachment_connector_type_code": "firearm",
+    "sockets": [],
+    "action_modes": [],
+    "effects": [
+      {
+        "effect_definition_code": "hit_modifier",
+        "action_mode_display_order": null,
+        "target_type": "attack",
+        "numeric_value": 1,
+        "operation": "add",
+        "trigger_timing": "on_attack",
+        "duration_type": "permanent",
+        "is_negative": 0,
+        "description": "裝備此機鎖時攻擊檢定命中 +1",
+        "sort_order": 1
+      }
+    ]
+  }
+]

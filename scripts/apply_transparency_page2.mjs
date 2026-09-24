@@ -1,130 +1,82 @@
 import sharp from 'sharp';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
-// Page 2 的 13 件物品
-const page2Items = [
-  'spear',
-  'halberd',
-  'flail',
-  'lucerne-hammer',
-  'net',
-  'diamond-sharpening',
-  'silver-blade',
-  'leather-handle',
-  'hardened-blade',
-  'humanoid-grease',
-  'monster-grease',
-  'demonic-grease',
-  'shapeshifter-grease'
-];
+const inputImagePath = path.resolve('.cache/pdf/page-3.png');
+const outputDir = path.resolve('public/images/items');
 
-async function makeTransparent(itemName) {
-  const filePath = path.resolve(`public/images/items/${itemName}.png`);
-  if (!fs.existsSync(filePath)) {
-    console.warn(`File not found: ${filePath}`);
-    return;
-  }
+// 已確認合格並鎖定
+// { name: 'ignis', left: 40, top: 89, width: 160, height: 160 },
+// { name: 'ira', left: 247, top: 89, width: 160, height: 160 },
+// { name: 'vita', left: 454, top: 89, width: 160, height: 160 },
+// { name: 'sagacitate', left: 654, top: 89, width: 160, height: 160 },
+// { name: 'agilitas', left: 39, top: 319, width: 160, height: 160 },
+// { name: 'formido', left: 247, top: 319, width: 160, height: 160 },
+// { name: 'sling', left: 38, top: 591, width: 160, height: 160 },
 
-  const { data, info } = await sharp(filePath)
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
+// 目前審查目標：Hunting Crossbow (獵弩，2格，左側含雙鋸齒槍弩接口)
+const currentItem = { name: 'hunting-crossbow', left: 18, top: 765, width: 190, height: 330 };
 
+
+
+
+
+
+
+
+
+
+
+async function makeTransparent(filePath) {
+  const { data, info } = await sharp(filePath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width, height } = info;
 
-  // 白色底色判斷：PDF 頁面白底或微灰 (RGB > 230)
-  const isBackground = (idx) => {
-    const r = data[idx];
-    const g = data[idx + 1];
-    const b = data[idx + 2];
-    return r > 230 && g > 230 && b > 230;
-  };
-
+  const isBackground = idx => data[idx] > 230 && data[idx + 1] > 230 && data[idx + 2] > 230;
   const visited = new Uint8Array(width * height);
   const queue = [];
 
-  // 1. 上下邊界
   for (let x = 0; x < width; x++) {
-    const topIdx = (0 * width + x) * 4;
-    const bottomIdx = ((height - 1) * width + x) * 4;
-    if (isBackground(topIdx)) {
-      queue.push(0 * width + x);
-      visited[0 * width + x] = 1;
-    }
-    if (isBackground(bottomIdx)) {
-      queue.push((height - 1) * width + x);
-      visited[(height - 1) * width + x] = 1;
-    }
+    if (isBackground(x * 4)) { queue.push(x); visited[x] = 1; }
+    const b = ((height - 1) * width + x) * 4;
+    if (isBackground(b)) { queue.push((height - 1) * width + x); visited[(height - 1) * width + x] = 1; }
   }
-
-  // 2. 左右邊界
   for (let y = 0; y < height; y++) {
-    const leftIdx = (y * width + 0) * 4;
-    const rightIdx = (y * width + (width - 1)) * 4;
-    if (isBackground(leftIdx) && !visited[y * width + 0]) {
-      queue.push(y * width + 0);
-      visited[y * width + 0] = 1;
-    }
-    if (isBackground(rightIdx) && !visited[y * width + (width - 1)]) {
-      queue.push(y * width + (width - 1));
-      visited[y * width + (width - 1)] = 1;
-    }
+    const l = (y * width) * 4;
+    if (isBackground(l) && !visited[y * width]) { queue.push(y * width); visited[y * width] = 1; }
+    const r = (y * width + (width - 1)) * 4;
+    if (isBackground(r) && !visited[y * width + (width - 1)]) { queue.push(y * width + (width - 1)); visited[y * width + (width - 1)] = 1; }
   }
 
-  // 3. 廣度優先搜尋 (Flood Fill)
   let head = 0;
   while (head < queue.length) {
     const curr = queue[head++];
     const x = curr % width;
     const y = Math.floor(curr / width);
+    data[curr * 4 + 3] = 0;
 
-    // 將背景設為透明
-    const pixelIdx = curr * 4;
-    data[pixelIdx + 3] = 0;
-
-    const neighbors = [
-      [x + 1, y],
-      [x - 1, y],
-      [x, y + 1],
-      [x, y - 1]
-    ];
-
-    for (const [nx, ny] of neighbors) {
+    for (const [nx, ny] of [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]]) {
       if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
         const nPos = ny * width + nx;
-        if (!visited[nPos]) {
-          const nIdx = nPos * 4;
-          if (isBackground(nIdx)) {
-            visited[nPos] = 1;
-            queue.push(nPos);
-          }
+        if (!visited[nPos] && isBackground(nPos * 4)) {
+          visited[nPos] = 1;
+          queue.push(nPos);
         }
       }
     }
   }
 
-  // 覆寫回原檔案
-  const tempPath = path.resolve(`public/images/items/${itemName}.tmp.png`);
-  await sharp(data, {
-    raw: {
-      width,
-      height,
-      channels: 4
-    }
-  })
-  .png()
-  .toFile(tempPath);
-
+  const tempPath = filePath.replace('.png', '.tmp.png');
+  await sharp(data, { raw: { width, height, channels: 4 } }).png().toFile(tempPath);
   fs.renameSync(tempPath, filePath);
-  console.log(`✅ [透明化完成] ${itemName}.png`);
 }
 
 async function run() {
-  for (const item of page2Items) {
-    await makeTransparent(item);
-  }
-  console.log('🎉 Page 2 全部 13 件卡片透明去背已全部完成！');
+  const targetPath = path.join(outputDir, `${currentItem.name}.png`);
+  await sharp(inputImagePath)
+    .extract({ left: currentItem.left, top: currentItem.top, width: currentItem.width, height: currentItem.height })
+    .toFile(targetPath);
+  await makeTransparent(targetPath);
+  console.log(`✅ 成功裁切並去背: ${currentItem.name}`);
 }
 
 run().catch(console.error);
