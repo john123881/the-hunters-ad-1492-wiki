@@ -17,6 +17,10 @@ for (const p of pages) {
 
 const quote = value => value === null || value === undefined ? 'NULL' : typeof value === 'number' ? String(value) : `'${String(value).replaceAll("'", "''")}'`;
 const lookup = (table, code) => `(SELECT id FROM ${table} WHERE code = ${quote(code)})`;
+const lookupBySlug = (table, slug) => `(SELECT id FROM ${table} WHERE slug = ${quote(slug)})`;
+
+const recipesUrl = new URL('data/recipes.json', root);
+const recipes = existsSync(recipesUrl) ? JSON.parse(readFileSync(recipesUrl, 'utf8')) : [];
 const required = ['code', 'slug', 'name', 'category_code', 'slot_count', 'consumption_type', 'usage_limit_type', 'original_effect_text', 'image_url'];
 const unique = key => new Set(items.map(item => item[key])).size === items.length;
 
@@ -78,7 +82,7 @@ const sql = [
   '-- 由 data/equipment_page1.json ~ page8.json 共同產生；請修改來源 JSON 再執行 npm run data:seed。',
   '-- 這是使用者整理資料；匯入本機 D1 時會取代目前所有物品與相依資料。',
   'PRAGMA foreign_keys = ON;',
-  'DELETE FROM recipe_ingredients;', 'DELETE FROM recipes;', 'DELETE FROM item_effects;', 'DELETE FROM weapon_traits;',
+  'DELETE FROM recipe_resources;', 'DELETE FROM recipe_ingredients;', 'DELETE FROM recipes;', 'DELETE FROM item_effects;', 'DELETE FROM weapon_traits;',
   'DELETE FROM weapon_sockets;', 'DELETE FROM attachment_specs;', 'DELETE FROM shield_roll_rules;', 'DELETE FROM defense_specs;',
   'DELETE FROM item_action_modes;', 'DELETE FROM weapon_specs;', 'DELETE FROM items;',
 ];
@@ -89,10 +93,13 @@ for (const [code, [name, group, description]] of Object.entries(effectDefinition
 
 for (const item of items) {
   const itemId = `(SELECT id FROM items WHERE code = ${quote(item.code)})`;
+  // single_use 是舊資料對消耗品的佔位值；× 與循環箭頭由 consumption_type 表達。
+  // 只有獨立的使用限制（例如方框 1：每個任務一次）才標記為已核對。
+  const usageVerified = item.usage_verified ?? item.usage_limit_type !== 'single_use';
   const data = {
     code: quote(item.code), slug: quote(item.slug), name: quote(item.name), original_name: quote(item.original_name ?? ''),
     category_id: lookup('item_categories', item.category_code), slot_count: item.slot_count,
-    consumption_type: quote(item.consumption_type), usage_limit_type: quote(item.usage_limit_type), usage_verified: 1,
+    consumption_type: quote(item.consumption_type), usage_limit_type: quote(item.usage_limit_type), usage_verified: Number(usageVerified),
     description: quote(item.description ?? ''), original_effect_text: quote(item.original_effect_text), image_url: quote(item.image_url),
     image_alt: quote(`${item.name} 物品圖片`), language_code: quote('zh-TW'), edition_code: quote(item.edition_code),
     source_kind: quote('reference'), source_reference: quote(item.source_reference ?? 'Equipment Compendium'),
@@ -144,5 +151,26 @@ for (const item of items) {
   }
 }
 
+let recipeInsertCount = 0;
+let resourceInsertCount = 0;
+
+for (const recipe of recipes) {
+  const outputItemId = lookupBySlug('items', recipe.item_slug);
+  const stationId = recipe.station_code ? lookup('crafting_stations', recipe.station_code) : 'NULL';
+  const level = recipe.required_station_level ?? 'NULL';
+  const desc = quote(recipe.description ?? '');
+
+  sql.push(`INSERT INTO recipes (output_item_id, output_quantity, crafting_station_id, required_station_level, description) VALUES (${outputItemId}, 1, ${stationId}, ${level}, ${desc});`);
+  recipeInsertCount++;
+
+  const recipeId = `(SELECT id FROM recipes WHERE output_item_id = ${outputItemId})`;
+
+  for (const [order, res] of (recipe.resources ?? []).entries()) {
+    const resourceId = lookupBySlug('crafting_resources', res.slug);
+    sql.push(`INSERT INTO recipe_resources (recipe_id, resource_id, quantity, sort_order) VALUES (${recipeId}, ${resourceId}, ${res.quantity}, ${order + 1});`);
+    resourceInsertCount++;
+  }
+}
+
 writeFileSync(outputUrl, `${sql.join('\n')}\n`);
-console.log(`✅ 已驗證並產生 Page 1 ~ Page 8 全書共 ${items.length} 筆物品：${fileURLToPath(outputUrl)}`);
+console.log(`✅ 已驗證並產生 Page 1 ~ Page 8 全書共 ${items.length} 筆物品、${recipeInsertCount} 組配方（共 ${resourceInsertCount} 項材料連結）：${fileURLToPath(outputUrl)}`);

@@ -52,7 +52,7 @@ export function DetailPage() {
             <dl className="item-basics">
               <div><dt>占用格數</dt><dd>{item.slotCount} 格</dd></div><div><dt>裝備區域</dt><dd>{item.slotZone ?? '未指定'}</dd></div>
               <div><dt>消耗方式</dt><dd>{item.consumptionType && <ItemGlyph code={item.consumptionType} label={consumptionLabels[item.consumptionType]} size={19} />}{item.consumptionType ? consumptionLabels[item.consumptionType] : '待核對'}</dd></div>
-              <div><dt>使用限制</dt><dd>{item.usageLimitType && <ItemGlyph code={item.usageLimitType} label={usageLabels[item.usageLimitType]} size={19} />}{item.usageLimitType ? usageLabels[item.usageLimitType] : '待核對'}</dd></div>
+              <div><dt>使用限制</dt><dd>{item.usageLimitType && <ItemGlyph code={item.usageLimitType} label={usageLabels[item.usageLimitType]} size={19} />}{item.usageLimitType ? usageLabels[item.usageLimitType] : item.consumptionType && item.consumptionType !== 'permanent' ? '依消耗方式' : '待核對'}</dd></div>
             </dl>
             {item.defense && <div className="profile-block"><h3>固定防禦</h3><dl className="stat-grid defense-grid">
               <div><dt>近戰防禦</dt><dd>{item.defense.meleeDefense}</dd></div><div><dt>遠程防禦</dt><dd>{item.defense.rangedDefense}</dd></div><div><dt>魔法防禦</dt><dd>{item.defense.magicDefense}</dd></div>

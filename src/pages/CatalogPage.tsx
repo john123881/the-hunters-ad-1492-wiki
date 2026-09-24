@@ -24,6 +24,13 @@ export function CatalogPage() {
 
   useEffect(() => { setDraft(q); }, [q]);
   useEffect(() => { document.title = '物品圖鑑｜THE HUNTERS A.D. 1492 WIKI'; }, []);
+  useEffect(() => {
+    if (params.get('usage') !== 'single_use') return;
+    const next = new URLSearchParams(params);
+    next.delete('usage');
+    next.delete('page');
+    setParams(next, { replace: true });
+  }, [params, setParams]);
 
   function update(changes: Record<string, string>) {
     const next = new URLSearchParams(params);

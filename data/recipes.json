@@ -1,0 +1,881 @@
+[
+  {
+    "item_slug": "dagger",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "cinquedea",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "javelins",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1, 工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 4 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "torch",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1, 工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 4 },
+      { "slug": "leather", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "katzbalger",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "long-sword",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 5 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "zweihander",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 3,
+    "description": "鐵匠工具 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 7 },
+      { "slug": "diamond", "quantity": 3 },
+      { "slug": "leather", "quantity": 4 }
+    ]
+  },
+  {
+    "item_slug": "axe",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "mace",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 4 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "horseman-pick",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 4 },
+      { "slug": "leather", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "two-handed-axe",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 3,
+    "description": "鐵匠工具 Lv.3, 工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 8 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "spear",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2, 工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 5 },
+      { "slug": "leather", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "halberd",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 3,
+    "description": "鐵匠工具 Lv.3, 工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 6 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 5 }
+    ]
+  },
+  {
+    "item_slug": "flail",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2, 工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 6 },
+      { "slug": "leather", "quantity": 3 },
+      { "slug": "yarn", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "net",
+    "station_code": "workshop",
+    "required_station_level": 3,
+    "description": "工藝作坊 Lv.3",
+    "resources": [
+      { "slug": "leather", "quantity": 3 },
+      { "slug": "yarn", "quantity": 4 }
+    ]
+  },
+  {
+    "item_slug": "diamond-sharpening",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "diamond", "quantity": 1 },
+      { "slug": "yarn", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "silver-blade",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "leather-handle",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "diamond", "quantity": 1 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "hardened-blade",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 3,
+    "description": "鐵匠工具 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "humanoid-grease",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "stalk", "quantity": 2 },
+      { "slug": "mushroom", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "monster-grease",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "monster-bone", "quantity": 2 },
+      { "slug": "fruit", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "demonic-grease",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "flower", "quantity": 2 },
+      { "slug": "leaf", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "shapeshifter-grease",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "monster-venom", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "ignis",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "monster-blood", "quantity": 1 },
+      { "slug": "mushroom", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "ira",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "monster-bone", "quantity": 1 },
+      { "slug": "leaf", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "vita",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "monster-egg", "quantity": 1 },
+      { "slug": "monster-bone", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "sagacitate",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "monster-venom", "quantity": 1 },
+      { "slug": "flower", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "agilitas",
+    "station_code": "alchemists_lab",
+    "required_station_level": 3,
+    "description": "煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "monster-blood", "quantity": 1 },
+      { "slug": "fruit", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "formido",
+    "station_code": "alchemists_lab",
+    "required_station_level": 3,
+    "description": "煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "stalk", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "root", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "sling",
+    "station_code": "workshop",
+    "required_station_level": 1,
+    "description": "工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "hunting-crossbow",
+    "station_code": "bowyers_table",
+    "required_station_level": 2,
+    "description": "製弓師工作台 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "yarn", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "arbalest",
+    "station_code": "bowyers_table",
+    "required_station_level": 3,
+    "description": "製弓師工作台 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 6 },
+      { "slug": "leather", "quantity": 4 },
+      { "slug": "yarn", "quantity": 5 }
+    ]
+  },
+  {
+    "item_slug": "hunting-bow",
+    "station_code": "bowyers_table",
+    "required_station_level": 1,
+    "description": "製弓師工作台 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "yarn", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "recurve-bow",
+    "station_code": "bowyers_table",
+    "required_station_level": 2,
+    "description": "製弓師工作台 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 4 },
+      { "slug": "yarn", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "long-bow",
+    "station_code": "bowyers_table",
+    "required_station_level": 3,
+    "description": "製弓師工作台 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 4 },
+      { "slug": "yarn", "quantity": 4 }
+    ]
+  },
+  {
+    "item_slug": "stun-arrows",
+    "station_code": "bowyers_table",
+    "required_station_level": 2,
+    "description": "製弓師工作台 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "slowing-arrows",
+    "station_code": "bowyers_table",
+    "required_station_level": 1,
+    "description": "製弓師工作台 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "bodkin-arrows",
+    "station_code": "bowyers_table",
+    "required_station_level": 1,
+    "description": "製弓師工作台 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "reinforced-limb",
+    "station_code": "bowyers_table",
+    "required_station_level": 1,
+    "description": "製弓師工作台 Lv.1",
+    "resources": [
+      { "slug": "leather", "quantity": 3 },
+      { "slug": "yarn", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "petronel",
+    "station_code": "bowyers_table",
+    "required_station_level": 1,
+    "description": "製弓師工作台 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "saltpeter", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "arquebus",
+    "station_code": "bowyers_table",
+    "required_station_level": 1,
+    "description": "製弓師工作台 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "saltpeter", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "blunderbuss",
+    "station_code": "bowyers_table",
+    "required_station_level": 2,
+    "description": "製弓師工作台 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 3 },
+      { "slug": "saltpeter", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "musket",
+    "station_code": "bowyers_table",
+    "required_station_level": 3,
+    "description": "製弓師工作台 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "saltpeter", "quantity": 4 }
+    ]
+  },
+  {
+    "item_slug": "elongated-barrel",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 2,
+    "description": "鐵匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "lead-balls",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "silver-balls",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "silver", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "improved-gunpowder",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "stalk", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "modern-lock",
+    "station_code": "blacksmiths_tools",
+    "required_station_level": 1,
+    "description": "鐵匠工具 Lv.1, 工藝作坊 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "plate-armor",
+    "station_code": "armorers_tools",
+    "required_station_level": 3,
+    "description": "護甲匠工具 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 6 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "diamond", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "breastplate",
+    "station_code": "armorers_tools",
+    "required_station_level": 2,
+    "description": "護甲匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 6 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "diamond", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "brigandine",
+    "station_code": "armorers_tools",
+    "required_station_level": 2,
+    "description": "護甲匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "diamond", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "chain-mail",
+    "station_code": "armorers_tools",
+    "required_station_level": 2,
+    "description": "護甲匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "gambeson",
+    "station_code": "armorers_tools",
+    "required_station_level": 1,
+    "description": "護甲匠工具 Lv.1",
+    "resources": [
+      { "slug": "leather", "quantity": 3 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "cervelliere",
+    "station_code": "armorers_tools",
+    "required_station_level": 1,
+    "description": "護甲匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "kettle-hat",
+    "station_code": "armorers_tools",
+    "required_station_level": 2,
+    "description": "護甲匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "armet",
+    "station_code": "armorers_tools",
+    "required_station_level": 3,
+    "description": "護甲匠工具 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 4 },
+      { "slug": "leather", "quantity": 3 }
+    ]
+  },
+  {
+    "item_slug": "aurillac-beret",
+    "station_code": "workshop",
+    "required_station_level": 2,
+    "description": "工藝作坊 Lv.2, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "monster-egg", "quantity": 1 },
+      { "slug": "monster-venom", "quantity": 2 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "headscarf-of-anglesey",
+    "station_code": "workshop",
+    "required_station_level": 3,
+    "description": "工藝作坊 Lv.3, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "monster-fur", "quantity": 1 },
+      { "slug": "yarn", "quantity": 4 }
+    ]
+  },
+  {
+    "item_slug": "wooden-shield",
+    "station_code": "armorers_tools",
+    "required_station_level": 1,
+    "description": "護甲匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "steel-shield",
+    "station_code": "armorers_tools",
+    "required_station_level": 3,
+    "description": "護甲匠工具 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "pavise",
+    "station_code": "armorers_tools",
+    "required_station_level": 2,
+    "description": "護甲匠工具 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "buckler",
+    "station_code": "armorers_tools",
+    "required_station_level": 3,
+    "description": "護甲匠工具 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 3 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "bracelet-of-cursing",
+    "station_code": "workshop",
+    "required_station_level": 1,
+    "description": "工藝作坊 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "monster-bone", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "avicenna-necklace",
+    "station_code": "workshop",
+    "required_station_level": 3,
+    "description": "工藝作坊 Lv.3, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "diamond", "quantity": 2 },
+      { "slug": "monster-venom", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "protection-ring",
+    "station_code": "workshop",
+    "required_station_level": 2,
+    "description": "工藝作坊 Lv.2, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "monster-venom", "quantity": 1 },
+      { "slug": "diamond", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "ring-of-power",
+    "station_code": "workshop",
+    "required_station_level": 1,
+    "description": "工藝作坊 Lv.1, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "monster-bone", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "ring-of-ulm",
+    "station_code": "workshop",
+    "required_station_level": 1,
+    "description": "工藝作坊 Lv.1, 煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "monster-blood", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "cobalt-pendant",
+    "station_code": "workshop",
+    "required_station_level": 2,
+    "description": "工藝作坊 Lv.2, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "monster-blood", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "magic-staff",
+    "station_code": "workshop",
+    "required_station_level": 1,
+    "description": "工藝作坊 Lv.1, 煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "silver", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "staff-of-doubt",
+    "station_code": "workshop",
+    "required_station_level": 1,
+    "description": "工藝作坊 Lv.1, 煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "monster-bone", "quantity": 1 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "silver", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "staff-of-domination",
+    "station_code": "workshop",
+    "required_station_level": 2,
+    "description": "工藝作坊 Lv.2, 煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "diamond", "quantity": 2 },
+      { "slug": "monster-fur", "quantity": 2 },
+      { "slug": "monster-blood", "quantity": 2 }
+    ]
+  },
+  {
+    "item_slug": "medicine",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "leaf", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "antidote",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "flower", "quantity": 1 },
+      { "slug": "fruit", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "healing-infusion",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "monster-fur", "quantity": 2 },
+      { "slug": "monster-bone", "quantity": 2 },
+      { "slug": "fruit", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "refreshing-infusion",
+    "station_code": "alchemists_lab",
+    "required_station_level": 3,
+    "description": "煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "flower", "quantity": 2 },
+      { "slug": "leaf", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "accuracy-infusion",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "stalk", "quantity": 2 },
+      { "slug": "mushroom", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "protection-infusion",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "monster-egg", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "courage-infusion",
+    "station_code": "alchemists_lab",
+    "required_station_level": 3,
+    "description": "煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "fruit", "quantity": 2 },
+      { "slug": "stalk", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "frag-bomb",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "saltpeter", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "incendiary-bomb",
+    "station_code": "alchemists_lab",
+    "required_station_level": 3,
+    "description": "煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "steel", "quantity": 2 },
+      { "slug": "leather", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "snare",
+    "station_code": "workshop",
+    "required_station_level": 2,
+    "description": "工藝作坊 Lv.2, 鐵匠工具 Lv.1",
+    "resources": [
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "yarn", "quantity": 2 },
+      { "slug": "leather", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "acid-grenade",
+    "station_code": "alchemists_lab",
+    "required_station_level": 3,
+    "description": "煉金實驗室 Lv.3",
+    "resources": [
+      { "slug": "saltpeter", "quantity": 1 },
+      { "slug": "monster-venom", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "frag-grenade",
+    "station_code": "alchemists_lab",
+    "required_station_level": 2,
+    "description": "煉金實驗室 Lv.2",
+    "resources": [
+      { "slug": "saltpeter", "quantity": 1 },
+      { "slug": "steel", "quantity": 1 },
+      { "slug": "yarn", "quantity": 1 }
+    ]
+  },
+  {
+    "item_slug": "stun-grenade",
+    "station_code": "alchemists_lab",
+    "required_station_level": 1,
+    "description": "煉金實驗室 Lv.1",
+    "resources": [
+      { "slug": "saltpeter", "quantity": 1 },
+      { "slug": "steel", "quantity": 1 }
+    ]
+  }
+]

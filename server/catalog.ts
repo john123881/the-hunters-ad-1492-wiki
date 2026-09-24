@@ -4,23 +4,25 @@ import type { ItemQuery } from './query';
 const visible = (alias: string) => `${alias}.is_published = 1 AND ${alias}.source_kind IN ('demo', 'reference', 'official')`;
 const summaryColumns = `i.id, i.code, i.slug, i.card_number AS cardNumber, i.name,
   c.code AS categoryCode, c.name AS categoryName, i.slot_count AS slotCount,
-  CASE WHEN i.usage_verified = 1 THEN i.consumption_type ELSE NULL END AS consumptionType, CASE WHEN i.usage_verified = 1 THEN i.usage_limit_type ELSE NULL END AS usageLimitType,
+  i.consumption_type AS consumptionType,
+  CASE WHEN i.usage_verified = 1 THEN i.usage_limit_type ELSE NULL END AS usageLimitType,
   i.description, i.image_url AS imageUrl, i.image_alt AS imageAlt, i.source_kind AS sourceKind`;
-const escapeLike = (value: string) => value.replace(/[\\%_]/g, '\\$&');
-
 export async function listItems(db: D1Database, query: ItemQuery): Promise<ItemsResponse> {
   const where = [visible('i')];
   const values: (string | number)[] = [];
   const add = (sql: string, ...args: (string | number)[]) => { where.push(sql); values.push(...args); };
   if (query.q) {
-    const pattern = `%${escapeLike(query.q)}%`;
-    add("(i.name LIKE ? ESCAPE '\\' OR i.code LIKE ? ESCAPE '\\' OR i.card_number LIKE ? ESCAPE '\\' OR i.original_name LIKE ? ESCAPE '\\' OR i.description LIKE ? ESCAPE '\\' OR i.original_effect_text LIKE ? ESCAPE '\\')", pattern, pattern, pattern, pattern, pattern, pattern);
+    const contains = (column: string) => `instr(lower(COALESCE(${column}, '')), lower(?)) > 0`;
+    add(`(${['i.name', 'i.code', 'i.card_number', 'i.original_name', 'i.description', 'i.original_effect_text'].map(contains).join(' OR ')})`,
+      query.q, query.q, query.q, query.q, query.q, query.q);
   }
   for (const [key, column] of Object.entries({ category: 'c.code', slotCount: 'i.slot_count', consumption: 'i.consumption_type', usage: 'i.usage_limit_type' })) {
     const value = query[key as keyof ItemQuery];
     if (value !== undefined) add(`${column} = ?`, value);
   }
-  if (query.consumption || query.usage) add('i.usage_verified = 1');
+  // usage_verified only qualifies the independent usage-limit field. Consumption
+  // symbols (×, rotating arrow, ∞) are verified separately and remain filterable.
+  if (query.usage) add('i.usage_verified = 1');
   const modes: string[] = []; const modeValues: (string | number)[] = [];
   if (query.attackType) { modes.push('m.attack_type = ?'); modeValues.push(query.attackType); }
   if (query.attribute) { modes.push('m.attribute_code = ?'); modeValues.push(query.attribute); }
