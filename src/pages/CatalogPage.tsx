@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useLocation, useSearchParams, Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, ChevronLeft, ChevronRight, LayoutGrid, List, Search, X } from 'lucide-react';
+import { ArrowDown, ArrowRight, BookOpen, ChevronLeft, ChevronRight, LayoutGrid, List, Search, X } from 'lucide-react';
 import { type ItemsResponse, type CatalogResponse } from '../../shared/types';
 import { useApi } from '../lib/useApi';
 import { ItemTile } from '../components/ItemTile';
@@ -23,7 +23,7 @@ export function CatalogPage() {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setDraft(q); }, [q]);
-  useEffect(() => { document.title = '物品圖鑑｜THE HUNTERS A.D. 1492 WIKI'; }, []);
+  useEffect(() => { document.title = 'THE HUNTERS A.D. 1492 WIKI'; }, []);
 
   function update(changes: Record<string, string>) {
     const next = new URLSearchParams(params);
@@ -43,9 +43,18 @@ export function CatalogPage() {
   const total = catalog.data?.data.total;
 
   return <>
-    <section id="catalog" className="catalog catalog-page" aria-labelledby="catalog-title">
+    <section className="hero" aria-labelledby="hero-title">
+      <img className="hero-keyart" src="/images/hero-keyart.png" alt="" />
+      <div className="hero-copy">
+        <p className="eyebrow"><span /> UNOFFICIAL ITEM COMPENDIUM</p>
+        <h1 id="hero-title"><span>THE HUNTERS</span><small>A.D. 1492 WIKI</small></h1>
+        <a className="hero-link" href="#catalog">BROWSE ITEMS <ArrowDown size={16} /></a>
+      </div>
+      <div className="hero-foot"><span>EST. 1492</span><span>WEAPONS · ARMOR · EQUIPMENT</span></div>
+    </section>
+    <section id="catalog" className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
-        <div><p className="eyebrow">THE HUNTER'S ARCHIVE</p><h1 id="catalog-title">物品圖鑑<span className="heading-dot">.</span></h1></div>
+        <div><p className="eyebrow">THE HUNTER'S ARCHIVE</p><h2 id="catalog-title">物品圖鑑<span className="heading-dot">.</span></h2></div>
         <Link to="/about" className="demo-note"><span className="status-dot" />資料來源說明 <ArrowUpRightSmall /></Link>
       </div>
 
@@ -94,7 +103,7 @@ export function CatalogPage() {
         <span>第 <strong>{data.pagination.page}</strong> 頁 <span className="muted">/ {data.pagination.totalPages}</span></span>
         <button className="page-arrow" disabled={data.pagination.page >= data.pagination.totalPages} onClick={() => changePage(data.pagination.page + 1)}><span>下一頁</span><ChevronRight size={16} /></button>
       </nav>}
-      <p className="catalog-footnote">✧ 本頁資料來自 equipment_page1.json 與 equipment_page2.json；來源與校對說明請見物品詳情。</p>
+      <p className="catalog-footnote">✧ 本頁資料來自 equipment_page1.json；來源與校對說明請見物品詳情。</p>
     </section>
   </>;
 }

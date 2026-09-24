@@ -26,11 +26,11 @@ export function DetailPage() {
   useEffect(() => { document.title = `${item?.name ?? '物品詳情'}｜THE HUNTERS A.D. 1492 WIKI`; }, [item?.name]);
 
   return <div className="detail-page">
-    <Link className="back-link" to={`/items${catalogSearch}`}><ArrowLeft size={16} />返回物品圖鑑</Link>
+    <Link className="back-link" to={`/${catalogSearch}`}><ArrowLeft size={16} />返回物品圖鑑</Link>
     {result.loading ? <div className="detail-loading" role="status"><div className="skeleton-art" /><p>正在翻閱物品檔案…</p></div> :
-      result.error ? result.error.status === 404 ? <div className="empty-state"><BookOpen size={38} /><p className="eyebrow">ARCHIVE NOT FOUND</p><h1>這件物品尚未收錄</h1><p>{result.error.message}</p><Link to="/items" className="button">瀏覽全部物品</Link></div> :
+      result.error ? result.error.status === 404 ? <div className="empty-state"><BookOpen size={38} /><p className="eyebrow">ARCHIVE NOT FOUND</p><h1>這件物品尚未收錄</h1><p>{result.error.message}</p><Link to="/" className="button">瀏覽全部物品</Link></div> :
       <ErrorState message={result.error.message} onRetry={result.retry} /> : item && <>
-      <div className="detail-breadcrumb"><span>物品圖鑑</span><span>/</span><Link to={`/items?category=${item.categoryCode}`}>{item.categoryName}</Link><span>/</span><span>{item.cardNumber ?? item.code}</span></div>
+      <div className="detail-breadcrumb"><span>物品圖鑑</span><span>/</span><Link to={`/?category=${item.categoryCode}`}>{item.categoryName}</Link><span>/</span><span>{item.cardNumber ?? item.code}</span></div>
       <div className="detail-grid">
         <aside className="detail-visual">
           <div className="detail-art-frame">
@@ -75,8 +75,8 @@ export function DetailPage() {
           </section>
           {(item.sockets.length > 0 || item.attachment) && <section className="detail-section" aria-labelledby="connectors-heading">
             <h2 id="connectors-heading"><span>03</span>附件接口</h2>
-            {item.attachment && <div className="connector-row"><div><strong>{item.attachment.name}</strong><small>{item.attachment.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon&connector=${item.attachment.code}`}>查詢相容武器 →</Link></div>}
-            {item.sockets.map(socket => <div className="connector-row" key={`${socket.slotIndex}-${socket.socketIndex}`}><div><strong>第 {socket.slotIndex} 格 · {socket.name}</strong><small>{socket.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon_attachment&connector=${socket.code}`}>查詢附件 →</Link></div>)}
+            {item.attachment && <div className="connector-row"><div><strong>{item.attachment.name}</strong><small>{item.attachment.shapeDescription}</small></div><Link className="text-link" to={`/?category=weapon&connector=${item.attachment.code}`}>查詢相容武器 →</Link></div>}
+            {item.sockets.map(socket => <div className="connector-row" key={`${socket.slotIndex}-${socket.socketIndex}`}><div><strong>第 {socket.slotIndex} 格 · {socket.name}</strong><small>{socket.shapeDescription}</small></div><Link className="text-link" to={`/?category=weapon_attachment&connector=${socket.code}`}>查詢附件 →</Link></div>)}
           </section>}
         </article>
       </div>

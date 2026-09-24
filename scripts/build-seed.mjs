@@ -43,9 +43,7 @@ const effectDefinitions = {
   magic_defense_modifier: ['魔法防禦修正', 'defense_modifier', '提升或降低魔法防禦'],
   hit_modifier: ['命中加成', 'attack_modifier', '攻擊檢定命中值加成'],
   dice_modifier: ['骰數修正', 'attack_modifier', '增加或減少擲骰顆數'],
-  reroll_die: ['重擲骰子', 'reroll', '允許重擲指定數量的骰子'],
-  offense_token_modifier: ['進攻標記修正', 'resource', '調整角色擁有的進攻標記（Offense token）'],
-  enemy_dice_modifier: ['敵人骰數修正', 'attack_modifier', '調整敵人擲骰判定顆數']
+  reroll_die: ['重擲骰子', 'reroll', '允許重擲指定數量的骰子']
 };
 
 const sql = [
@@ -77,10 +75,6 @@ for (const item of items) {
 
   if (item.category_code === 'weapon') {
     sql.push(`INSERT INTO weapon_specs (item_id, notes) VALUES (${itemId}, ${quote('依整理資料建立的武器規格。')});`);
-  }
-
-  for (const trait of item.traits ?? []) {
-    sql.push(`INSERT INTO weapon_traits (weapon_item_id, trait_code, numeric_value, description) VALUES (${itemId}, ${quote(trait.trait_code)}, ${trait.numeric_value === null || trait.numeric_value === undefined ? 'NULL' : trait.numeric_value}, ${quote(trait.description ?? '')});`);
   }
 
   if (item.category_code === 'weapon_attachment' && item.attachment_connector_type_code) {
