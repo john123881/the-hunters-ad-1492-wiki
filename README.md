@@ -13,7 +13,7 @@
 - 搜尋及篩選條件保留在網址中，可直接分享
 - 響應式版面、鍵盤焦點、載入／無結果／錯誤狀態
 
-目前資料來源是 [`data/equipment_page1.json`](data/equipment_page1.json) 與 [`data/equipment_page2.json`](data/equipment_page2.json)，共收錄 25 件武器與武器附件。角色行動卡與合成查詢尚未開放。
+目前資料來源是 [`data/equipment_page1.json`](data/equipment_page1.json) 與 [`data/equipment_page2.json`](data/equipment_page2.json)，共收錄 25 件武器與武器附件。物品卡片與詳情已加入合成材料及工坊需求；獨立合成查詢與角色行動卡尚未開放。詳見 [合成規劃](docs/crafting-plan.md)。
 
 ## 技術架構
 
@@ -55,6 +55,7 @@ npm run dev
 | `npm run dev` | 啟動 React、Hono 與本機 D1 開發環境 |
 | `npm run typecheck` | 檢查前後端 TypeScript |
 | `npm run build` | 型別檢查並建立正式版產物 |
+| `npm run preview` | 在 http://localhost:4173 預覽建置結果與本機 API |
 | `npm run data:seed` | 驗證來源 JSON 並產生 D1 seed SQL |
 | `npm run db:migrate` | 套用本機 D1 migrations |
 | `npm run db:setup` | 套用 migrations 並匯入目前物品資料 |

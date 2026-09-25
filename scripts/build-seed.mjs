@@ -82,7 +82,7 @@ const sql = [
   '-- 由 data/equipment_page1.json ~ page8.json 共同產生；請修改來源 JSON 再執行 npm run data:seed。',
   '-- 這是使用者整理資料；匯入本機 D1 時會取代目前所有物品與相依資料。',
   'PRAGMA foreign_keys = ON;',
-  'DELETE FROM recipe_resources;', 'DELETE FROM recipe_ingredients;', 'DELETE FROM recipes;', 'DELETE FROM item_effects;', 'DELETE FROM weapon_traits;',
+  'DELETE FROM recipe_resources;', 'DELETE FROM recipe_ingredients;', 'DELETE FROM recipe_station_requirements;', 'DELETE FROM recipes;', 'DELETE FROM item_effects;', 'DELETE FROM weapon_traits;',
   'DELETE FROM weapon_sockets;', 'DELETE FROM attachment_specs;', 'DELETE FROM shield_roll_rules;', 'DELETE FROM defense_specs;',
   'DELETE FROM item_action_modes;', 'DELETE FROM weapon_specs;', 'DELETE FROM items;',
 ];
@@ -156,14 +156,23 @@ let resourceInsertCount = 0;
 
 for (const recipe of recipes) {
   const outputItemId = lookupBySlug('items', recipe.item_slug);
-  const stationId = recipe.station_code ? lookup('crafting_stations', recipe.station_code) : 'NULL';
-  const level = recipe.required_station_level ?? 'NULL';
+  const stations = recipe.stations ?? [];
+  if (stations.length === 0) throw new Error(`${recipe.item_slug} 缺少工坊需求。`);
+  for (const station of stations) {
+    if (!Number.isInteger(station.level) || station.level < 1 || station.level > 3) throw new Error(`${recipe.item_slug} 的工坊等級必須是 1–3。`);
+  }
+  const primaryStation = stations[0];
+  const stationId = lookup('crafting_stations', primaryStation.code);
   const desc = quote(recipe.description ?? '');
 
-  sql.push(`INSERT INTO recipes (output_item_id, output_quantity, crafting_station_id, required_station_level, description) VALUES (${outputItemId}, 1, ${stationId}, ${level}, ${desc});`);
+  sql.push(`INSERT INTO recipes (output_item_id, output_quantity, crafting_station_id, required_station_level, description) VALUES (${outputItemId}, 1, ${stationId}, ${primaryStation.level}, ${desc});`);
   recipeInsertCount++;
 
   const recipeId = `(SELECT id FROM recipes WHERE output_item_id = ${outputItemId})`;
+
+  for (const [order, station] of stations.entries()) {
+    sql.push(`INSERT INTO recipe_station_requirements (recipe_id, crafting_station_id, required_level, sort_order) VALUES (${recipeId}, ${lookup('crafting_stations', station.code)}, ${station.level}, ${order + 1});`);
+  }
 
   for (const [order, res] of (recipe.resources ?? []).entries()) {
     const resourceId = lookupBySlug('crafting_resources', res.slug);

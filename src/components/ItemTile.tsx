@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { ItemSummary } from '../../shared/types';
 import { CardImage } from './CardImage';
 import { ItemGlyph } from './ItemGlyph';
+import { CraftingStrip } from './CraftingStrip';
 
 export function ItemTile({ item, catalogSearch }: { item: ItemSummary; catalogSearch: string }) {
   const usage = item.usageLimitType === 'once_per_combat'
@@ -23,6 +24,7 @@ export function ItemTile({ item, catalogSearch }: { item: ItemSummary; catalogSe
     <div className="card-copy">
       <div className="card-meta"><span>{item.cardNumber ?? item.code}</span><span>{item.slotCount} 格</span>{usage}</div>
       <h3>{item.name}</h3><p>{item.description}</p>
+      {item.crafting && <CraftingStrip recipe={item.crafting} />}
       <div className="card-bottom"><span>{item.sourceKind === 'demo' ? '示範物品' : '整理資料'}</span><span>查閱物品 <ArrowUpRight size={13} /></span></div>
     </div>
   </Link>;

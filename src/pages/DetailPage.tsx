@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Expand, ScrollText, ShieldCheck, X } from 'lucide-react';
 import { actionLabels, attackLabels, attributeLabels, consumptionLabels, usageLabels, resolutionLabels, targetLabels, timingLabels, durationLabels, operationLabels, type ActionMode, type DetailResponse } from '../../shared/types';
 import { useApi } from '../lib/useApi';
-import { CardImage } from '../components/CardImage';
+import { CardImage, webpImageUrl } from '../components/CardImage';
 import { ErrorState } from '../components/States';
 import { connectorGlyphCode, ItemGlyph } from '../components/ItemGlyph';
 
@@ -78,6 +78,35 @@ export function DetailPage() {
             <h2 id="connectors-heading"><span>03</span>附件接口</h2>
             {item.attachment && <div className="connector-row"><ItemGlyph code={connectorGlyphCode(item.attachment.code)} label={item.attachment.name} size={28} /><div><strong>{item.attachment.name}</strong><small>{item.attachment.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon&connector=${item.attachment.code}`}>查詢相容武器 →</Link></div>}
             {item.sockets.map(socket => <div className="connector-row" key={`${socket.slotIndex}-${socket.socketIndex}`}><ItemGlyph code={connectorGlyphCode(socket.code)} label={socket.name} size={28} /><div><strong>第 {socket.slotIndex} 格 · {socket.name}</strong><small>{socket.shapeDescription}</small></div><Link className="text-link" to={`/items?category=weapon_attachment&connector=${socket.code}`}>查詢附件 →</Link></div>)}
+          </section>}
+          {item.crafting && <section className="detail-section crafting-detail" aria-labelledby="crafting-heading">
+            <h2 id="crafting-heading"><span>04</span>合成</h2>
+            <div className="crafting-detail-group">
+              <h3>製作工坊</h3>
+              <div className="crafting-detail-grid">
+                {item.crafting.stations.map(station => <div className="crafting-detail-card crafting-detail-station" key={station.code}>
+                  <picture>
+                    <source srcSet={webpImageUrl(station.imageUrl)} type="image/webp" />
+                    <img src={station.imageUrl} alt="" width={64} height={64} loading="lazy" decoding="async" />
+                  </picture>
+                  <div><strong>{station.name}</strong><small lang="en">{station.originalName}</small></div>
+                  <b aria-label={`工坊等級 ${station.requiredLevel}`}>{station.requiredLevel}</b>
+                </div>)}
+              </div>
+            </div>
+            <div className="crafting-detail-group">
+              <h3>所需材料</h3>
+              <div className="crafting-detail-grid">
+                {item.crafting.resources.map(resource => <Link to={`/items?q=${encodeURIComponent(resource.name)}`} className="crafting-detail-card crafting-resource-link" key={resource.code} title={`搜尋所有需要「${resource.name}」的物品`}>
+                  <picture>
+                    <source srcSet={webpImageUrl(resource.imageUrl)} type="image/webp" />
+                    <img src={resource.imageUrl} alt="" width={64} height={64} loading="lazy" decoding="async" />
+                  </picture>
+                  <div><strong>{resource.name}</strong><small lang="en">{resource.originalName}</small></div>
+                  <b>{resource.quantity}</b>
+                </Link>)}
+              </div>
+            </div>
           </section>}
         </article>
       </div>

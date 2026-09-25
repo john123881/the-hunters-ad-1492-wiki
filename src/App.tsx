@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ArrowUpRight, LogIn } from 'lucide-react';
 import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
@@ -24,7 +24,6 @@ export function App() {
         </Link>
         <nav className="main-nav" aria-label="主要導覽">
           <NavLink to="/items">物品圖鑑</NavLink>
-          <NavLink to="/crafting">物件合成表</NavLink>
           <NavLink to="/campaigns">戰役紀錄</NavLink>
         </nav>
         <NavLink to="/login" className="login-link"><LogIn size={15} />登入</NavLink>
@@ -35,7 +34,7 @@ export function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/items" element={<CatalogPage />} />
         <Route path="/items/:slug" element={<DetailPage />} />
-        <Route path="/crafting" element={<ComingSoonPage title="物件合成表" eyebrow="CRAFTING · IN DEVELOPMENT" description="合成配方與素材查詢功能正在規劃中。" />} />
+        <Route path="/crafting" element={<Navigate to="/items" replace />} />
         <Route path="/campaigns" element={<ComingSoonPage title="戰役紀錄" eyebrow="CAMPAIGN LOG · IN DEVELOPMENT" description="戰役進度與紀錄功能尚未開放。" requiresLogin />} />
         <Route path="/login" element={<ComingSoonPage title="登入" eyebrow="ACCOUNT ACCESS · IN DEVELOPMENT" description="登入功能尚未開放。" />} />
         <Route path="/about" element={<AboutPage />} />

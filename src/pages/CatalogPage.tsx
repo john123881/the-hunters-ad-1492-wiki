@@ -71,7 +71,7 @@ export function CatalogPage() {
           <form className="search-form" onSubmit={search} role="search">
             <Search size={20} aria-hidden="true" />
             <label className="sr-only" htmlFor="card-search">依名稱或編號搜尋</label>
-            <input id="card-search" type="search" autoComplete="off" maxLength={100} placeholder="搜尋名稱、編號、說明或牌面文字" value={draft} onChange={event => setDraft(event.target.value)} />
+            <input id="card-search" type="search" autoComplete="off" maxLength={100} placeholder="搜尋名稱、編號、合成材料、工坊或牌面文字" value={draft} onChange={event => setDraft(event.target.value)} />
             {draft && <button className="clear-search" type="button" aria-label="清除搜尋" onClick={() => { setDraft(''); update({ q: '', page: '' }); }}><X size={16} /></button>}
             <button type="submit" className="search-submit">搜尋 <ArrowRight size={15} /></button>
           </form>
@@ -101,7 +101,7 @@ export function CatalogPage() {
         <span>第 <strong>{data.pagination.page}</strong> 頁 <span className="muted">/ {data.pagination.totalPages}</span></span>
         <button className="page-arrow" disabled={data.pagination.page >= data.pagination.totalPages} onClick={() => changePage(data.pagination.page + 1)}><span>下一頁</span><ChevronRight size={16} /></button>
       </nav>}
-      <p className="catalog-footnote">✧ 本頁資料來自 equipment_page1.json 與 equipment_page2.json；來源與校對說明請見物品詳情。</p>
+      <p className="catalog-footnote">✧ 本頁資料來自 equipment_page1.json 至 equipment_page8.json；來源與校對說明請見物品詳情。</p>
     </section>
   </>;
 }

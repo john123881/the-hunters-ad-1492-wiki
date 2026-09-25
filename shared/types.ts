@@ -17,12 +17,26 @@ export type AttackType = keyof typeof attackLabels;
 export type AttributeCode = keyof typeof attributeLabels;
 
 export interface Lookup { code: string; name: string }
+export interface CraftingResource {
+  code: string; slug: string; name: string; originalName: string;
+  categoryCode: 'material' | 'plant' | 'trophy';
+  imageUrl: string; imageAlt: string; quantity: number; sortOrder: number;
+}
+export interface CraftingStationRequirement {
+  code: string; name: string; originalName: string; imageUrl: string;
+  requiredLevel: number; sortOrder: number;
+}
+export interface CraftingRecipe {
+  id: number; outputQuantity: number; description: string | null;
+  resources: CraftingResource[]; stations: CraftingStationRequirement[];
+}
 export interface ItemSummary {
   id: number; code: string; slug: string; cardNumber: string | null; name: string;
   categoryCode: CategoryCode; categoryName: string; slotCount: number;
   consumptionType: ConsumptionType | null; usageLimitType: UsageLimitType | null;
   description: string; imageUrl: string; imageAlt: string;
   sourceKind: 'demo' | 'reference' | 'official';
+  crafting: CraftingRecipe | null;
 }
 export interface ItemReference { id: number; slug: string; code: string; name: string; cardNumber: string | null }
 export interface ActionMode {
