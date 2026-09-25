@@ -15,7 +15,8 @@
     "data:seed": "node scripts/build-seed.mjs",
     "db:seed": "WRANGLER_LOG_PATH=.cache/wrangler wrangler d1 execute hunters-db --local --file seeds/equipment_catalog.sql",
     "db:setup": "npm run db:migrate && npm run db:seed",
-    "check": "npm run build"
+    "check": "npm run build",
+    "images:optimize": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "hono": "^4.9.0",

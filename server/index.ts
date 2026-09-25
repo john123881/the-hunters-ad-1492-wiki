@@ -4,7 +4,7 @@ import { InvalidQuery, parseQuery } from './query';
 
 type Bindings = { DB: D1Database; ASSETS: Fetcher };
 const app = new Hono<{ Bindings: Bindings }>();
-app.use('*', async (c, next) => {
+app.use('/api/*', async (c, next) => {
   c.header('Cache-Control', 'no-store');
   c.header('X-Content-Type-Options', 'nosniff');
   await next();

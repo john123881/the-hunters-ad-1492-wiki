@@ -83,7 +83,7 @@ export function DetailPage() {
       </div>
       <dialog className="image-dialog" ref={dialog} aria-labelledby="zoom-title" onClick={event => { if (event.target === event.currentTarget) dialog.current?.close(); }}>
         <div className="dialog-heading"><h2 id="zoom-title">{item.name} · 物品圖片</h2><button autoFocus onClick={() => dialog.current?.close()} aria-label="關閉圖片"><X size={22} /></button></div>
-        <img src={item.imageUrl} alt={item.imageAlt || item.name} /><p>{item.sourceReference}</p>
+        <CardImage src={item.imageUrl} alt={item.imageAlt || item.name} /><p>{item.sourceReference}</p>
       </dialog>
     </>}
   </div>;
