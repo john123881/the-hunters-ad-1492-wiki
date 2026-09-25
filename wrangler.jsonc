@@ -13,8 +13,7 @@
     {
       "binding": "DB",
       "database_name": "hunters-db",
-      // 本機識別碼，並非已建立的雲端資料庫。部署時必須改為平台配置。
-      "database_id": "local-hunters-db",
+      "database_id": "bd63b535-c78e-4eed-a608-ac7e257d72e6",
       "migrations_dir": "migrations"
     }
   ]
