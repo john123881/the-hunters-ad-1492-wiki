@@ -65,7 +65,7 @@
       },
       {
         "slot_index": 2,
-        "connector_type_code": "melee"
+        "connector_type_code": "rune"
       }
     ],
     "action_modes": [
@@ -127,20 +127,7 @@
     "source_reference": "Equipment Compendium p.2",
     "is_published": 1,
     "sort_order": 15,
-    "sockets": [
-      {
-        "slot_index": 1,
-        "connector_type_code": "melee"
-      },
-      {
-        "slot_index": 2,
-        "connector_type_code": "melee"
-      },
-      {
-        "slot_index": 3,
-        "connector_type_code": "melee"
-      }
-    ],
+    "sockets": [],
     "action_modes": [
       {
         "display_order": 1,
@@ -207,7 +194,7 @@
       },
       {
         "slot_index": 2,
-        "connector_type_code": "melee"
+        "connector_type_code": "rune"
       }
     ],
     "action_modes": [

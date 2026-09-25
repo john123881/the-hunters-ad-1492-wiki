@@ -249,7 +249,11 @@
     "sockets": [
       {
         "slot_index": 1,
-        "connector_type_code": "firearm"
+        "connector_type_code": "bow"
+      },
+      {
+        "slot_index": 2,
+        "connector_type_code": "bow"
       }
     ],
     "traits": [
@@ -295,11 +299,15 @@
     "sockets": [
       {
         "slot_index": 1,
-        "connector_type_code": "firearm"
+        "connector_type_code": "bow"
       },
       {
         "slot_index": 2,
-        "connector_type_code": "firearm"
+        "connector_type_code": "bow"
+      },
+      {
+        "slot_index": 3,
+        "connector_type_code": "bow"
       }
     ],
     "traits": [
