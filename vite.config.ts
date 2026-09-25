@@ -10,6 +10,8 @@ function sitesArtifact() {
     apply: 'build' as const,
     async closeBundle() {
       const metadataDirectory = resolve('dist/.openai');
+      // 本機秘密設定不可進入發布封裝。
+      await rm(resolve('dist/the_hunters_ad_1492/.dev.vars'), { force: true });
       await rm(metadataDirectory, { recursive: true, force: true });
       await mkdir(metadataDirectory, { recursive: true });
       await cp('.openai/hosting.json', resolve(metadataDirectory, 'hosting.json'));
