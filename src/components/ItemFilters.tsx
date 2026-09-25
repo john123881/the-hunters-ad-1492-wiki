@@ -18,7 +18,7 @@ export function ItemFilters({ params, catalog, update, reset }: Props) {
     <summary>進階篩選 <span>{activeCount ? `${activeCount} 項條件` : '格數、面板與效果'}</span></summary>
     <div className="filter-groups">
       <fieldset><legend>攜帶與使用</legend><div className="filter-fields">
-        {select('slotCount','占用格數',[1,2,3,4].map(n => ({ code: String(n), name: `${n} 格` })))}
+        {select('slotCount','占用格數',[1,2,3].map(n => ({ code: String(n), name: `${n} 格` })))}
         {select('consumption','消耗方式', options(consumptionLabels))}{select('usage','使用限制', usageOptions)}
         {select('connector','附件接口',catalog?.connectors ?? [])}
       </div></fieldset>
