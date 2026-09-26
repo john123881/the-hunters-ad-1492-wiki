@@ -1,19 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { ArrowUpRight, LogIn } from 'lucide-react';
+import { ArrowUpRight, LogIn, UserRound } from 'lucide-react';
+import type { AuthSession, AuthSessionResponse } from '../shared/types';
 import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
 import { DetailPage } from './pages/DetailPage';
 import { AboutPage } from './pages/AboutPage';
-import { ComingSoonPage } from './pages/ComingSoonPage';
+import { LoginPage } from './pages/LoginPage';
+import { CampaignPage } from './pages/CampaignPage';
 
 export function App() {
   const location = useLocation();
+  const [session, setSession] = useState<AuthSession | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/session', { credentials: 'same-origin' })
+      .then(response => response.ok ? response.json() as Promise<AuthSessionResponse> : Promise.reject())
+      .then(result => setSession(result.data))
+      .catch(() => setSession(null))
+      .finally(() => setSessionLoading(false));
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
     document.getElementById('main-content')?.focus({ preventScroll: true });
   }, [location.pathname]);
+
+  async function logout() {
+    try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }); }
+    finally { setSession(null); }
+  }
 
   return <>
     <a className="skip-link" href="#main-content">跳至主要內容</a>
@@ -26,7 +43,10 @@ export function App() {
           <NavLink to="/items">物品圖鑑</NavLink>
           <NavLink to="/campaigns">戰役紀錄</NavLink>
         </nav>
-        <NavLink to="/login" className="login-link"><LogIn size={15} />登入</NavLink>
+        <NavLink to={session ? '/campaigns' : '/login'} className="login-link">
+          {session ? <UserRound size={15} /> : <LogIn size={15} />}
+          {session ? `${session.playerAlias} · ${session.playerNumber}` : '登入'}
+        </NavLink>
       </div>
     </header>
     <main id="main-content" tabIndex={-1} className="page-shell">
@@ -35,8 +55,8 @@ export function App() {
         <Route path="/items" element={<CatalogPage />} />
         <Route path="/items/:slug" element={<DetailPage />} />
         <Route path="/crafting" element={<Navigate to="/items" replace />} />
-        <Route path="/campaigns" element={<ComingSoonPage title="戰役紀錄" eyebrow="CAMPAIGN LOG · IN DEVELOPMENT" description="戰役進度與紀錄功能尚未開放。" requiresLogin />} />
-        <Route path="/login" element={<ComingSoonPage title="登入" eyebrow="ACCOUNT ACCESS · IN DEVELOPMENT" description="登入功能尚未開放。" />} />
+        <Route path="/campaigns" element={<CampaignPage session={session} loading={sessionLoading} onLogout={logout} />} />
+        <Route path="/login" element={<LoginPage session={session} onLogin={setSession} />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<div className="empty-state"><p className="eyebrow">404 · LOST IN THE MIST</p><h1>你走進了迷霧</h1><p>此頁不存在，讓我們回到熟悉的路上。</p><Link className="button" to="/">返回首頁</Link></div>} />
       </Routes>

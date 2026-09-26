@@ -30,3 +30,4 @@ tmp/
 scripts/locate_offense_icon.py
 
 .agents
+plan

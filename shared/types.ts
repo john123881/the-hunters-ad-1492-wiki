@@ -74,3 +74,53 @@ export interface CatalogResponse {
 }
 export interface DetailResponse { data: ItemDetail }
 export interface ApiErrorResponse { error: { code: string; message: string } }
+
+export interface AuthSession {
+  campaignId: string;
+  campaignName: string;
+  playerNumber: number;
+  playerAlias: string;
+  isActive: boolean;
+  expiresAt: string;
+}
+export interface AuthSessionResponse { data: AuthSession | null }
+
+export interface WagonUpgrade {
+  code: string;
+  name: string;
+  originalName: string;
+  imageUrl: string;
+  sortOrder: number;
+  level: number;
+}
+export interface WagonTimeToken {
+  id: number;
+  tokenCode: 'A' | 'B' | 'C' | 'D';
+  placedAtDay: number;
+  unlockAtDay: number;
+  storyCardCode: string;
+}
+export interface WagonResource {
+  code: string;
+  name: string;
+  imageUrl: string;
+  quantity: number;
+}
+export interface WagonEquipmentInstance {
+  id: number; itemId: number; code: string; slug: string;
+  cardNumber: string | null; name: string; imageUrl: string;
+  categoryName: string; damageable: boolean; damageMarkers: number; notes: string;
+}
+export interface CampaignWagon {
+  campaignId: string;
+  campaignName: string;
+  elapsedDays: number;
+  locationCode: string;
+  sharedGold: number;
+  version: number;
+  upgrades: WagonUpgrade[];
+  timeTokens: WagonTimeToken[];
+  resources: WagonResource[];
+  equipment: WagonEquipmentInstance[];
+}
+export interface CampaignWagonResponse { data: CampaignWagon }
