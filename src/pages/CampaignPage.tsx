@@ -1,15 +1,15 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock3, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { Clock3, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ApiErrorResponse, AuthSession, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const DAY_ROWS = [Array.from({ length: 10 }, (_, index) => index + 1), Array.from({ length: 10 }, (_, index) => index + 11), Array.from({ length: 10 }, (_, index) => index + 21)];
-const WORKSHOP_GEOMETRY: Record<string, { centers: [number, number][]; halfX: number; halfY: number }> = {
-  armorers_tools: { centers: [[160, 650], [160, 594], [160, 538]], halfX: 40, halfY: 39 },
-  alchemists_lab: { centers: [[400, 474], [400, 421], [400, 368]], halfX: 38, halfY: 37 },
-  bowyers_table: { centers: [[602, 408], [602, 355], [602, 302]], halfX: 38, halfY: 37 },
-  workshop: { centers: [[810, 408], [810, 355], [810, 302]], halfX: 38, halfY: 37 },
-  blacksmiths_tools: { centers: [[1130, 560], [1130, 507], [1130, 454]], halfX: 39, halfY: 38 },
+const WORKSHOP_GEOMETRY: Record<string, { centers: [number, number][] }> = {
+  armorers_tools: { centers: [[155, 643], [155, 591], [156, 537]] },
+  alchemists_lab: { centers: [[400, 458], [400, 408], [400, 358]] },
+  bowyers_table: { centers: [[604, 394], [604, 342], [604, 291]] },
+  workshop: { centers: [[813, 413], [813, 362], [813, 310]] },
+  blacksmiths_tools: { centers: [[1132, 553], [1132, 504], [1132, 455]] },
 };
 function diamondPoints(cx: number, cy: number, halfX: number, halfY: number) {
   return cx + ',' + (cy - halfY) + ' ' + (cx + halfX) + ',' + cy + ' ' + cx + ',' + (cy + halfY) + ' ' + (cx - halfX) + ',' + cy;
@@ -27,7 +27,6 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [wagonLoading, setWagonLoading] = useState(false);
   const [failure, setFailure] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
-  const [shownCycle, setShownCycle] = useState(0);
   const [pendingDay, setPendingDay] = useState<number | null>(null);
   const [savingDay, setSavingDay] = useState(false);
   const [toast, setToast] = useState('');
@@ -38,6 +37,9 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [tokenCode, setTokenCode] = useState<'A' | 'B' | 'C' | 'D'>('A');
   const [unlockAtDay, setUnlockAtDay] = useState('');
   const [savingToken, setSavingToken] = useState(false);
+  const [savingUpgradeCode, setSavingUpgradeCode] = useState('');
+  const savingUpgradeRef = useRef(false);
+  const [activeFocusTab, setActiveFocusTab] = useState<'workshops' | 'timetrack'>('workshops');
 
   useEffect(() => { document.title = '馬車面板｜THE HUNTERS A.D. 1492 WIKI'; }, []);
 
@@ -51,7 +53,6 @@ export function CampaignPage({ session, loading, onLogout }: {
       const result = await response.json() as CampaignWagonResponse;
       setWagon(result.data);
       setCampaignName(result.data.campaignName);
-      setShownCycle(Math.floor((result.data.elapsedDays - 1) / 30));
     } catch (cause) {
       setFailure(cause instanceof Error ? cause.message : '無法讀取馬車資料。');
     } finally {
@@ -67,18 +68,20 @@ export function CampaignPage({ session, loading, onLogout }: {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  const currentCycle = wagon ? Math.floor((wagon.elapsedDays - 1) / 30) : 0;
-  const cycleStart = shownCycle * 30;
-  const tokensByDay = useMemo(() => {
+  const hasPlusThirty = wagon ? wagon.elapsedDays > 30 : false;
+  const currentSlotNumber = wagon ? ((wagon.elapsedDays - 1) % 30) + 1 : 1;
+
+  const tokensBySlot = useMemo(() => {
     const groups = new Map<number, WagonTimeToken[]>();
     for (const token of wagon?.timeTokens ?? []) {
-      if (token.unlockAtDay > cycleStart && token.unlockAtDay <= cycleStart + 30) {
-        const dayInCycle = token.unlockAtDay - cycleStart;
-        groups.set(dayInCycle, [...(groups.get(dayInCycle) ?? []), token]);
+      const isTokenPlusThirty = token.unlockAtDay > 30;
+      if (isTokenPlusThirty === hasPlusThirty) {
+        const slot = ((token.unlockAtDay - 1) % 30) + 1;
+        groups.set(slot, [...(groups.get(slot) ?? []), token]);
       }
     }
     return groups;
-  }, [wagon?.timeTokens, cycleStart]);
+  }, [wagon?.timeTokens, hasPlusThirty]);
 
   if (loading) return <section className="campaign-gate"><p className="eyebrow">VERIFYING SESSION</p><h1>正在確認戰役憑證…</h1></section>;
   if (!session) return <section className="campaign-gate">
@@ -106,7 +109,6 @@ export function CampaignPage({ session, loading, onLogout }: {
       if (!response.ok) throw new Error(await readError(response));
       const result = await response.json() as CampaignWagonResponse;
       setWagon(result.data);
-      setShownCycle(Math.floor((result.data.elapsedDays - 1) / 30));
       setToast(`時間已更新為第 ${result.data.elapsedDays} 天`);
       setPendingDay(null);
     } catch (cause) {
@@ -128,14 +130,29 @@ export function CampaignPage({ session, loading, onLogout }: {
   }
 
   async function setUpgrade(stationCode: string, level: number) {
-    const response = await fetch(`/api/campaign/wagon/upgrades/${stationCode}`, {
-      method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ level }),
-    });
-    if (!response.ok) { setFailure(await readError(response)); return; }
-    const result = await response.json() as CampaignWagonResponse;
-    setWagon(result.data);
-    setToast('工坊等級已更新');
+    if (!wagon || savingUpgradeRef.current) return;
+    savingUpgradeRef.current = true;
+    setSavingUpgradeCode(stationCode);
+    try {
+      const response = await fetch(`/api/campaign/wagon/upgrades/${stationCode}`, {
+        method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, expectedVersion: wagon.version }),
+      });
+      if (!response.ok) {
+        const problem = (await response.json()) as ApiErrorResponse;
+        if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
+          await loadWagon();
+          setFailure('另一位玩家剛剛更新了馬車，已重新載入最新資料。');
+        } else setFailure(problem.error.message);
+        return;
+      }
+      const result = await response.json() as CampaignWagonResponse;
+      setWagon(result.data);
+      setToast('工坊等級已更新');
+    } finally {
+      savingUpgradeRef.current = false;
+      setSavingUpgradeCode('');
+    }
   }
 
   async function addTimeToken(event: FormEvent) {
@@ -143,7 +160,7 @@ export function CampaignPage({ session, loading, onLogout }: {
     setSavingToken(true);
     const response = await fetch('/api/campaign/wagon/time-tokens', {
       method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storyCardCode, tokenCode, unlockAtDay: Number(unlockAtDay) }),
+      body: JSON.stringify({ storyCardCode, tokenCode, unlockAfterDays: Number(unlockAtDay) }),
     });
     if (!response.ok) {
       setFailure(await readError(response));
@@ -179,11 +196,11 @@ export function CampaignPage({ session, loading, onLogout }: {
         <p className="eyebrow">ACTIVE CAMPAIGN · PLAYER {session.playerNumber}</p>
         {editingName
           ? <form className="campaign-name-form" onSubmit={saveName}>
-              <label className="sr-only" htmlFor="campaign-name">戰役名稱</label>
-              <input id="campaign-name" value={campaignName} maxLength={60} onChange={event => setCampaignName(event.target.value)} autoFocus />
-              <button className="button" type="submit">儲存</button>
-              <button className="text-button" type="button" onClick={() => { setCampaignName(wagon.campaignName); setEditingName(false); }}>取消</button>
-            </form>
+            <label className="sr-only" htmlFor="campaign-name">戰役名稱</label>
+            <input id="campaign-name" value={campaignName} maxLength={60} onChange={event => setCampaignName(event.target.value)} autoFocus />
+            <button className="button" type="submit">儲存</button>
+            <button className="text-button" type="button" onClick={() => { setCampaignName(wagon.campaignName); setEditingName(false); }}>取消</button>
+          </form>
           : <div className="campaign-title-row"><h1 id="campaign-title">{wagon.campaignName}</h1><button className="icon-button" onClick={() => setEditingName(true)} aria-label="修改戰役名稱"><Pencil size={15} /></button></div>}
         <p className="campaign-id">戰役 ID · {session.campaignId}</p>
       </div>
@@ -200,101 +217,177 @@ export function CampaignPage({ session, loading, onLogout }: {
 
     <article className="wagon-board">
       <header className="wagon-board-head">
-        <div><p className="eyebrow">WAGON RECORD</p><h2>馬車面板</h2></div>
+        <div><p className="eyebrow">WAGON RECORD</p><h2>馬車全景總覽</h2></div>
         <div className="wagon-board-status">
-          <SharedGold value={wagon.sharedGold} onChange={setWagon} onError={setFailure} onToast={setToast} />
-          <div className="elapsed-day"><small>累計時間</small><strong>{wagon.elapsedDays}</strong><span>天</span></div>
+          <SharedGold value={wagon.sharedGold} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={loadWagon} />
+          <div className="elapsed-day">
+            <small>累計時間</small>
+            <strong>{wagon.elapsedDays}</strong>
+            <span>天 {hasPlusThirty ? '(+30沙漏點亮)' : ''}</span>
+          </div>
         </div>
       </header>
-      <div className="board-cycle-switcher">
-        <button className="icon-button" disabled={shownCycle === 0} onClick={() => setShownCycle(value => Math.max(0, value - 1))} aria-label="查看前 30 天"><ChevronLeft /></button>
-        <span>畫布顯示第 {cycleStart + 1}–{cycleStart + 30} 天</span>
-        <button className="icon-button" onClick={() => setShownCycle(value => value + 1)} aria-label="查看後 30 天"><ChevronRight /></button>
-        {shownCycle !== currentCycle && <button className="text-button" onClick={() => setShownCycle(currentCycle)}>回到目前</button>}
-      </div>
+
       <div className="wagon-canvas">
         <svg className="wagon-board-svg" viewBox="0 0 1536 1024" role="group" aria-label="馬車面板：五種工坊升級軌與三列交錯時間軌">
           <image href="/images/campaign/wagon-board-concept-v2.png" x="0" y="0" width="1536" height="1024" />
-          <g className="svg-workshop-slots" aria-label="五種工坊等級">
+
+          {/* 五種工坊等級：純狀態顯示，不接受點擊，累加點亮 */}
+          <g className="svg-workshop-slots" aria-label="五種工坊當前等級（純顯示）" pointerEvents="none">
             {wagon.upgrades.flatMap(upgrade => {
               const geometry = WORKSHOP_GEOMETRY[upgrade.code];
               if (!geometry) return [];
               return geometry.centers.map(([cx, cy], index) => {
                 const level = index + 1;
-                const selectedLevel = level === upgrade.level;
-                return <g
-                  className="svg-hit-target"
-                  role="button"
-                  tabIndex={0}
-                  aria-label={upgrade.name + '第 ' + level + ' 級' + (level <= upgrade.level ? '，已點亮' : '')}
-                  aria-pressed={selectedLevel}
-                  onClick={() => void setUpgrade(upgrade.code, selectedLevel ? level - 1 : level)}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      void setUpgrade(upgrade.code, selectedLevel ? level - 1 : level);
-                    }
-                  }}
+                const isLit = level <= upgrade.level;
+                return <polygon
                   key={upgrade.code + level}
-                >
-                  <polygon
-                    className={'svg-workshop-slot station-fill-' + upgrade.code + (level <= upgrade.level ? ' lit' : '')}
-                    points={diamondPoints(cx, cy, geometry.halfX, geometry.halfY)}
-                  />
-                </g>;
+                  className={'svg-workshop-slot station-fill-' + upgrade.code + (isLit ? ' lit' : '')}
+                  points={diamondPoints(cx, cy, 27, 27)}
+                  aria-label={`${upgrade.name} 第 ${level} 級：${isLit ? '已點亮' : '未達成'}`}
+                />;
               });
             })}
           </g>
+
+          {/* 時間軌：支援點擊切換，30天後自動點亮+30沙漏格 */}
           <g className="svg-time-slots" aria-label="時間軌">
-            {DAY_ROWS.flatMap((days, rowIndex) => days.map((day, index) => {
+            {DAY_ROWS.flatMap((days, rowIndex) => days.map((slotNum, index) => {
               const cx = (rowIndex === 1 ? 421 : 371) + index * 102;
               const cy = 781 + rowIndex * 57;
-              const absoluteDay = cycleStart + day;
-              const tokens = tokensByDay.get(day) ?? [];
-              const isCurrent = absoluteDay === wagon.elapsedDays;
+              const targetDay = (hasPlusThirty ? 30 : 0) + slotNum;
+              const tokens = tokensBySlot.get(slotNum) ?? [];
+              const isCurrent = slotNum === currentSlotNumber;
+              const isPast = slotNum < currentSlotNumber;
               return <g
                 className="svg-hit-target"
                 role="button"
                 tabIndex={0}
-                aria-label={'將累計時間設為第 ' + absoluteDay + ' 天' + (tokens.length ? '，有 ' + tokens.length + ' 枚 Time Token' : '')}
-                onClick={() => setPendingDay(absoluteDay)}
+                aria-label={'設定為第 ' + targetDay + ' 天' + (tokens.length ? '，有 Time Token: ' + tokens.map(t => t.tokenCode).join(',') : '')}
+                onClick={() => setPendingDay(targetDay)}
                 onKeyDown={event => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    setPendingDay(absoluteDay);
+                    setPendingDay(targetDay);
                   }
                 }}
-                key={absoluteDay}
+                key={slotNum}
               >
                 <polygon
-                  className={'svg-time-slot' + (isCurrent ? ' current' : '') + (absoluteDay < wagon.elapsedDays ? ' past' : '')}
+                  className={'svg-time-slot' + (isCurrent ? ' current' : '') + (isPast ? ' past' : '')}
                   points={diamondPoints(cx, cy, 37, 34)}
                 />
                 {isCurrent && <circle className="svg-current-day" cx={cx} cy={cy} r="9" />}
-                {tokens.length > 0 && <>
-                  <circle className="svg-token-badge" cx={cx + 29} cy={cy - 27} r="15" />
-                  <text className="svg-token-text" x={cx + 29} y={cy - 23}>{tokens.length > 1 ? tokens.length : tokens[0].tokenCode}</text>
-                </>}
+                {tokens.map((token, tokenIndex) => {
+                  const badgeY = cy - ((tokens.length - 1) * 12) + tokenIndex * 24;
+                  return <g key={token.id}>
+                    <circle className="svg-token-badge" cx={cx + 31} cy={badgeY} r="12" />
+                    <text className="svg-token-text" x={cx + 31} y={badgeY + 4}>{token.tokenCode}</text>
+                  </g>;
+                })}
               </g>;
             }))}
           </g>
+
+          {/* +30 沙漏格：天數 > 30 時點亮，點擊切換前後 30 天區間 */}
           <g
-            className="svg-hit-target svg-plus-thirty"
+            className={'svg-hit-target svg-plus-thirty' + (hasPlusThirty ? ' active' : '')}
             role="button"
             tabIndex={0}
-            aria-label={'累計時間增加 30 天，目前第 ' + wagon.elapsedDays + ' 天'}
-            onClick={() => setPendingDay(wagon.elapsedDays + 30)}
+            aria-label={hasPlusThirty ? '目前處於 +30 天階段（第 31–60 天），點擊切換回 1–30 天' : '點擊切換至 +30 天階段（第 31–60 天）'}
+            onClick={() => {
+              if (hasPlusThirty) {
+                setPendingDay(Math.max(1, wagon.elapsedDays - 30));
+              } else {
+                setPendingDay(Math.min(60, wagon.elapsedDays + 30));
+              }
+            }}
             onKeyDown={event => {
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
-                setPendingDay(wagon.elapsedDays + 30);
+                if (hasPlusThirty) {
+                  setPendingDay(Math.max(1, wagon.elapsedDays - 30));
+                } else {
+                  setPendingDay(Math.min(60, wagon.elapsedDays + 30));
+                }
               }
             }}
           >
-            <polygon points={diamondPoints(203, 858, 39, 39)} />
+            <polygon
+              className={hasPlusThirty ? 'lit' : ''}
+              points={diamondPoints(203, 858, 39, 39)}
+            />
+            {hasPlusThirty && <text className="svg-hourglass-icon" x="203" y="865">⏳</text>}
           </g>
         </svg>
       </div>
+      {/* 總覽下方：分區放大互動切換（工坊控制 / 時間軌專注區） */}
+      <nav className="wagon-focus-nav" aria-label="分區放大檢視切換">
+        <button
+          className={'focus-tab-btn' + (activeFocusTab === 'workshops' ? ' active' : '')}
+          onClick={() => setActiveFocusTab('workshops')}
+        >
+          <Wrench size={16} /> 工坊升級控制台
+        </button>
+        <button
+          className={'focus-tab-btn' + (activeFocusTab === 'timetrack' ? ' active' : '')}
+          onClick={() => setActiveFocusTab('timetrack')}
+        >
+          <Clock3 size={16} /> 時間軌專注操作區
+        </button>
+      </nav>
+
+      {/* 分區放大 A：時間軌專注操作區 */}
+      {activeFocusTab === 'timetrack' && (
+        <section className="wagon-timetrack-focus-section" aria-labelledby="timetrack-focus-title">
+          <div className="timetrack-focus-header">
+            <div>
+              <p className="eyebrow">TIME TRACK FOCUS</p>
+              <h3 id="timetrack-focus-title">時間軌放大操作（第 1–60 天）</h3>
+            </div>
+            <div className="timetrack-quick-actions">
+              <button
+                className={'button' + (hasPlusThirty ? ' active-hourglass' : '')}
+                onClick={() => {
+                  if (hasPlusThirty) setPendingDay(Math.max(1, wagon.elapsedDays - 30));
+                  else setPendingDay(Math.min(60, wagon.elapsedDays + 30));
+                }}
+              >
+                {hasPlusThirty ? '⏳ 31–60 天中（切換為 1–30 天）' : '＋30 沙漏未點亮（點擊切為 31–60 天）'}
+              </button>
+            </div>
+          </div>
+
+          <div className="timetrack-slots-grid">
+            {Array.from({ length: 30 }, (_, i) => i + 1).map(slotNum => {
+              const targetDay = (hasPlusThirty ? 30 : 0) + slotNum;
+              const tokens = tokensBySlot.get(slotNum) ?? [];
+              const isCurrent = slotNum === currentSlotNumber;
+              const isPast = slotNum < currentSlotNumber;
+              return (
+                <button
+                  key={slotNum}
+                  type="button"
+                  className={'time-slot-cell' + (isCurrent ? ' current' : '') + (isPast ? ' past' : '')}
+                  onClick={() => setPendingDay(targetDay)}
+                  aria-label={`第 ${targetDay} 天${tokens.length ? '，Token: ' + tokens.map(t => t.tokenCode).join(',') : ''}`}
+                >
+                  <span className="slot-day-number">{targetDay}</span>
+                  {tokens.length > 0 && (
+                    <span className="slot-tokens-indicator">
+                      {tokens.map(t => (
+                        <span key={t.id} className="token-dot" title={`${t.tokenCode} (${t.storyCardCode})`}>
+                          {t.tokenCode}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </article>
 
     {dueTokens.length > 0 && <section className="due-panel" aria-labelledby="due-title">
@@ -310,12 +403,12 @@ export function CampaignPage({ session, loading, onLogout }: {
 
     <section className="wagon-grid">
       <article className="wagon-panel workshop-panel">
-        <header><div><p className="eyebrow">FIVE WORKSHOPS</p><h2><Wrench size={20} />五種工坊</h2></div><small>直接記錄桌遊面板上的等級</small></header>
+        <header><div><p className="eyebrow">FIVE WORKSHOPS</p><h2><Wrench size={20} />五種工坊</h2></div><small>直接點選等級（0–3 級）</small></header>
         <div className="workshop-list">
           {wagon.upgrades.map(upgrade => <div className="workshop-row" key={upgrade.code}>
-            <div>{upgrade.imageUrl && <img src={upgrade.imageUrl} alt="" />}<span><strong>{upgrade.name}</strong><small>{upgrade.originalName}</small></span></div>
+            <div>{upgrade.imageUrl && <img src={upgrade.imageUrl.replace(/\.webp$/, '.png')} alt="" />}<span><strong>{upgrade.name}</strong><small>{upgrade.originalName}</small></span></div>
             <div className="level-selector" aria-label={`${upgrade.name}等級`}>
-              {[0, 1, 2, 3].map(level => <button key={level} className={level === upgrade.level ? 'selected' : ''} onClick={() => void setUpgrade(upgrade.code, level)} aria-pressed={level === upgrade.level}>{level}</button>)}
+              {[0, 1, 2, 3].map(level => <button key={level} disabled={Boolean(savingUpgradeCode)} className={level === upgrade.level ? 'selected' : ''} onClick={() => void setUpgrade(upgrade.code, level)} aria-pressed={level === upgrade.level}>{level}</button>)}
             </div>
           </div>)}
         </div>
@@ -328,17 +421,28 @@ export function CampaignPage({ session, loading, onLogout }: {
           <label>Token
             <select value={tokenCode} onChange={event => setTokenCode(event.target.value as typeof tokenCode)}>{['A', 'B', 'C', 'D'].map(code => <option key={code}>{code}</option>)}</select>
           </label>
-          <label>到期天數<input type="number" min={wagon.elapsedDays} max={9999} value={unlockAtDay} onChange={event => setUnlockAtDay(event.target.value)} required /></label>
-          <button className="button" disabled={savingToken}>{savingToken ? '放置中…' : '確認放置'}</button>
+          <label>幾天後解鎖<input type="number" min={1} max={60 - wagon.elapsedDays} value={unlockAtDay} onChange={event => setUnlockAtDay(event.target.value)} placeholder="例如 5" required />
+            {unlockAtDay && <small>將於第 {wagon.elapsedDays + Number(unlockAtDay)} 天解鎖</small>}
+          </label>
+          <button className="button" disabled={savingToken || wagon.elapsedDays >= 60}>{savingToken ? '放置中…' : '確認放置'}</button>
         </form>}
         <div className="active-token-list">
           {wagon.timeTokens.length === 0 && <p className="muted">目前沒有有效的 Time Token。</p>}
-          {wagon.timeTokens.map(token => <div key={token.id}><span className="token-seal">{token.tokenCode}</span><strong>{token.storyCardCode}</strong><span>第 {token.unlockAtDay} 天</span><em>{token.unlockAtDay <= wagon.elapsedDays ? '可移除' : '等待中'}</em></div>)}
+          {wagon.timeTokens.map(token => {
+            const remainingDays = Math.max(0, token.unlockAtDay - wagon.elapsedDays);
+            return <div key={token.id}>
+              <span className="token-seal">{token.tokenCode}</span>
+              <strong>{token.storyCardCode}</strong>
+              <span>第 {token.unlockAtDay} 天解鎖</span>
+              <em>{remainingDays === 0 ? '現在可解鎖' : `剩餘 ${remainingDays} 天`}</em>
+            </div>;
+          })}
         </div>
       </article>
 
-      <ResourceInventory resources={wagon.resources} onChange={setWagon} onError={setFailure} onToast={setToast} />
+      <ResourceInventory resources={wagon.resources} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={loadWagon} />
       <EquipmentInventory equipment={wagon.equipment} onChange={setWagon} onError={setFailure} onToast={setToast} />
+      <WagonNotes notes={wagon.notes} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={loadWagon} />
     </section>
 
     {pendingDay !== null && <div className="confirm-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPendingDay(null); }}>
@@ -354,26 +458,37 @@ export function CampaignPage({ session, loading, onLogout }: {
 }
 
 
-function SharedGold({ value, onChange, onError, onToast }: {
+function SharedGold({ value, version, onChange, onError, onToast, onConflict }: {
   value: number;
+  version: number;
   onChange: (wagon: CampaignWagon) => void;
   onError: (message: string) => void;
   onToast: (message: string) => void;
+  onConflict: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
   async function update(next: number) {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     const sharedGold = Math.max(0, Math.min(99999, next));
     const response = await fetch('/api/campaign/wagon/gold', {
       method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sharedGold }),
+      body: JSON.stringify({ sharedGold, expectedVersion: version }),
     });
-    if (!response.ok) onError(await readError(response));
-    else {
+    if (!response.ok) {
+      const problem = (await response.json()) as ApiErrorResponse;
+      if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
+        await onConflict();
+        onError('另一位玩家剛剛更新了馬車，已重新載入最新資料。');
+      } else onError(problem.error.message);
+    } else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);
       onToast('團隊共用金錢已更新為 ' + sharedGold);
     }
+    busyRef.current = false;
     setBusy(false);
   }
   return <div className="shared-gold">
@@ -383,25 +498,37 @@ function SharedGold({ value, onChange, onError, onToast }: {
 }
 
 
-function ResourceInventory({ resources, onChange, onError, onToast }: {
+function ResourceInventory({ resources, version, onChange, onError, onToast, onConflict }: {
   resources: WagonResource[];
+  version: number;
   onChange: (wagon: CampaignWagon) => void;
   onError: (message: string) => void;
   onToast: (message: string) => void;
+  onConflict: () => Promise<void>;
 }) {
   const [busyCode, setBusyCode] = useState('');
+  const busyRef = useRef(false);
   async function setQuantity(resource: WagonResource, quantity: number) {
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusyCode(resource.code);
+    const nextQuantity = Math.max(0, Math.min(999, quantity));
     const response = await fetch('/api/campaign/wagon/resources/' + resource.code, {
       method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity: Math.max(0, quantity) }),
+      body: JSON.stringify({ quantity: nextQuantity, expectedVersion: version }),
     });
-    if (!response.ok) onError(await readError(response));
-    else {
+    if (!response.ok) {
+      const problem = (await response.json()) as ApiErrorResponse;
+      if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
+        await onConflict();
+        onError('另一位玩家剛剛更新了馬車，已重新載入最新資料。');
+      } else onError(problem.error.message);
+    } else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);
-      onToast(resource.name + '已更新為 ' + Math.max(0, quantity));
+      onToast(resource.name + '已更新為 ' + nextQuantity);
     }
+    busyRef.current = false;
     setBusyCode('');
   }
   return <article className="wagon-panel resource-inventory">
@@ -411,11 +538,82 @@ function ResourceInventory({ resources, onChange, onError, onToast }: {
         {resource.imageUrl ? <img src={resource.imageUrl} alt="" /> : <span className="resource-fallback" />}
         <span><strong>{resource.name}</strong><small>{resource.code.replace(/^(material|plant|trophy)_/, '')}</small></span>
         <div>
-          <button aria-label={'減少' + resource.name} disabled={busyCode === resource.code || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 1)}>−</button>
+          <button aria-label={resource.name + '減少 5'} disabled={Boolean(busyCode) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 5)}>−5</button>
+          <button aria-label={resource.name + '減少 1'} disabled={Boolean(busyCode) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 1)}>−</button>
           <output aria-label={resource.name + '數量'}>{resource.quantity}</output>
-          <button aria-label={'增加' + resource.name} disabled={busyCode === resource.code} onClick={() => void setQuantity(resource, resource.quantity + 1)}>＋</button>
+          <button aria-label={resource.name + '增加 1'} disabled={Boolean(busyCode) || resource.quantity >= 999} onClick={() => void setQuantity(resource, resource.quantity + 1)}>＋</button>
+          <button aria-label={resource.name + '增加 5'} disabled={Boolean(busyCode) || resource.quantity >= 999} onClick={() => void setQuantity(resource, resource.quantity + 5)}>＋5</button>
         </div>
       </div>)}
+    </div>
+  </article>;
+}
+
+
+function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: {
+  notes: string;
+  version: number;
+  onChange: (wagon: CampaignWagon) => void;
+  onError: (message: string) => void;
+  onToast: (message: string) => void;
+  onConflict: () => Promise<void>;
+}) {
+  const [draft, setDraft] = useState(notes);
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
+  const dirty = draft !== notes;
+
+  useEffect(() => { if (!dirty) setDraft(notes); }, [notes, dirty]);
+
+  async function saveNotes() {
+    if (!dirty || savingRef.current) return;
+    if (!window.confirm('儲存目前的馬車備註？')) return;
+    savingRef.current = true;
+    setSaving(true);
+    try {
+      const response = await fetch('/api/campaign/wagon/notes', {
+        method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: draft, expectedVersion: version }),
+      });
+      if (!response.ok) {
+        const problem = (await response.json()) as ApiErrorResponse;
+        if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
+          await onConflict();
+          onError('另一位玩家剛剛更新了馬車，已重新載入最新資料。請確認備註後再儲存。');
+        } else onError(problem.error.message);
+        return;
+      }
+      const result = await response.json() as CampaignWagonResponse;
+      onChange(result.data);
+      setDraft(result.data.notes);
+      onToast('馬車備註已儲存');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
+  }
+
+  return <article className="wagon-panel wagon-notes">
+    <header>
+      <div><p className="eyebrow">WAGON NOTES</p><h2><Pencil size={20} />馬車備註</h2></div>
+      <small>{dirty ? '有尚未儲存的修改' : '已儲存'}</small>
+    </header>
+    <div className="wagon-notes-editor">
+      <label htmlFor="wagon-notes">線索與其他團隊紀錄</label>
+      <textarea
+        id="wagon-notes"
+        value={draft}
+        maxLength={5000}
+        rows={10}
+        placeholder={'例如：\n・獲得線索 1、2、3\n・需要回頭調查舊教堂\n・下次遊戲提醒'}
+        onChange={event => setDraft(event.target.value)}
+      />
+      <div>
+        <span>{draft.length} / 5000</span>
+        <button className="button" type="button" disabled={!dirty || saving} onClick={() => void saveNotes()}>
+          {saving ? '儲存中…' : '儲存備註'}
+        </button>
+      </div>
     </div>
   </article>;
 }
@@ -475,7 +673,7 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
   }
 
   async function removeEquipment(item: WagonEquipmentInstance) {
-    if (!window.confirm('從馬車移除這一件「' + item.name + '」？')) return;
+    if (!window.confirm('移除「' + item.name + '・實體 #' + item.id + '」？')) return;
     setBusyId(item.id);
     const response = await fetch('/api/campaign/wagon/equipment/' + item.id, {
       method: 'DELETE', credentials: 'same-origin',
@@ -507,8 +705,8 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
         <div className="equipment-name"><small>{item.cardNumber ?? item.code} · 實體 #{item.id}</small><strong>{item.name}</strong><span>{item.categoryName}</span></div>
         {item.damageable
           ? <button className={'damage-toggle ' + (item.damageMarkers === 1 ? 'damaged' : '')} disabled={busyId === item.id} aria-pressed={item.damageMarkers === 1} onClick={() => void updateDamage(item, item.damageMarkers === 1 ? 0 : 1)}>
-              <small>鎧甲狀態</small><strong>{item.damageMarkers === 1 ? '損壞' : '完好'}</strong>
-            </button>
+            <small>鎧甲狀態</small><strong>{item.damageMarkers === 1 ? '損壞' : '完好'}</strong>
+          </button>
           : <span className="no-damage"><small>損壞</small><strong>不適用</strong></span>}
         <button className="remove-equipment" disabled={busyId === item.id} onClick={() => void removeEquipment(item)}>移除</button>
       </article>)}

@@ -75,6 +75,7 @@ export interface CatalogResponse {
 export interface DetailResponse { data: ItemDetail }
 export interface ApiErrorResponse { error: { code: string; message: string } }
 
+export interface CampaignPlayerSeat { playerNumber: number; playerAlias: string }
 export interface AuthSession {
   campaignId: string;
   campaignName: string;
@@ -82,6 +83,7 @@ export interface AuthSession {
   playerAlias: string;
   isActive: boolean;
   expiresAt: string;
+  players: CampaignPlayerSeat[];
 }
 export interface AuthSessionResponse { data: AuthSession | null }
 
@@ -117,6 +119,7 @@ export interface CampaignWagon {
   elapsedDays: number;
   locationCode: string;
   sharedGold: number;
+  notes: string;
   version: number;
   upgrades: WagonUpgrade[];
   timeTokens: WagonTimeToken[];
@@ -124,3 +127,43 @@ export interface CampaignWagon {
   equipment: WagonEquipmentInstance[];
 }
 export interface CampaignWagonResponse { data: CampaignWagon }
+
+export interface CampaignMapTile {
+  mapCode: string;
+  rowIndex: number;
+  columnIndex: number;
+  isRevealed: boolean;
+  face: 'FRONT' | 'BACK';
+  resourceNotes: string;
+  notes: string;
+}
+export interface CampaignLocationCard {
+  locationCode: string;
+  isRevealed: boolean;
+  face: 'FRONT' | 'BACK';
+  resourceNotes: string;
+  notes: string;
+}
+export interface CampaignMapCard {
+  id: number;
+  cardCode: string;
+  cardType: 'STORY' | 'MISSION' | 'FEATURE';
+  status: 'PENDING' | 'RESOLVED';
+  locationType: 'MAP' | 'LOCATION';
+  locationCode: string;
+  notes: string;
+  isInTownDeck: boolean;
+  timeToken: { tokenCode: 'A' | 'B' | 'C' | 'D'; unlockAtDay: number | null } | null;
+}
+export interface CampaignMap {
+  campaignId: string;
+  version: number;
+  currentLocationType: 'MAP' | 'LOCATION' | null;
+  currentLocationCode: string | null;
+  roadEventNotes: string;
+  townEventNotes: string;
+  tiles: CampaignMapTile[];
+  locations: CampaignLocationCard[];
+  cards: CampaignMapCard[];
+}
+export interface CampaignMapResponse { data: CampaignMap }

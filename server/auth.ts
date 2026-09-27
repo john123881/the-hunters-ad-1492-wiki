@@ -66,10 +66,14 @@ export async function readSession(c: Ctx): Promise<{ hash: string; data: AuthSes
     campaign_name: string; is_active: number; player_alias: string;
   }>();
   if (!row) return null;
+  const players = await c.env.DB.prepare(
+    'SELECT player_number, player_alias FROM campaign_players WHERE campaign_id = ? ORDER BY player_number',
+  ).bind(row.campaign_id).all<{ player_number: number; player_alias: string }>();
   return { hash, data: {
     campaignId: row.campaign_id, campaignName: row.campaign_name,
     playerNumber: row.player_number, playerAlias: row.player_alias,
     isActive: row.is_active === 1, expiresAt: new Date(row.expires_at * 1000).toISOString(),
+    players: players.results.map(player => ({ playerNumber: player.player_number, playerAlias: player.player_alias })),
   } };
 }
 export async function loginCampaign(c: Ctx) {
@@ -121,9 +125,13 @@ export async function loginCampaign(c: Ctx) {
   setCookie(c, COOKIE, token, {
     httpOnly: true, secure: new URL(c.req.url).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: WEEK,
   });
+  const players = await c.env.DB.prepare(
+    'SELECT player_number, player_alias FROM campaign_players WHERE campaign_id = ? ORDER BY player_number',
+  ).bind(campaignId).all<{ player_number: number; player_alias: string }>();
   return c.json({ data: {
     campaignId, campaignName: campaign.campaign_name, playerNumber, playerAlias,
     isActive: campaign.is_active === 1, expiresAt: new Date(expiresAt * 1000).toISOString(),
+    players: players.results.map(player => ({ playerNumber: player.player_number, playerAlias: player.player_alias })),
   } satisfies AuthSession });
 }
 export async function getSession(c: Ctx) {

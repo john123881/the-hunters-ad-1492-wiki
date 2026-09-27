@@ -8,6 +8,9 @@ import { DetailPage } from './pages/DetailPage';
 import { AboutPage } from './pages/AboutPage';
 import { LoginPage } from './pages/LoginPage';
 import { CampaignPage } from './pages/CampaignPage';
+import { CampaignMapPage } from './pages/CampaignMapPage';
+import { CampaignCharactersPage } from './pages/CampaignCharactersPage';
+import { CampaignTabs } from './components/CampaignTabs';
 
 export function App() {
   const location = useLocation();
@@ -43,19 +46,45 @@ export function App() {
           <NavLink to="/items">物品圖鑑</NavLink>
           <NavLink to="/campaigns">戰役紀錄</NavLink>
         </nav>
-        <NavLink to={session ? '/campaigns' : '/login'} className="login-link">
-          {session ? <UserRound size={15} /> : <LogIn size={15} />}
-          {session ? `${session.playerAlias} · ${session.playerNumber}` : '登入'}
-        </NavLink>
+        {session
+          ? <details className="player-menu" onToggle={event => {
+              if (!event.currentTarget.open) return;
+              void fetch('/api/auth/session', { credentials: 'same-origin' })
+                .then(response => response.ok ? response.json() as Promise<AuthSessionResponse> : Promise.reject())
+                .then(result => setSession(result.data))
+                .catch(() => undefined);
+            }}>
+              <summary className="login-link"><UserRound size={15} />{session.playerAlias} · {session.playerNumber}</summary>
+              <div className="player-roster" aria-label="戰役隊友名單">
+                <p>戰役隊友</p>
+                <ol>
+                  {[1, 2, 3, 4].map(playerNumber => {
+                    const player = session.players.find(entry => entry.playerNumber === playerNumber);
+                    return <li className={playerNumber === session.playerNumber ? 'current' : ''} key={playerNumber}>
+                      <span>{playerNumber}</span>
+                      <strong>{player?.playerAlias ?? '從缺'}</strong>
+                      {playerNumber === session.playerNumber && <small>你</small>}
+                    </li>;
+                  })}
+                </ol>
+                <Link to="/campaigns/wagon">進入戰役面板</Link>
+              </div>
+            </details>
+          : <NavLink to="/login" className="login-link"><LogIn size={15} />登入</NavLink>}
       </div>
     </header>
     <main id="main-content" tabIndex={-1} className="page-shell">
+      {session && location.pathname.startsWith('/campaigns') && <CampaignTabs />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/items" element={<CatalogPage />} />
         <Route path="/items/:slug" element={<DetailPage />} />
         <Route path="/crafting" element={<Navigate to="/items" replace />} />
-        <Route path="/campaigns" element={<CampaignPage session={session} loading={sessionLoading} onLogout={logout} />} />
+        <Route path="/campaigns" element={<Navigate to="/campaigns/wagon" replace />} />
+        <Route path="/campaigns/wagon" element={<CampaignPage session={session} loading={sessionLoading} onLogout={logout} />} />
+        <Route path="/campaigns/map" element={<CampaignMapPage session={session} loading={sessionLoading} />} />
+        <Route path="/campaigns/characters" element={<CampaignCharactersPage session={session} loading={sessionLoading} />} />
+        <Route path="/campaigns/characters/:playerNumber" element={<CampaignCharactersPage session={session} loading={sessionLoading} />} />
         <Route path="/login" element={<LoginPage session={session} onLogin={setSession} />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<div className="empty-state"><p className="eyebrow">404 · LOST IN THE MIST</p><h1>你走進了迷霧</h1><p>此頁不存在，讓我們回到熟悉的路上。</p><Link className="button" to="/">返回首頁</Link></div>} />
@@ -70,3 +99,4 @@ export function App() {
     </footer>
   </>;
 }
+

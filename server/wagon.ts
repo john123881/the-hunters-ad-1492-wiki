@@ -28,11 +28,11 @@ async function ensureWagon(db: D1Database, campaignId: string) {
 async function loadWagon(db: D1Database, session: AuthSession) {
   await ensureWagon(db, session.campaignId);
   const wagon = await db.prepare(`
-    SELECT w.elapsed_days, w.location_code, w.shared_gold, w.version, c.campaign_name
+    SELECT w.elapsed_days, w.location_code, w.shared_gold, w.notes, w.version, c.campaign_name
     FROM campaign_wagons w JOIN campaigns c ON c.id = w.campaign_id
     WHERE w.campaign_id = ?
   `).bind(session.campaignId).first<{
-    elapsed_days: number; location_code: string; shared_gold: number; version: number; campaign_name: string;
+    elapsed_days: number; location_code: string; shared_gold: number; notes: string; version: number; campaign_name: string;
   }>();
   const upgrades = await db.prepare(`
     SELECT s.code, s.name, s.original_name, s.image_url, s.sort_order, u.level
@@ -73,6 +73,7 @@ async function loadWagon(db: D1Database, session: AuthSession) {
     elapsedDays: wagon?.elapsed_days ?? 1,
     locationCode: wagon?.location_code ?? '',
     sharedGold: wagon?.shared_gold ?? 0,
+    notes: wagon?.notes ?? '',
     version: wagon?.version ?? 1,
     upgrades: upgrades.results.map(row => ({
       code: row.code, name: row.name, originalName: row.original_name,
@@ -105,8 +106,8 @@ export async function updateWagonDay(c: Ctx) {
   const body = await parseBody(c);
   const elapsedDays = Number(body?.elapsedDays);
   const expectedVersion = Number(body?.expectedVersion);
-  if (!Number.isInteger(elapsedDays) || elapsedDays < 1 || elapsedDays > 9999) {
-    return error(c, 400, 'INVALID_ELAPSED_DAYS', '累計天數需為 1 至 9999 的整數。');
+  if (!Number.isInteger(elapsedDays) || elapsedDays < 1 || elapsedDays > 60) {
+    return error(c, 400, 'INVALID_ELAPSED_DAYS', '累計天數需為 1 至 60 的整數。');
   }
   if (!Number.isInteger(expectedVersion) || expectedVersion < 1) {
     return error(c, 400, 'INVALID_VERSION', '頁面版本不正確，請重新整理後再試。');
@@ -160,14 +161,19 @@ export async function updateWagonUpgrade(c: Ctx) {
   const stationCode = c.req.param('stationCode') ?? '';
   const body = await parseBody(c);
   const level = Number(body?.level);
+  const expectedVersion = Number(body?.expectedVersion);
   if (!STATIONS.includes(stationCode)) return error(c, 404, 'STATION_NOT_FOUND', '找不到這個工坊。');
   if (!Number.isInteger(level) || level < 0 || level > 3) return error(c, 400, 'INVALID_LEVEL', '工坊等級需為 0 至 3。');
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) return error(c, 400, 'INVALID_VERSION', '頁面版本不正確，請重新整理後再試。');
   await ensureWagon(c.env.DB, session.campaignId);
   const before = await c.env.DB.prepare(`
     SELECT u.level FROM campaign_wagon_upgrades u
     JOIN crafting_stations s ON s.id = u.station_id
     WHERE u.campaign_id = ? AND s.code = ?
   `).bind(session.campaignId, stationCode).first<{ level: number }>();
+  const claimed = await c.env.DB.prepare("UPDATE campaign_wagons SET version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?")
+    .bind(session.playerNumber, session.campaignId, expectedVersion).run();
+  if (!claimed.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
   await c.env.DB.batch([
     c.env.DB.prepare(`
       UPDATE campaign_wagon_upgrades SET level = ?, updated_at = datetime('now')
@@ -190,15 +196,16 @@ export async function createTimeToken(c: Ctx) {
   const body = await parseBody(c);
   const storyCardCode = typeof body?.storyCardCode === 'string' ? body.storyCardCode.trim().toUpperCase() : '';
   const tokenCode = typeof body?.tokenCode === 'string' ? body.tokenCode.toUpperCase() : '';
-  const unlockAtDay = Number(body?.unlockAtDay);
+  const unlockAfterDays = Number(body?.unlockAfterDays);
   if (!/^S\d{3,4}$/.test(storyCardCode)) return error(c, 400, 'INVALID_STORY_CARD', '劇情卡編號格式需為 Sxxx。');
   if (!['A', 'B', 'C', 'D'].includes(tokenCode)) {
     return error(c, 400, 'INVALID_TIME_TOKEN', '請選擇 A 至 D 的其中一枚 Time Token。');
   }
   const wagon = await loadWagon(c.env.DB, session);
-  if (!Number.isInteger(unlockAtDay) || unlockAtDay < wagon.elapsedDays || unlockAtDay > 9999) {
-    return error(c, 400, 'INVALID_UNLOCK_DAY', '解鎖天數不可早於目前累計天數。');
+  if (!Number.isInteger(unlockAfterDays) || unlockAfterDays < 1 || wagon.elapsedDays + unlockAfterDays > 60) {
+    return error(c, 400, 'INVALID_UNLOCK_DELAY', '解鎖等待天數至少為 1 天，且解鎖日不可超過第 60 天。');
   }
+  const unlockAtDay = wagon.elapsedDays + unlockAfterDays;
   await c.env.DB.prepare(`
     INSERT INTO campaign_cards_progress (campaign_id, card_code, card_type, status)
     VALUES (?, ?, 'STORY', 'LOCKED')
@@ -221,8 +228,12 @@ export async function createTimeToken(c: Ctx) {
       session.campaignId, session.playerNumber, String(inserted.meta.last_row_id),
       JSON.stringify({ storyCardCode, tokenCode, unlockAtDay }),
     ).run();
-  } catch {
-    return error(c, 409, 'TIME_TOKEN_CONFLICT', '這枚 Token 或劇情卡已有有效的時間標記。');
+  } catch (cause) {
+    const msg = cause instanceof Error ? cause.message : String(cause);
+    if (msg.includes('UNIQUE constraint failed') || msg.includes('idx_active')) {
+      return error(c, 409, 'TIME_TOKEN_CONFLICT', '這枚 Token 或劇情卡已有有效的時間標記。');
+    }
+    return error(c, 400, 'TIME_TOKEN_ERROR', '放置 Token 失敗：' + msg);
   }
   return c.json({ data: await loadWagon(c.env.DB, session) }, 201);
 }
@@ -269,11 +280,16 @@ export async function updateWagonResource(c: Ctx) {
   const resourceCode = c.req.param('resourceCode') ?? '';
   const body = await parseBody(c);
   const quantity = Number(body?.quantity);
+  const expectedVersion = Number(body?.expectedVersion);
   if (!Number.isInteger(quantity) || quantity < 0 || quantity > 999) return error(c, 400, 'INVALID_RESOURCE_QUANTITY', '素材數量需為 0 至 999 的整數。');
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) return error(c, 400, 'INVALID_VERSION', '頁面版本不正確，請重新整理後再試。');
   await ensureWagon(c.env.DB, session.campaignId);
   const resource = await c.env.DB.prepare('SELECT id FROM crafting_resources WHERE code = ? AND is_published = 1').bind(resourceCode).first<{ id: number }>();
   if (!resource) return error(c, 404, 'RESOURCE_NOT_FOUND', '找不到這種素材。');
   const before = await c.env.DB.prepare('SELECT quantity FROM campaign_wagon_resources WHERE campaign_id = ? AND resource_id = ?').bind(session.campaignId, resource.id).first<{ quantity: number }>();
+  const claimed = await c.env.DB.prepare("UPDATE campaign_wagons SET version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?")
+    .bind(session.playerNumber, session.campaignId, expectedVersion).run();
+  if (!claimed.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
   await c.env.DB.batch([
     c.env.DB.prepare("INSERT INTO campaign_wagon_resources (campaign_id, resource_id, quantity) VALUES (?, ?, ?) ON CONFLICT(campaign_id, resource_id) DO UPDATE SET quantity = excluded.quantity, updated_at = datetime('now')").bind(session.campaignId, resource.id, quantity),
     c.env.DB.prepare("INSERT INTO wagon_activity_logs (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json) VALUES (?, ?, 'SET_RESOURCE_QUANTITY', 'RESOURCE', ?, ?, ?)").bind(session.campaignId, session.playerNumber, resourceCode, JSON.stringify({ quantity: before?.quantity ?? 0 }), JSON.stringify({ quantity })),
@@ -330,14 +346,41 @@ export async function updateSharedGold(c: Ctx) {
   const session = await requireCampaignSession(c);
   const body = await parseBody(c);
   const sharedGold = Number(body?.sharedGold);
+  const expectedVersion = Number(body?.expectedVersion);
   if (!Number.isInteger(sharedGold) || sharedGold < 0 || sharedGold > 99999) {
     return error(c, 400, 'INVALID_SHARED_GOLD', '團隊共用金錢需為 0 至 99999 的整數。');
   }
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) return error(c, 400, 'INVALID_VERSION', '頁面版本不正確，請重新整理後再試。');
   await ensureWagon(c.env.DB, session.campaignId);
   const before = await c.env.DB.prepare('SELECT shared_gold FROM campaign_wagons WHERE campaign_id = ?').bind(session.campaignId).first<{ shared_gold: number }>();
+  const claimed = await c.env.DB.prepare("UPDATE campaign_wagons SET shared_gold = ?, version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?")
+    .bind(sharedGold, session.playerNumber, session.campaignId, expectedVersion).run();
+  if (!claimed.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
   await c.env.DB.batch([
-    c.env.DB.prepare("UPDATE campaign_wagons SET shared_gold = ?, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ?").bind(sharedGold, session.playerNumber, session.campaignId),
     c.env.DB.prepare("INSERT INTO wagon_activity_logs (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json) VALUES (?, ?, 'SET_SHARED_GOLD', 'WAGON', ?, ?, ?)").bind(session.campaignId, session.playerNumber, session.campaignId, JSON.stringify({ sharedGold: before?.shared_gold ?? 0 }), JSON.stringify({ sharedGold })),
   ]);
+  return c.json({ data: await loadWagon(c.env.DB, session) });
+}
+
+export async function updateWagonNotes(c: Ctx) {
+  const session = await requireCampaignSession(c);
+  const body = await parseBody(c);
+  const notes = typeof body?.notes === 'string' ? body.notes.trim() : '';
+  const expectedVersion = Number(body?.expectedVersion);
+  if (notes.length > 5000) return error(c, 400, 'INVALID_WAGON_NOTES', '馬車備註最多 5000 個字元。');
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) return error(c, 400, 'INVALID_VERSION', '頁面版本不正確，請重新整理後再試。');
+  await ensureWagon(c.env.DB, session.campaignId);
+  const before = await c.env.DB.prepare('SELECT notes FROM campaign_wagons WHERE campaign_id = ?')
+    .bind(session.campaignId).first<{ notes: string }>();
+  const updated = await c.env.DB.prepare(
+    "UPDATE campaign_wagons SET notes = ?, version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?",
+  ).bind(notes, session.playerNumber, session.campaignId, expectedVersion).run();
+  if (!updated.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
+  await c.env.DB.prepare(
+    "INSERT INTO wagon_activity_logs (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json) VALUES (?, ?, 'UPDATE_WAGON_NOTES', 'WAGON', ?, ?, ?)",
+  ).bind(
+    session.campaignId, session.playerNumber, session.campaignId,
+    JSON.stringify({ notes: before?.notes ?? '' }), JSON.stringify({ notes }),
+  ).run();
   return c.json({ data: await loadWagon(c.env.DB, session) });
 }
