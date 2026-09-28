@@ -4,7 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 import { getItem, getCatalog, listItems } from './catalog';
 import { InvalidQuery, parseQuery } from './query';
 import { getSession, loginCampaign, logout } from './auth';
-import { getCampaignMap, removeMapCard, updateLocationCard, updateMapEventNotes, updateMapPosition, updateMapTile, upsertMapCard } from './map';
+import { getCampaignMap, removeMapCard, updateLocationCard, updateMapEventNotes, updateMapPosition, updateMapTile, upsertMapCard, updateCampaignCardProgress } from './map';
 import { addWagonEquipment, createTimeToken, getWagon, removeTimeToken, removeWagonEquipment, updateCampaignName, updateWagonDay, updateSharedGold, updateWagonEquipment, updateWagonResource, updateWagonUpgrade, updateWagonNotes } from './wagon';
 
 type Bindings = { DB: D1Database; ASSETS: Fetcher };
@@ -25,6 +25,7 @@ app.patch('/api/campaign/map/position', updateMapPosition);
 app.patch('/api/campaign/map/locations/:locationCode', updateLocationCard);
 app.patch('/api/campaign/map/event-notes', updateMapEventNotes);
 app.post('/api/campaign/map/cards', upsertMapCard);
+app.patch('/api/campaign/map/card-progress/:cardCode', updateCampaignCardProgress);
 app.delete('/api/campaign/map/cards/:placementId', removeMapCard);
 app.get('/api/campaign/wagon', getWagon);
 app.patch('/api/campaign/name', updateCampaignName);

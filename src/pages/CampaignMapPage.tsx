@@ -20,6 +20,8 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
   const [messageKind, setMessageKind] = useState<'success' | 'error'>('success');
+  const [progressTypeFilter, setProgressTypeFilter] = useState<'ALL' | 'STORY' | 'MISSION'>('ALL');
+  const [progressStateFilter, setProgressStateFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
 
   const loadMap = useCallback(async () => {
     if (!session) return;
@@ -65,9 +67,28 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     ...map?.tiles.map(tile => ({ value: 'MAP:' + tile.mapCode, label: tile.mapCode })) ?? [],
     ...map?.locations.map(location => ({ value: 'LOCATION:' + location.locationCode, label: location.locationCode })) ?? [],
   ], [map]);
+  const normalizedCardCode = cardCode.trim().toUpperCase();
+  const placedCardCodes = useMemo(() => new Set(map?.cards.map(card => card.cardCode) ?? []), [map]);
+  const availablePlacementCards = useMemo(() => ({
+    story: map?.cardProgress.filter(card => card.cardType === 'STORY' && !card.isResolved && !card.locationCode) ?? [],
+    mission: map?.cardProgress.filter(card => card.cardType === 'MISSION' && !card.isResolved && !card.locationCode) ?? [],
+    feature: Array.from({ length: 16 }, (_, index) => `F${String(index + 1).padStart(3, '0')}`)
+      .filter(code => !placedCardCodes.has(code)),
+  }), [map, placedCardCodes]);
+  const existingProgressForInput = map?.cardProgress.find(card => card.cardCode === normalizedCardCode);
+  const placementBlockedMessage = existingProgressForInput?.isResolved
+    ? normalizedCardCode + ' 已完成／不再使用，不能再次放置。'
+    : '';
+  const visibleCardProgress = useMemo(() => map?.cardProgress.filter(card => {
+    const typeMatches = progressTypeFilter === 'ALL' || card.cardType === progressTypeFilter;
+    const stateMatches = progressStateFilter === 'ALL'
+      || (progressStateFilter === 'RESOLVED' ? card.isResolved : !card.isResolved);
+    return typeMatches && stateMatches;
+  }) ?? [], [map, progressStateFilter, progressTypeFilter]);
+  const resolvedCardCount = map?.cardProgress.filter(card => card.isResolved).length ?? 0;
 
   async function mutate(path: string, method: 'PATCH' | 'POST' | 'DELETE', payload: object, action: string) {
-    if (!map || busy) return;
+    if (!map || busy) return false;
     setBusy(action);
     setMessage('');
     setMessageKind('success');
@@ -84,9 +105,11 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
       setMap(result.data);
       setMessageKind('success');
       setMessage(response.status === 201 ? '已新增卡片紀錄。' : '地圖紀錄已更新。');
+      return true;
     } catch (error) {
       setMessageKind('error');
       setMessage(error instanceof Error ? error.message : '地圖更新失敗。');
+      return false;
     } finally {
       setBusy('');
     }
@@ -127,7 +150,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
               >
                 {cards.map(card => (
                   <span className={'map-card-code ' + card.status.toLowerCase()} key={card.id}>
-                    {card.cardCode}
+                    {card.cardCode}{card.timeToken ? ' · ' + card.timeToken.tokenCode : ''}
                   </span>
                 ))}
               </span>
@@ -156,28 +179,34 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         <section className="map-placed-cards">
           <div className="map-subheading"><div><p className="eyebrow">S / J / F CARDS</p><h3>放置卡片</h3></div><span>{selectedCards.length} 張</span></div>
           <div className="map-card-form">
-            <label><span>卡片編號</span><input value={cardCode} onChange={event => setCardCode(event.target.value.toUpperCase())} placeholder="S025、J003、F001" /></label>
+            <label><span>卡片編號</span><select aria-invalid={Boolean(placementBlockedMessage)} value={cardCode} onChange={event => setCardCode(event.target.value)}>
+              <option value="">選擇卡片</option>
+              <optgroup label="劇情卡 S">{availablePlacementCards.story.map(card => <option key={card.cardCode} value={card.cardCode}>{card.cardCode}</option>)}</optgroup>
+              <optgroup label="任務卡 J">{availablePlacementCards.mission.map(card => <option key={card.cardCode} value={card.cardCode}>{card.cardCode}</option>)}</optgroup>
+              <optgroup label="大劇情卡 F">{availablePlacementCards.feature.map(code => <option key={code} value={code}>{code}</option>)}</optgroup>
+            </select></label>
             <label><span>備註</span><input value={cardNotes} onChange={event => setCardNotes(event.target.value)} placeholder="可留空" /></label>
-            <button className="button" disabled={Boolean(busy) || !cardCode.trim()} onClick={async () => {
-              await mutate('/api/campaign/map/cards', 'POST', { cardCode, locationCode: draft.mapCode, status: 'PENDING', notes: cardNotes }, 'card');
-              setCardCode(''); setCardNotes('');
+            <button className="button" disabled={Boolean(busy) || !cardCode.trim() || Boolean(placementBlockedMessage)} onClick={async () => {
+              const succeeded = await mutate('/api/campaign/map/cards', 'POST', { cardCode, locationCode: draft.mapCode, status: 'PENDING', notes: cardNotes }, 'card');
+              if (succeeded) { setCardCode(''); setCardNotes(''); }
             }} type="button">放置</button>
+            {placementBlockedMessage && <p className="map-form-error" role="alert">{placementBlockedMessage}</p>}
           </div>
           <div className="placed-card-list">
             {selectedCards.length === 0 && <p className="map-empty">這張地圖卡目前沒有 S／J／F 卡。</p>}
             {selectedCards.map(card => <article key={card.id}>
               <div><strong>{card.cardCode}</strong><small>{card.cardType === 'STORY' ? '劇情卡' : card.cardType === 'MISSION' ? '任務卡' : '大劇情卡'}</small></div>
               {card.timeToken && <span className="time-token-chip"><Clock3 aria-hidden="true" />{card.timeToken.tokenCode} · 第 {card.timeToken.unlockAtDay} 天</span>}
-              <select aria-label={'移動 ' + card.cardCode} disabled={Boolean(busy)} value={card.locationType + ':' + card.locationCode} onChange={event => {
+              <select aria-label={'移動 ' + card.cardCode} disabled={Boolean(busy) || card.status === 'RESOLVED'} value={card.locationType + ':' + card.locationCode} onChange={event => {
                 const [locationType, locationCode] = event.target.value.split(':');
                 mutate('/api/campaign/map/cards', 'POST', { cardCode: card.cardCode, locationType, locationCode, status: card.status, notes: card.notes, isInTownDeck: card.isInTownDeck }, 'move-card');
               }}>{placementOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
               {card.cardType === 'FEATURE' && <button className={'status-toggle ' + (card.isInTownDeck ? 'resolved' : 'pending')} disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/cards', 'POST', {
                 cardCode: card.cardCode, locationType: card.locationType, locationCode: card.locationCode, status: card.status, notes: card.notes, isInTownDeck: !card.isInTownDeck,
               }, 'town-deck')} type="button">{card.isInTownDeck ? '已加入城鎮' : '未加入城鎮'}</button>}
-              <button className={'status-toggle ' + card.status.toLowerCase()} disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/cards', 'POST', {
+              <button className={'status-toggle ' + card.status.toLowerCase()} disabled={Boolean(busy) || card.status === 'RESOLVED'} onClick={() => mutate('/api/campaign/map/cards', 'POST', {
                 cardCode: card.cardCode, locationType: 'MAP', locationCode: draft.mapCode,
-                status: card.status === 'PENDING' ? 'RESOLVED' : 'PENDING', notes: card.notes, isInTownDeck: card.isInTownDeck,
+                status: 'RESOLVED', notes: card.notes, isInTownDeck: card.isInTownDeck,
               }, 'card-status')} type="button">{card.status === 'PENDING' ? '待觸發' : '已完成'}</button>
               <button className="icon-button danger" aria-label={'移除 ' + card.cardCode} disabled={Boolean(busy)} onClick={() => {
                 if (window.confirm('移除 ' + card.cardCode + ' 的地圖紀錄？')) mutate('/api/campaign/map/cards/' + card.id, 'DELETE', {}, 'remove-card');
@@ -216,13 +245,52 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         </div>
         <div className="location-card-records">
           <div className="map-subheading"><div><p className="eyebrow">PLACED CARDS</p><h3>{locationDraft.locationCode} 上的卡片</h3></div><span>{selectedLocationCards.length} 張</span></div>
-          <div className="map-card-form"><label><span>卡片編號</span><input value={cardCode} onChange={event => setCardCode(event.target.value.toUpperCase())} placeholder="S025、J003、F001" /></label><label><span>備註</span><input value={cardNotes} onChange={event => setCardNotes(event.target.value)} /></label><button className="button" disabled={Boolean(busy) || !cardCode.trim()} onClick={async () => { await mutate('/api/campaign/map/cards', 'POST', { cardCode, locationType: 'LOCATION', locationCode: locationDraft.locationCode, status: 'PENDING', notes: cardNotes }, 'card'); setCardCode(''); setCardNotes(''); }} type="button">放置</button></div>
+          <div className="map-card-form"><label><span>卡片編號</span><select aria-invalid={Boolean(placementBlockedMessage)} value={cardCode} onChange={event => setCardCode(event.target.value)}>
+              <option value="">選擇卡片</option>
+              <optgroup label="劇情卡 S">{availablePlacementCards.story.map(card => <option key={card.cardCode} value={card.cardCode}>{card.cardCode}</option>)}</optgroup>
+              <optgroup label="任務卡 J">{availablePlacementCards.mission.map(card => <option key={card.cardCode} value={card.cardCode}>{card.cardCode}</option>)}</optgroup>
+              <optgroup label="大劇情卡 F">{availablePlacementCards.feature.map(code => <option key={code} value={code}>{code}</option>)}</optgroup>
+            </select></label><label><span>備註</span><input value={cardNotes} onChange={event => setCardNotes(event.target.value)} /></label><button className="button" disabled={Boolean(busy) || !cardCode.trim() || Boolean(placementBlockedMessage)} onClick={async () => { const succeeded = await mutate('/api/campaign/map/cards', 'POST', { cardCode, locationType: 'LOCATION', locationCode: locationDraft.locationCode, status: 'PENDING', notes: cardNotes }, 'card'); if (succeeded) { setCardCode(''); setCardNotes(''); } }} type="button">放置</button>{placementBlockedMessage && <p className="map-form-error" role="alert">{placementBlockedMessage}</p>}</div>
           <div className="placed-card-list">
             {selectedLocationCards.length === 0 && <p className="map-empty">這張地點卡目前沒有 S／J／F 卡。</p>}
-            {selectedLocationCards.map(card => <article key={card.id}><div><strong>{card.cardCode}</strong><small>{card.status === 'PENDING' ? '待觸發' : '已完成'}</small></div><select aria-label={'移動 ' + card.cardCode} value={card.locationType + ':' + card.locationCode} onChange={event => { const [locationType, locationCode] = event.target.value.split(':'); mutate('/api/campaign/map/cards', 'POST', { cardCode: card.cardCode, locationType, locationCode, status: card.status, notes: card.notes, isInTownDeck: card.isInTownDeck }, 'move-card'); }}>{placementOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><button className={'status-toggle ' + card.status.toLowerCase()} onClick={() => mutate('/api/campaign/map/cards', 'POST', { cardCode: card.cardCode, locationType: 'LOCATION', locationCode: locationDraft.locationCode, status: card.status === 'PENDING' ? 'RESOLVED' : 'PENDING', notes: card.notes, isInTownDeck: card.isInTownDeck }, 'card-status')} type="button">{card.status === 'PENDING' ? '待觸發' : '已完成'}</button><button className="icon-button danger" aria-label={'移除 ' + card.cardCode} onClick={() => window.confirm('移除 ' + card.cardCode + ' 的位置紀錄？') && mutate('/api/campaign/map/cards/' + card.id, 'DELETE', {}, 'remove-card')} type="button"><Trash2 aria-hidden="true" /></button></article>)}
+            {selectedLocationCards.map(card => <article key={card.id}><div><strong>{card.cardCode}</strong><small>{card.status === 'PENDING' ? '待觸發' : '已完成'}</small></div>{card.timeToken && <span className="time-token-chip"><Clock3 aria-hidden="true" />Token {card.timeToken.tokenCode} · 第 {card.timeToken.unlockAtDay} 天解鎖</span>}<select aria-label={'移動 ' + card.cardCode} disabled={Boolean(busy) || card.status === 'RESOLVED'} value={card.locationType + ':' + card.locationCode} onChange={event => { const [locationType, locationCode] = event.target.value.split(':'); mutate('/api/campaign/map/cards', 'POST', { cardCode: card.cardCode, locationType, locationCode, status: card.status, notes: card.notes, isInTownDeck: card.isInTownDeck }, 'move-card'); }}>{placementOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select><button className={'status-toggle ' + card.status.toLowerCase()} disabled={Boolean(busy) || card.status === 'RESOLVED'} onClick={() => mutate('/api/campaign/map/cards', 'POST', { cardCode: card.cardCode, locationType: 'LOCATION', locationCode: locationDraft.locationCode, status: 'RESOLVED', notes: card.notes, isInTownDeck: card.isInTownDeck }, 'card-status')} type="button">{card.status === 'PENDING' ? '待觸發' : '已完成'}</button><button className="icon-button danger" aria-label={'移除 ' + card.cardCode} onClick={() => window.confirm('移除 ' + card.cardCode + ' 的位置紀錄？') && mutate('/api/campaign/map/cards/' + card.id, 'DELETE', {}, 'remove-card')} type="button"><Trash2 aria-hidden="true" /></button></article>)}
           </div>
         </div>
       </div>}
+    </section>
+
+    <section className="campaign-card-progress-section" aria-labelledby="campaign-card-progress-title">
+      <header className="campaign-module-heading compact">
+        <div><p className="eyebrow">STORY / MISSION CARDS</p><h2 id="campaign-card-progress-title">劇情卡與任務卡清單</h2><p>每場戰役獨立保存完成狀態；點選卡號可標記完成。</p></div>
+        <span>{resolvedCardCount} / {map.cardProgress.length} 已完成</span>
+      </header>
+      <div className="card-progress-toolbar">
+        <div role="group" aria-label="卡片類型">
+          {(['ALL', 'STORY', 'MISSION'] as const).map(filter => <button className={progressTypeFilter === filter ? 'active' : ''} key={filter} onClick={() => setProgressTypeFilter(filter)} type="button">{filter === 'ALL' ? '全部' : filter === 'STORY' ? '劇情卡 S' : '任務卡 J'}</button>)}
+        </div>
+        <div role="group" aria-label="完成狀態">
+          {(['ALL', 'OPEN', 'RESOLVED'] as const).map(filter => <button className={progressStateFilter === filter ? 'active' : ''} key={filter} onClick={() => setProgressStateFilter(filter)} type="button">{filter === 'ALL' ? '全部狀態' : filter === 'OPEN' ? '未完成' : '已完成'}</button>)}
+        </div>
+        <p><span className="card-progress-key unplaced" />未放置 <span className="card-progress-key placed" />已放置 <span className="card-progress-key resolved" />已完成</p>
+      </div>
+      <div className="campaign-card-progress-grid">
+        {visibleCardProgress.map(card => {
+          const state = card.isResolved ? 'resolved' : card.locationCode ? 'placed' : 'unplaced';
+          const stateLabel = card.isResolved ? '已完成' : card.locationCode ? '已放置於 ' + card.locationCode : '未放置';
+          return <button
+            aria-label={card.cardCode + '，' + stateLabel}
+            className={'campaign-card-progress ' + state}
+            disabled={Boolean(busy)}
+            key={card.cardCode}
+            onClick={() => {
+              if (card.isResolved && !window.confirm('將 ' + card.cardCode + ' 更正為未完成？這只應用於修正誤記。')) return;
+              mutate('/api/campaign/map/card-progress/' + card.cardCode, 'PATCH', { isResolved: !card.isResolved }, 'card-progress');
+            }}
+            title={stateLabel}
+            type="button"
+          ><strong>{card.cardCode}</strong></button>;
+        })}
+      </div>
     </section>
 
     <section className="event-notes-section" aria-labelledby="event-notes-title">

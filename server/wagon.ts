@@ -53,6 +53,20 @@ async function loadWagon(db: D1Database, session: AuthSession) {
     id: number; token_code: 'A' | 'B' | 'C' | 'D';
     placed_at_day: number; unlock_at_day: number; card_code: string;
   }>();
+  const availableStoryCards = await db.prepare(`
+    SELECT catalog.card_code
+    FROM campaign_card_catalog catalog
+    LEFT JOIN campaign_card_statuses status
+      ON status.campaign_id = ? AND status.card_code = catalog.card_code
+    LEFT JOIN campaign_cards_progress progress
+      ON progress.campaign_id = ? AND progress.card_code = catalog.card_code
+    LEFT JOIN campaign_card_time_tokens token
+      ON token.story_card_progress_id = progress.id AND token.status = 'ACTIVE'
+    WHERE catalog.card_type = 'STORY'
+      AND COALESCE(status.is_resolved, 0) = 0
+      AND token.id IS NULL
+    ORDER BY catalog.sort_order
+  `).bind(session.campaignId, session.campaignId).all<{ card_code: string }>();
   const resources = await db.prepare(`
     SELECT r.code, r.name, r.image_url, COALESCE(wr.quantity, 0) AS quantity
     FROM crafting_resources r
@@ -84,6 +98,7 @@ async function loadWagon(db: D1Database, session: AuthSession) {
       placedAtDay: row.placed_at_day, unlockAtDay: row.unlock_at_day,
       storyCardCode: row.card_code,
     })),
+    availableStoryCardCodes: availableStoryCards.results.map(row => row.card_code),
     resources: resources.results.map(row => ({
       code: row.code, name: row.name, imageUrl: row.image_url, quantity: row.quantity,
     })),
@@ -197,7 +212,18 @@ export async function createTimeToken(c: Ctx) {
   const storyCardCode = typeof body?.storyCardCode === 'string' ? body.storyCardCode.trim().toUpperCase() : '';
   const tokenCode = typeof body?.tokenCode === 'string' ? body.tokenCode.toUpperCase() : '';
   const unlockAfterDays = Number(body?.unlockAfterDays);
-  if (!/^S\d{3,4}$/.test(storyCardCode)) return error(c, 400, 'INVALID_STORY_CARD', '劇情卡編號格式需為 Sxxx。');
+  if (!/^S\d{3}$/.test(storyCardCode)) return error(c, 400, 'INVALID_STORY_CARD', '請選擇有效的劇情卡編號。');
+  const storyCard = await c.env.DB.prepare(`
+    SELECT catalog.card_code, COALESCE(status.is_resolved, 0) AS is_resolved
+    FROM campaign_card_catalog catalog
+    LEFT JOIN campaign_card_statuses status
+      ON status.campaign_id = ? AND status.card_code = catalog.card_code
+    WHERE catalog.card_code = ? AND catalog.card_type = 'STORY'
+  `).bind(session.campaignId, storyCardCode).first<{ card_code: string; is_resolved: number }>();
+  if (!storyCard) return error(c, 400, 'INVALID_STORY_CARD', '這個劇情卡編號不在已知卡片清單中。');
+  if (storyCard.is_resolved === 1) {
+    return error(c, 409, 'CARD_ALREADY_RESOLVED', storyCardCode + ' 已完成／不再使用，不能放置 Time Token。');
+  }
   if (!['A', 'B', 'C', 'D'].includes(tokenCode)) {
     return error(c, 400, 'INVALID_TIME_TOKEN', '請選擇 A 至 D 的其中一枚 Time Token。');
   }

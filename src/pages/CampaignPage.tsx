@@ -207,8 +207,6 @@ export function CampaignPage({ session, loading, onLogout }: {
       <span className={session.isActive ? 'campaign-state active' : 'campaign-state'}>{session.isActive ? '進行中' : '已凍結'}</span>
     </header>
 
-    {failure && <div className="campaign-error" role="alert">{failure}<button onClick={() => setFailure('')}>關閉</button></div>}
-
     <div className="campaign-session-card">
       <UserRound aria-hidden="true" />
       <div><small>目前玩家</small><strong>{session.playerAlias}</strong><span>玩家席位 {session.playerNumber}</span></div>
@@ -417,7 +415,12 @@ export function CampaignPage({ session, loading, onLogout }: {
       <article className="wagon-panel token-panel">
         <header><div><p className="eyebrow">TIME TOKENS</p><h2><Clock3 size={20} />劇情卡時間標記</h2></div><button className="button" onClick={() => setTokenFormOpen(value => !value)}>{tokenFormOpen ? '收起' : '放置 Token'}</button></header>
         {tokenFormOpen && <form className="token-form" onSubmit={addTimeToken}>
-          <label>劇情卡編號<input value={storyCardCode} onChange={event => setStoryCardCode(event.target.value)} placeholder="S001" pattern="S[0-9]{3,4}" required /></label>
+          <label>劇情卡編號
+            <select value={storyCardCode} onChange={event => setStoryCardCode(event.target.value)} required>
+              <option value="">選擇劇情卡</option>
+              {wagon.availableStoryCardCodes.map(code => <option key={code} value={code}>{code}</option>)}
+            </select>
+          </label>
           <label>Token
             <select value={tokenCode} onChange={event => setTokenCode(event.target.value as typeof tokenCode)}>{['A', 'B', 'C', 'D'].map(code => <option key={code}>{code}</option>)}</select>
           </label>
@@ -453,7 +456,9 @@ export function CampaignPage({ session, loading, onLogout }: {
         <div><button className="text-button" onClick={() => setPendingDay(null)}>取消</button><button className="button" disabled={savingDay} onClick={() => void updateDay()}>{savingDay ? '更新中…' : '確認更新'}</button></div>
       </section>
     </div>}
-    {toast && <div className="toast" role="status">{toast}</div>}
+    {failure
+      ? <div className="toast toast-error" role="alert"><span>{failure}</span><button aria-label="關閉錯誤通知" onClick={() => setFailure('')} type="button">關閉</button></div>
+      : toast && <div className="toast" role="status">{toast}</div>}
   </section>;
 }
 

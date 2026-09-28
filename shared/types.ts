@@ -123,6 +123,7 @@ export interface CampaignWagon {
   version: number;
   upgrades: WagonUpgrade[];
   timeTokens: WagonTimeToken[];
+  availableStoryCardCodes: string[];
   resources: WagonResource[];
   equipment: WagonEquipmentInstance[];
 }
@@ -165,5 +166,16 @@ export interface CampaignMap {
   tiles: CampaignMapTile[];
   locations: CampaignLocationCard[];
   cards: CampaignMapCard[];
+  cardProgress: CampaignCardProgress[];
 }
+
+export interface CampaignCardProgress {
+  cardCode: string;
+  cardType: 'STORY' | 'MISSION';
+  edition: 'CORE' | 'EXPANSION';
+  isResolved: boolean;
+  locationType: 'MAP' | 'LOCATION' | null;
+  locationCode: string | null;
+}
+
 export interface CampaignMapResponse { data: CampaignMap }
