@@ -31,3 +31,9 @@ scripts/locate_offense_icon.py
 
 .agents
 plan
+
+# 規則擷取與地圖母版/中繼底圖素材
+pdf_text.txt
+public/images/campaign/maps/clear-*-sheet.png
+public/images/campaign/maps/red-frame-uniform-base/
+public/images/campaign/maps/uniform-name-blanks/
