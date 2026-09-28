@@ -232,28 +232,32 @@ export async function createTimeToken(c: Ctx) {
     return error(c, 400, 'INVALID_UNLOCK_DELAY', '解鎖等待天數至少為 1 天，且解鎖日不可超過第 60 天。');
   }
   const unlockAtDay = wagon.elapsedDays + unlockAfterDays;
-  await c.env.DB.prepare(`
-    INSERT INTO campaign_cards_progress (campaign_id, card_code, card_type, status)
-    VALUES (?, ?, 'STORY', 'LOCKED')
-    ON CONFLICT(campaign_id, card_code) DO UPDATE SET status = 'LOCKED', updated_at = datetime('now')
-  `).bind(session.campaignId, storyCardCode).run();
-  const card = await c.env.DB.prepare(
-    'SELECT id FROM campaign_cards_progress WHERE campaign_id = ? AND card_code = ?',
-  ).bind(session.campaignId, storyCardCode).first<{ id: number }>();
   try {
-    const inserted = await c.env.DB.prepare(`
-      INSERT INTO campaign_card_time_tokens
-        (campaign_id, story_card_progress_id, token_code, placed_at_day, unlock_at_day)
-      VALUES (?, ?, ?, ?, ?)
-    `).bind(session.campaignId, card?.id, tokenCode, wagon.elapsedDays, unlockAtDay).run();
-    await c.env.DB.prepare(`
-      INSERT INTO wagon_activity_logs
-        (campaign_id, player_number, action_type, entity_type, entity_id, after_json)
-      VALUES (?, ?, 'PLACE_TIME_TOKEN', 'TIME_TOKEN', ?, ?)
-    `).bind(
-      session.campaignId, session.playerNumber, String(inserted.meta.last_row_id),
-      JSON.stringify({ storyCardCode, tokenCode, unlockAtDay }),
-    ).run();
+    await c.env.DB.batch([
+      c.env.DB.prepare(`
+        INSERT INTO campaign_cards_progress (campaign_id, card_code, card_type, status)
+        VALUES (?, ?, 'STORY', 'LOCKED')
+        ON CONFLICT(campaign_id, card_code) DO UPDATE SET status = 'LOCKED', updated_at = datetime('now')
+      `).bind(session.campaignId, storyCardCode),
+      c.env.DB.prepare(`
+        INSERT INTO campaign_card_time_tokens
+          (campaign_id, story_card_progress_id, token_code, placed_at_day, unlock_at_day)
+        SELECT ?, id, ?, ?, ?
+        FROM campaign_cards_progress
+        WHERE campaign_id = ? AND card_code = ?
+      `).bind(
+        session.campaignId, tokenCode, wagon.elapsedDays, unlockAtDay,
+        session.campaignId, storyCardCode,
+      ),
+      c.env.DB.prepare(`
+        INSERT INTO wagon_activity_logs
+          (campaign_id, player_number, action_type, entity_type, entity_id, after_json)
+        VALUES (?, ?, 'PLACE_TIME_TOKEN', 'TIME_TOKEN', ?, ?)
+      `).bind(
+        session.campaignId, session.playerNumber, storyCardCode,
+        JSON.stringify({ storyCardCode, tokenCode, unlockAtDay }),
+      ),
+    ]);
   } catch (cause) {
     const msg = cause instanceof Error ? cause.message : String(cause);
     if (msg.includes('UNIQUE constraint failed') || msg.includes('idx_active')) {

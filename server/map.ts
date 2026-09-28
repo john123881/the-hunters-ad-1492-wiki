@@ -19,6 +19,13 @@ function validLocationCode(code: string) {
   const value = Number(code.slice(1));
   return /^L\d{2}$/.test(code) && value >= 1 && value <= 14;
 }
+function parentMapCodeForLocation(code: string | null) {
+  const value = Number(code?.slice(1));
+  if (value >= 1 && value <= 6) return 'M10';
+  if (value >= 7 && value <= 9) return 'M15';
+  if (value >= 10 && value <= 11) return 'M04';
+  return null;
+}
 function cardType(code: string): 'STORY' | 'MISSION' | 'FEATURE' | null {
   if (/^S(?:0(?:0[1-9]|[1-9]\d)|10[0-2]|20[1-9]|210)$/.test(code)) return 'STORY';
   if (/^J(?:0(?:0[1-9]|1[0-6])|10[1-2])$/.test(code)) return 'MISSION';
@@ -79,22 +86,31 @@ async function loadMap(db: D1Database, session: AuthSession) {
   const cardProgress = await db.prepare(`
     SELECT c.card_code, c.card_type, c.edition,
            COALESCE(s.is_resolved, 0) AS is_resolved,
-           p.location_type, p.location_code
+           p.location_type, p.location_code,
+           token.token_code, token.unlock_at_day
     FROM campaign_card_catalog c
     LEFT JOIN campaign_card_statuses s
       ON s.card_code = c.card_code AND s.campaign_id = ?
     LEFT JOIN campaign_map_card_placements p
       ON p.card_code = c.card_code AND p.campaign_id = ?
+    LEFT JOIN campaign_cards_progress progress
+      ON progress.card_code = c.card_code AND progress.campaign_id = ?
+    LEFT JOIN campaign_card_time_tokens token
+      ON token.story_card_progress_id = progress.id AND token.status = 'ACTIVE'
     ORDER BY c.sort_order
-  `).bind(session.campaignId, session.campaignId).all<{
+  `).bind(session.campaignId, session.campaignId, session.campaignId).all<{
     card_code: string; card_type: 'STORY' | 'MISSION'; edition: 'CORE' | 'EXPANSION';
     is_resolved: number; location_type: 'MAP' | 'LOCATION' | null; location_code: string | null;
+    token_code: 'A' | 'B' | 'C' | 'D' | null; unlock_at_day: number | null;
   }>();
   return {
     campaignId: session.campaignId,
     version: map?.version ?? 1,
     currentLocationType: map?.current_location_type ?? null,
     currentLocationCode: map?.current_location_code ?? null,
+    currentMapCode: map?.current_location_type === 'MAP'
+      ? map.current_location_code
+      : parentMapCodeForLocation(map?.current_location_code ?? null),
     roadEventNotes: map?.road_event_notes ?? '',
     townEventNotes: map?.town_event_notes ?? '',
     tiles: tiles.results.map(row => ({
@@ -114,24 +130,73 @@ async function loadMap(db: D1Database, session: AuthSession) {
     cardProgress: cardProgress.results.map(row => ({
       cardCode: row.card_code, cardType: row.card_type, edition: row.edition,
       isResolved: Boolean(row.is_resolved), locationType: row.location_type, locationCode: row.location_code,
+      timeToken: row.token_code ? { tokenCode: row.token_code, unlockAtDay: row.unlock_at_day } : null,
     })),
   };
 }
-async function claimVersion(c: Ctx, session: AuthSession, expectedVersion: number) {
-  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) return false;
-  await ensureMap(c.env.DB, session.campaignId);
-  const result = await c.env.DB.prepare(`
-    UPDATE campaign_maps SET version = version + 1, updated_by_player = ?, updated_at = datetime('now')
-    WHERE campaign_id = ? AND version = ?
-  `).bind(session.playerNumber, session.campaignId, expectedVersion).run();
-  return Boolean(result.meta.changes);
-}
-async function log(db: D1Database, session: AuthSession, action: string, entity: string, id: string, before: unknown, after: unknown) {
-  await db.prepare(`
+function guardedMapLog(
+  db: D1Database,
+  session: AuthSession,
+  expectedVersion: number,
+  action: string,
+  entity: string,
+  id: string,
+  before: unknown,
+  after: unknown,
+) {
+  return db.prepare(`
     INSERT INTO map_activity_logs
       (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).bind(session.campaignId, session.playerNumber, action, entity, id, JSON.stringify(before), JSON.stringify(after)).run();
+    SELECT ?, ?, ?, ?, ?, ?, ?
+    WHERE EXISTS (
+      SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?
+    )
+  `).bind(
+    session.campaignId, session.playerNumber, action, entity, id,
+    JSON.stringify(before), JSON.stringify(after),
+    session.campaignId, expectedVersion,
+  );
+}
+
+function guardedWagonLog(
+  db: D1Database,
+  session: AuthSession,
+  expectedVersion: number,
+  tokenId: number,
+  cardCode: string,
+  tokenCode: string,
+) {
+  return db.prepare(`
+    INSERT INTO wagon_activity_logs
+      (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json)
+    SELECT ?, ?, 'REMOVE_TIME_TOKEN_ON_CARD_RESOLUTION', 'TIME_TOKEN', ?, ?, ?
+    WHERE EXISTS (
+      SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?
+    )
+  `).bind(
+    session.campaignId, session.playerNumber, String(tokenId),
+    JSON.stringify({ status: 'ACTIVE', storyCardCode: cardCode, tokenCode }),
+    JSON.stringify({ status: 'REMOVED', storyCardCode: cardCode, reason: 'CARD_RESOLVED' }),
+    session.campaignId, expectedVersion,
+  );
+}
+
+async function runMapBatch(
+  c: Ctx,
+  session: AuthSession,
+  expectedVersion: number,
+  statements: D1PreparedStatement[],
+  finalMapUpdate?: D1PreparedStatement,
+) {
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) return false;
+  await ensureMap(c.env.DB, session.campaignId);
+  const versionUpdate = finalMapUpdate ?? c.env.DB.prepare(`
+    UPDATE campaign_maps
+    SET version = version + 1, updated_by_player = ?, updated_at = datetime('now')
+    WHERE campaign_id = ? AND version = ?
+  `).bind(session.playerNumber, session.campaignId, expectedVersion);
+  const results = await c.env.DB.batch([...statements, versionUpdate]);
+  return Boolean(results[results.length - 1]?.meta.changes);
 }
 
 export async function getCampaignMap(c: Ctx) {
@@ -149,22 +214,22 @@ export async function updateMapTile(c: Ctx) {
   const face = isRevealed === true ? 'FRONT' : 'BACK';
   const resourceNotes = typeof input?.resourceNotes === 'string' ? input.resourceNotes.trim() : '';
   const notes = typeof input?.notes === 'string' ? input.notes.trim() : '';
-  if (typeof isRevealed !== 'boolean') {
-    return error(c, 400, 'INVALID_MAP_TILE', '地圖卡狀態不正確。');
-  }
+  if (typeof isRevealed !== 'boolean') return error(c, 400, 'INVALID_MAP_TILE', '地圖卡狀態不正確。');
   if (resourceNotes.length > 1000 || notes.length > 2000) {
     return error(c, 400, 'MAP_NOTES_TOO_LONG', '資源紀錄或備註內容過長。');
   }
   const before = await c.env.DB.prepare('SELECT is_revealed, face, resource_notes, notes FROM campaign_map_tiles WHERE campaign_id = ? AND map_code = ?')
     .bind(session.campaignId, mapCode).first();
-  if (!await claimVersion(c, session, expectedVersion)) {
-    return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  }
-  await c.env.DB.prepare(`
-    UPDATE campaign_map_tiles SET is_revealed = ?, face = ?, resource_notes = ?, notes = ?, updated_at = datetime('now')
-    WHERE campaign_id = ? AND map_code = ?
-  `).bind(isRevealed ? 1 : 0, face, resourceNotes, notes, session.campaignId, mapCode).run();
-  await log(c.env.DB, session, 'UPDATE_MAP_TILE', 'MAP_TILE', mapCode, before, { isRevealed, face, resourceNotes, notes });
+  const updated = await runMapBatch(c, session, expectedVersion, [
+    c.env.DB.prepare(`
+      UPDATE campaign_map_tiles
+      SET is_revealed = ?, face = ?, resource_notes = ?, notes = ?, updated_at = datetime('now')
+      WHERE campaign_id = ? AND map_code = ?
+        AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+    `).bind(isRevealed ? 1 : 0, face, resourceNotes, notes, session.campaignId, mapCode, session.campaignId, expectedVersion),
+    guardedMapLog(c.env.DB, session, expectedVersion, 'UPDATE_MAP_TILE', 'MAP_TILE', mapCode, before, { isRevealed, face, resourceNotes, notes }),
+  ]);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -178,17 +243,21 @@ export async function updateMapPosition(c: Ctx) {
     return error(c, 400, 'INVALID_LOCATION', '目前位置類型不正確。');
   }
   if ((locationType === 'MAP' && (!locationCode || !validMapCode(locationCode)))
-      || (locationType === 'LOCATION' && (!locationCode || !/^L(?:0[1-9]|1[0-4])$/.test(locationCode)))) {
+      || (locationType === 'LOCATION' && (!locationCode || !validLocationCode(locationCode)))) {
     return error(c, 400, 'INVALID_LOCATION', '目前位置編號不正確。');
   }
   const before = await c.env.DB.prepare('SELECT current_location_type, current_location_code FROM campaign_maps WHERE campaign_id = ?')
     .bind(session.campaignId).first();
-  if (!await claimVersion(c, session, expectedVersion)) {
-    return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  }
-  await c.env.DB.prepare('UPDATE campaign_maps SET current_location_type = ?, current_location_code = ? WHERE campaign_id = ?')
-    .bind(locationType, locationCode, session.campaignId).run();
-  await log(c.env.DB, session, 'SET_HUNTER_LOCATION', 'MAP', session.campaignId, before, { locationType, locationCode });
+  const finalUpdate = c.env.DB.prepare(`
+    UPDATE campaign_maps
+    SET current_location_type = ?, current_location_code = ?,
+        version = version + 1, updated_by_player = ?, updated_at = datetime('now')
+    WHERE campaign_id = ? AND version = ?
+  `).bind(locationType, locationCode, session.playerNumber, session.campaignId, expectedVersion);
+  const updated = await runMapBatch(c, session, expectedVersion, [
+    guardedMapLog(c.env.DB, session, expectedVersion, 'SET_HUNTER_LOCATION', 'MAP', session.campaignId, before, { locationType, locationCode }),
+  ], finalUpdate);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -204,7 +273,9 @@ export async function upsertMapCard(c: Ctx) {
   const requestedStatus = input?.status === 'RESOLVED' ? 'RESOLVED' : 'PENDING';
   const notes = typeof input?.notes === 'string' ? input.notes.trim() : '';
   if (!type) return error(c, 400, 'INVALID_CARD_CODE', '卡片編號需為有效的 S、J 或 F 編號。');
-  if ((locationType === 'MAP' && !validMapCode(locationCode)) || (locationType === 'LOCATION' && !validLocationCode(locationCode))) return error(c, 400, 'INVALID_LOCATION', '請選擇有效的地圖卡或地點卡。');
+  if ((locationType === 'MAP' && !validMapCode(locationCode)) || (locationType === 'LOCATION' && !validLocationCode(locationCode))) {
+    return error(c, 400, 'INVALID_LOCATION', '請選擇有效的地圖卡或地點卡。');
+  }
   if (notes.length > 500) return error(c, 400, 'CARD_NOTES_TOO_LONG', '卡片備註不可超過 500 字。');
 
   const trackedCard = type === 'STORY' || type === 'MISSION'
@@ -224,33 +295,63 @@ export async function upsertMapCard(c: Ctx) {
 
   const before = await c.env.DB.prepare('SELECT * FROM campaign_map_card_placements WHERE campaign_id = ? AND card_code = ?')
     .bind(session.campaignId, cardCode).first();
-  if (!await claimVersion(c, session, expectedVersion)) {
-    return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  }
+  const activeToken = trackedCard && requestedStatus === 'RESOLVED'
+    ? await c.env.DB.prepare(`
+      SELECT token.id, token.token_code
+      FROM campaign_card_time_tokens token
+      JOIN campaign_cards_progress card ON card.id = token.story_card_progress_id
+      WHERE token.campaign_id = ? AND card.card_code = ? AND token.status = 'ACTIVE'
+    `).bind(session.campaignId, cardCode).first<{ id: number; token_code: string }>()
+    : null;
+  const statements: D1PreparedStatement[] = [];
 
   if (trackedCard && requestedStatus === 'RESOLVED') {
-    await c.env.DB.prepare(`
+    statements.push(c.env.DB.prepare(`
       INSERT INTO campaign_card_statuses
         (campaign_id, card_code, is_resolved, resolved_at, updated_by_player)
-      VALUES (?, ?, 1, datetime('now'), ?)
+      SELECT ?, ?, 1, datetime('now'), ?
+      WHERE EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
       ON CONFLICT(campaign_id, card_code) DO UPDATE SET
-        is_resolved = 1,
-        resolved_at = COALESCE(campaign_card_statuses.resolved_at, datetime('now')),
-        updated_by_player = excluded.updated_by_player,
-        updated_at = datetime('now')
-    `).bind(session.campaignId, cardCode, session.playerNumber).run();
+        is_resolved = 1, resolved_at = COALESCE(campaign_card_statuses.resolved_at, datetime('now')),
+        updated_by_player = excluded.updated_by_player, updated_at = datetime('now')
+    `).bind(session.campaignId, cardCode, session.playerNumber, session.campaignId, expectedVersion));
+    if (activeToken) {
+      statements.push(
+        guardedWagonLog(c.env.DB, session, expectedVersion, activeToken.id, cardCode, activeToken.token_code),
+        c.env.DB.prepare(`
+          UPDATE campaign_card_time_tokens
+          SET status = 'REMOVED', removed_at = datetime('now'), removed_by_player = ?
+          WHERE id = ? AND campaign_id = ? AND status = 'ACTIVE'
+            AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+        `).bind(session.playerNumber, activeToken.id, session.campaignId, session.campaignId, expectedVersion),
+        c.env.DB.prepare(`
+          UPDATE campaign_cards_progress SET status = 'RESOLVED', updated_at = datetime('now')
+          WHERE campaign_id = ? AND card_code = ?
+            AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+        `).bind(session.campaignId, cardCode, session.campaignId, expectedVersion),
+      );
+    }
   }
-  const effectiveStatus = trackedCard && progress?.is_resolved === 1 ? 'RESOLVED' : requestedStatus;
-  await c.env.DB.prepare(`
-    INSERT INTO campaign_map_card_placements
-      (campaign_id, card_code, card_type, status, location_type, location_code, notes, is_in_town_deck)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(campaign_id, card_code) DO UPDATE SET
-      card_type = excluded.card_type, status = excluded.status,
-      location_type = excluded.location_type, location_code = excluded.location_code,
-      notes = excluded.notes, is_in_town_deck = excluded.is_in_town_deck, updated_at = datetime('now')
-  `).bind(session.campaignId, cardCode, type, effectiveStatus, locationType, locationCode, notes, isInTownDeck ? 1 : 0).run();
-  await log(c.env.DB, session, before ? 'MOVE_OR_UPDATE_CARD' : 'PLACE_CARD', 'MAP_CARD', cardCode, before, { cardCode, type, status: effectiveStatus, locationType, locationCode, notes, isInTownDeck });
+
+  statements.push(
+    c.env.DB.prepare(`
+      INSERT INTO campaign_map_card_placements
+        (campaign_id, card_code, card_type, status, location_type, location_code, notes, is_in_town_deck)
+      SELECT ?, ?, ?, ?, ?, ?, ?, ?
+      WHERE EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+      ON CONFLICT(campaign_id, card_code) DO UPDATE SET
+        card_type = excluded.card_type, status = excluded.status,
+        location_type = excluded.location_type, location_code = excluded.location_code,
+        notes = excluded.notes, is_in_town_deck = excluded.is_in_town_deck, updated_at = datetime('now')
+    `).bind(session.campaignId, cardCode, type, requestedStatus, locationType, locationCode, notes, isInTownDeck ? 1 : 0, session.campaignId, expectedVersion),
+    guardedMapLog(
+      c.env.DB, session, expectedVersion, before ? 'MOVE_OR_UPDATE_CARD' : 'PLACE_CARD',
+      'MAP_CARD', cardCode, before,
+      { cardCode, type, status: requestedStatus, locationType, locationCode, notes, isInTownDeck, removedTimeToken: Boolean(activeToken) },
+    ),
+  );
+  const updated = await runMapBatch(c, session, expectedVersion, statements);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) }, before ? 200 : 201);
 }
 
@@ -272,32 +373,56 @@ export async function updateCampaignCardProgress(c: Ctx) {
   const before = await c.env.DB.prepare(
     'SELECT is_resolved, resolved_at FROM campaign_card_statuses WHERE campaign_id = ? AND card_code = ?',
   ).bind(session.campaignId, cardCode).first<{ is_resolved: number; resolved_at: string | null }>();
-  if (Boolean(before?.is_resolved) === isResolved) {
-    return c.json({ data: await loadMap(c.env.DB, session) });
-  }
-  if (!await claimVersion(c, session, expectedVersion)) {
-    return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  }
+  if (Boolean(before?.is_resolved) === isResolved) return c.json({ data: await loadMap(c.env.DB, session) });
 
-  await c.env.DB.prepare(`
-    INSERT INTO campaign_card_statuses
-      (campaign_id, card_code, is_resolved, resolved_at, updated_by_player)
-    VALUES (?, ?, ?, CASE WHEN ? = 1 THEN datetime('now') ELSE NULL END, ?)
-    ON CONFLICT(campaign_id, card_code) DO UPDATE SET
-      is_resolved = excluded.is_resolved,
-      resolved_at = excluded.resolved_at,
-      updated_by_player = excluded.updated_by_player,
-      updated_at = datetime('now')
-  `).bind(session.campaignId, cardCode, isResolved ? 1 : 0, isResolved ? 1 : 0, session.playerNumber).run();
-  await c.env.DB.prepare(`
-    UPDATE campaign_map_card_placements
-    SET status = ?, updated_at = datetime('now')
-    WHERE campaign_id = ? AND card_code = ?
-  `).bind(isResolved ? 'RESOLVED' : 'PENDING', session.campaignId, cardCode).run();
-  await log(
-    c.env.DB, session, isResolved ? 'RESOLVE_CARD' : 'REOPEN_CARD',
-    'CAMPAIGN_CARD', cardCode, before ?? { is_resolved: 0, resolved_at: null }, { isResolved },
-  );
+  const activeToken = isResolved
+    ? await c.env.DB.prepare(`
+      SELECT token.id, token.token_code
+      FROM campaign_card_time_tokens token
+      JOIN campaign_cards_progress card ON card.id = token.story_card_progress_id
+      WHERE token.campaign_id = ? AND card.card_code = ? AND token.status = 'ACTIVE'
+    `).bind(session.campaignId, cardCode).first<{ id: number; token_code: string }>()
+    : null;
+  const statements: D1PreparedStatement[] = [
+    c.env.DB.prepare(`
+      INSERT INTO campaign_card_statuses
+        (campaign_id, card_code, is_resolved, resolved_at, updated_by_player)
+      SELECT ?, ?, ?, CASE WHEN ? = 1 THEN datetime('now') ELSE NULL END, ?
+      WHERE EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+      ON CONFLICT(campaign_id, card_code) DO UPDATE SET
+        is_resolved = excluded.is_resolved, resolved_at = excluded.resolved_at,
+        updated_by_player = excluded.updated_by_player, updated_at = datetime('now')
+    `).bind(session.campaignId, cardCode, isResolved ? 1 : 0, isResolved ? 1 : 0, session.playerNumber, session.campaignId, expectedVersion),
+    c.env.DB.prepare(`
+      UPDATE campaign_map_card_placements
+      SET status = ?, updated_at = datetime('now')
+      WHERE campaign_id = ? AND card_code = ?
+        AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+    `).bind(isResolved ? 'RESOLVED' : 'PENDING', session.campaignId, cardCode, session.campaignId, expectedVersion),
+  ];
+  if (activeToken) {
+    statements.push(
+      guardedWagonLog(c.env.DB, session, expectedVersion, activeToken.id, cardCode, activeToken.token_code),
+      c.env.DB.prepare(`
+        UPDATE campaign_card_time_tokens
+        SET status = 'REMOVED', removed_at = datetime('now'), removed_by_player = ?
+        WHERE id = ? AND campaign_id = ? AND status = 'ACTIVE'
+          AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+      `).bind(session.playerNumber, activeToken.id, session.campaignId, session.campaignId, expectedVersion),
+      c.env.DB.prepare(`
+        UPDATE campaign_cards_progress SET status = 'RESOLVED', updated_at = datetime('now')
+        WHERE campaign_id = ? AND card_code = ?
+          AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+      `).bind(session.campaignId, cardCode, session.campaignId, expectedVersion),
+    );
+  }
+  statements.push(guardedMapLog(
+    c.env.DB, session, expectedVersion, isResolved ? 'RESOLVE_CARD' : 'REOPEN_CARD',
+    'CAMPAIGN_CARD', cardCode, before ?? { is_resolved: 0, resolved_at: null },
+    { isResolved, removedTimeToken: Boolean(activeToken) },
+  ));
+  const updated = await runMapBatch(c, session, expectedVersion, statements);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -309,15 +434,17 @@ export async function removeMapCard(c: Ctx) {
   const before = await c.env.DB.prepare('SELECT * FROM campaign_map_card_placements WHERE id = ? AND campaign_id = ?')
     .bind(id, session.campaignId).first();
   if (!before) return error(c, 404, 'MAP_CARD_NOT_FOUND', '找不到這筆卡片紀錄。');
-  if (!await claimVersion(c, session, expectedVersion)) {
-    return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  }
-  await c.env.DB.prepare('DELETE FROM campaign_map_card_placements WHERE id = ? AND campaign_id = ?')
-    .bind(id, session.campaignId).run();
-  await log(c.env.DB, session, 'REMOVE_CARD', 'MAP_CARD', String(id), before, null);
+  const updated = await runMapBatch(c, session, expectedVersion, [
+    c.env.DB.prepare(`
+      DELETE FROM campaign_map_card_placements
+      WHERE id = ? AND campaign_id = ?
+        AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+    `).bind(id, session.campaignId, session.campaignId, expectedVersion),
+    guardedMapLog(c.env.DB, session, expectedVersion, 'REMOVE_CARD', 'MAP_CARD', String(id), before, null),
+  ]);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
-
 
 export async function updateLocationCard(c: Ctx) {
   const session = await requireCampaignSession(c);
@@ -331,11 +458,18 @@ export async function updateLocationCard(c: Ctx) {
   const notes = typeof input?.notes === 'string' ? input.notes.trim() : '';
   if (typeof isRevealed !== 'boolean') return error(c, 400, 'INVALID_LOCATION_CARD', '地點卡狀態不正確。');
   if (resourceNotes.length > 1000 || notes.length > 2000) return error(c, 400, 'LOCATION_NOTES_TOO_LONG', '資源紀錄或備註內容過長。');
-  const before = await c.env.DB.prepare('SELECT is_revealed, face, resource_notes, notes FROM campaign_location_cards WHERE campaign_id = ? AND location_code = ?').bind(session.campaignId, locationCode).first();
-  if (!await claimVersion(c, session, expectedVersion)) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  await c.env.DB.prepare(`UPDATE campaign_location_cards SET is_revealed = ?, face = ?, resource_notes = ?, notes = ?, updated_at = datetime('now') WHERE campaign_id = ? AND location_code = ?`)
-    .bind(isRevealed ? 1 : 0, face, resourceNotes, notes, session.campaignId, locationCode).run();
-  await log(c.env.DB, session, 'UPDATE_LOCATION_CARD', 'LOCATION_CARD', locationCode, before, { isRevealed, face, resourceNotes, notes });
+  const before = await c.env.DB.prepare('SELECT is_revealed, face, resource_notes, notes FROM campaign_location_cards WHERE campaign_id = ? AND location_code = ?')
+    .bind(session.campaignId, locationCode).first();
+  const updated = await runMapBatch(c, session, expectedVersion, [
+    c.env.DB.prepare(`
+      UPDATE campaign_location_cards
+      SET is_revealed = ?, face = ?, resource_notes = ?, notes = ?, updated_at = datetime('now')
+      WHERE campaign_id = ? AND location_code = ?
+        AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ? AND version = ?)
+    `).bind(isRevealed ? 1 : 0, face, resourceNotes, notes, session.campaignId, locationCode, session.campaignId, expectedVersion),
+    guardedMapLog(c.env.DB, session, expectedVersion, 'UPDATE_LOCATION_CARD', 'LOCATION_CARD', locationCode, before, { isRevealed, face, resourceNotes, notes }),
+  ]);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -345,11 +479,20 @@ export async function updateMapEventNotes(c: Ctx) {
   const expectedVersion = Number(input?.expectedVersion);
   const roadEventNotes = typeof input?.roadEventNotes === 'string' ? input.roadEventNotes.trim() : '';
   const townEventNotes = typeof input?.townEventNotes === 'string' ? input.townEventNotes.trim() : '';
-  if (roadEventNotes.length > 4000 || townEventNotes.length > 4000) return error(c, 400, 'EVENT_NOTES_TOO_LONG', '事件紀錄不可超過 4000 字。');
-  const before = await c.env.DB.prepare('SELECT road_event_notes, town_event_notes FROM campaign_maps WHERE campaign_id = ?').bind(session.campaignId).first();
-  if (!await claimVersion(c, session, expectedVersion)) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
-  await c.env.DB.prepare('UPDATE campaign_maps SET road_event_notes = ?, town_event_notes = ? WHERE campaign_id = ?')
-    .bind(roadEventNotes, townEventNotes, session.campaignId).run();
-  await log(c.env.DB, session, 'UPDATE_EVENT_NOTES', 'MAP', session.campaignId, before, { roadEventNotes, townEventNotes });
+  if (roadEventNotes.length > 4000 || townEventNotes.length > 4000) {
+    return error(c, 400, 'EVENT_NOTES_TOO_LONG', '事件紀錄不可超過 4000 字。');
+  }
+  const before = await c.env.DB.prepare('SELECT road_event_notes, town_event_notes FROM campaign_maps WHERE campaign_id = ?')
+    .bind(session.campaignId).first();
+  const finalUpdate = c.env.DB.prepare(`
+    UPDATE campaign_maps
+    SET road_event_notes = ?, town_event_notes = ?,
+        version = version + 1, updated_by_player = ?, updated_at = datetime('now')
+    WHERE campaign_id = ? AND version = ?
+  `).bind(roadEventNotes, townEventNotes, session.playerNumber, session.campaignId, expectedVersion);
+  const updated = await runMapBatch(c, session, expectedVersion, [
+    guardedMapLog(c.env.DB, session, expectedVersion, 'UPDATE_EVENT_NOTES', 'MAP', session.campaignId, before, { roadEventNotes, townEventNotes }),
+  ], finalUpdate);
+  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
   return c.json({ data: await loadMap(c.env.DB, session) });
 }

@@ -161,6 +161,7 @@ export interface CampaignMap {
   version: number;
   currentLocationType: 'MAP' | 'LOCATION' | null;
   currentLocationCode: string | null;
+  currentMapCode: string | null;
   roadEventNotes: string;
   townEventNotes: string;
   tiles: CampaignMapTile[];
@@ -176,6 +177,7 @@ export interface CampaignCardProgress {
   isResolved: boolean;
   locationType: 'MAP' | 'LOCATION' | null;
   locationCode: string | null;
+  timeToken: { tokenCode: 'A' | 'B' | 'C' | 'D'; unlockAtDay: number | null } | null;
 }
 
 export interface CampaignMapResponse { data: CampaignMap }
