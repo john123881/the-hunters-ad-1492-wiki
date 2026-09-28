@@ -6,27 +6,43 @@
 
 ## 功能
 
-- 瀏覽目前收錄的物品與裝備
-- 依名稱、資料代碼或效果文字搜尋
-- 依格數、攻擊類型、屬性、效果及接口篩選
-- 查看物品圖片、行動面板、效果與接口資訊
-- 搜尋及篩選條件保留在網址中，可直接分享
-- 響應式版面、鍵盤焦點、載入／無結果／錯誤狀態
+### 1. 裝備與物品圖鑑 (Equipment Compendium)
+- 瀏覽目前收錄的裝備與物品（涵蓋武器、防具、頭盔、飾品、附件、藥劑與材料等）
+- 依名稱、資料代碼、效果文字搜尋，或依格數、攻擊類型、屬性、效果及接口篩選
+- 查看去背卡片縮圖、行動面板、數值加成、效果說明與工坊合成需求
+- 搜尋及篩選條件完整保留在網址中，支援直接分享
 
-目前資料來源是 [`data/equipment_page1.json`](data/equipment_page1.json) 與 [`data/equipment_page2.json`](data/equipment_page2.json)，共收錄 25 件武器與武器附件。物品卡片與詳情已加入合成材料及工坊需求；獨立合成查詢與角色行動卡尚未開放。詳見 [合成規劃](docs/crafting-plan.md)。
+### 2. 戰役管理系統 (Campaign System)
+- **多玩家席位與權限**：支援 1~4 人跑團憑證登入，具備樂觀鎖（Optimistic Locking）版本防衝突控制
+- **馬車營地系統 (Wagon Management)**：
+  - 追蹤戰役天數（Elapsed Days）與推進歷程
+  - 5 大工坊升級槽位（鐵匠、製弓、煉金、工藝、防具）等級與升級紀錄
+  - 馬車共用裝備倉庫與材料庫存管理
+  - 時間標記（Time Token A/B/C/D）排程放置與到期提醒
+- **大世界戰役地圖 (Campaign World Map)**：
+  - 完整 20 張地圖板塊（M01 ~ M20）網格連續地圖與雙面切換（正面探險地圖 / 背面純色底圖）
+  - 移動指示物（Hunters Move Token）放置與獵人隊伍當前位置標記
+  - 支援地圖卡片放置、狀態切換（未完成／進行中／已解決）、加入城鎮牌庫標記
+  - **卡片即時備註**：直接在地圖抽屜中針對放置卡片新增與修改備註（notes）
+  - **到期時間標記指示**：在地圖卡片上直接顯示已綁定的 Time Token 與預計解鎖天數
+  - **地點卡（Location Cards）**：支援地點揭示、資源備註與探索歷程紀錄
+  - **沉浸式體驗與行動端優化**：具備 3D 卡牌翻轉動效（Card Flip）、卡號快速搜尋、地圖全景檢視與手機 Safe-area 底部操作列
+
+> 目前資料來源包含裝備圖鑑資料集、工坊合成資料以及戰役地圖母版。物品內容仍以遊戲原始實體配件與規則書為準。
 
 ## 技術架構
 
 - React 19、TypeScript、Vite
-- Hono API
-- Cloudflare D1
-- Cloudflare Workers Vite plugin
-- 已部署至 ChatGPT Sites
+- Hono API（Worker 邊緣運行）
+- Cloudflare D1（關聯式 SQLite 邊緣資料庫）
+- Cloudflare Workers（全球部署，結合 Assets 靜態託管）
+- Playwright（視覺回歸與行動裝置適配測試）
+- 已部署至 [Cloudflare Workers](https://the-hunters-ad-1492.boardgame-wiki.workers.dev)
 
-前端只透過 `/api` 讀取資料，物品列表並未重複寫死在 React 程式中。
+前端資料嚴格透過 `/api` 讀取，重要操作均採 D1 batch 原子批次交易防護。
 
 ```text
-React → /api → Hono → D1
+React (SPA) → /api → Hono Router → Cloudflare D1 (hunters-db)
 ```
 
 詳細設計請參閱 [系統架構](docs/architecture.md) 與 [資料庫設計](docs/database-review.md)。
@@ -46,43 +62,41 @@ npm run dev
 
 開啟 <http://localhost:5173>。
 
-`npm run db:setup` 只操作 `.wrangler/` 內的本機 D1。物品 seed 可重跑，並會以 `data/equipment_page1.json` 與 `data/equipment_page2.json` 產生的 `seeds/equipment_catalog.sql`，重建本機物品及其行動模式、效果和接口。
+`npm run db:setup` 會自動執行 D1 migration 並匯入裝備目錄。
 
 ## 常用指令
 
 | 指令 | 用途 |
 | --- | --- |
-| `npm run dev` | 啟動 React、Hono 與本機 D1 開發環境 |
-| `npm run typecheck` | 檢查前後端 TypeScript |
+| `npm run dev` | 啟動 React、Hono 與本機 D1 開發伺服器 |
+| `npm run typecheck` | 檢查前後端 TypeScript 型別 |
 | `npm run build` | 型別檢查並建立正式版產物 |
-| `npm run preview` | 在 http://localhost:4173 預覽建置結果與本機 API |
+| `npm run preview` | 在本機預覽正式建置結果與 API |
 | `npm run data:seed` | 驗證來源 JSON 並產生 D1 seed SQL |
 | `npm run db:migrate` | 套用本機 D1 migrations |
-| `npm run db:setup` | 套用 migrations 並匯入目前物品資料 |
+| `npm run db:setup` | 套用 migrations 並重設本機基礎資料 |
+| `npm run test:visual` | 執行 Playwright 行動端視覺回歸測試 |
+| `npm run deploy:prod` | 一鍵完成型別檢查、打包、遠端遷移與部署至 Cloudflare |
 
 ## 主要目錄
 
 | 路徑 | 用途 |
 | --- | --- |
-| `src/` | React 頁面、元件與樣式 |
-| `server/` | Hono 路由、查詢參數與 D1 SQL |
-| `shared/` | 前後端共用 TypeScript 資料契約 |
-| `data/` | 可公開的整理資料來源 |
-| `migrations/` | D1 schema 與增量變更 |
-| `seeds/` | 由資料來源產生的 D1 匯入 SQL |
-| `public/images/` | 網站使用的本機圖片資源 |
-| `docs/` | 架構與資料庫設計文件 |
-
-## 資料與圖片
-
-`equipment_page1.json` 與 `equipment_page2.json` 是使用者整理且允許訪客查閱的資料。原始 PDF、先前擷取圖片與舊版轉錄產物已由 `.gitignore` 排除，不會提交至 repository。
-
-物品圖片目前存放於 `public/images/items/`，共包含 25 張 PNG。若日後加入第三方素材，應先確認公開與部署授權。
-
-## 部署
-
-專案使用標準 Worker `fetch` 入口、靜態前端產物及名稱為 `DB` 的 D1 binding，並已部署至 [ChatGPT Sites](https://the-hunters-ad-1492.a123881.chatgpt.site/)。本機設定中的 `local-hunters-db` 不是正式資料庫 ID；`npm run db:setup` 不會更新正式網站的 D1。
+| `src/` | React 頁面（圖鑑、馬車、地圖、角色）、元件與 CSS 樣式 |
+| `server/` | Hono 路由模組（items, campaigns, wagon, map）與 D1 SQL 交易 |
+| `shared/` | 前後端共用 TypeScript 資料契約與常數定義 |
+| `data/` | 裝備與材料來源資料 |
+| `migrations/` | Cloudflare D1 資料庫 schema 增量遷移檔案 |
+| `seeds/` | 資料庫匯入 SQL |
+| `public/` | 靜態資產（物品圖片、地圖板塊切圖、資源圖示、工坊圖示） |
+| `tests/visual/` | 行動端視覺回歸測試與快照 |
+| `docs/` | 架構、資料庫與合成系統設計文件 |
 
 ## 專案狀態
 
-目前為物品圖鑑 MVP，資料來源涵蓋 Equipment Compendium Page 1 與 Page 2，共 25 件物品。暫不包含登入、隊伍、戰役紀錄、角色狀態及管理後台。
+本專案現已完成：
+1. **物品圖鑑與合成系統（MVP）**
+2. **馬車營地與天數推進系統**
+3. **M01~M20 大世界戰役地圖與卡片標記系統**
+4. **角色面板系統（Hero & Equipment Boards）規格規劃中（見 `plan_campaign_characters.md`）**
+
