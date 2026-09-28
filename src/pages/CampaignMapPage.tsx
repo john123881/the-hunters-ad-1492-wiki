@@ -116,7 +116,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           >
             <img
               alt={tile.mapCode + (tile.isRevealed ? ' 正面' : ' 背面')}
-              src={'/images/campaign/maps/' + tile.mapCode + '-' + (tile.isRevealed ? 'front' : 'back') + '.webp?v=7'}
+              src={'/images/campaign/maps/' + tile.mapCode + '-' + (tile.isRevealed ? 'front' : 'back') + '.webp?v=12'}
             />
             <span className="map-tile-state">{tile.isRevealed ? '已揭示' : '未揭示'}</span>
             {occupied && <span className="hunter-marker" title="獵人目前位置"><MapPin aria-hidden="true" /></span>}
