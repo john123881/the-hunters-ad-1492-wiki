@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "dimensions": {
+    "width": 900,
+    "height": 1200
+  },
+  "coordinateSystem": "All board interaction coordinates use this 900x1200 image space.",
+  "boards": {
+    "brawler": "/images/campaign/characters/brawler-board-v1.png",
+    "crossbowman": "/images/campaign/characters/crossbowman-board-v1.png",
+    "cutthroat": "/images/campaign/characters/cutthroat-board-v1.png",
+    "huntress": "/images/campaign/characters/huntress-board-v1.png",
+    "landsknecht": "/images/campaign/characters/landsknecht-board-v1.png",
+    "man-at-arms": "/images/campaign/characters/man-at-arms-board-v1.png",
+    "medic": "/images/campaign/characters/medic-board-v1.png",
+    "sorceress": "/images/campaign/characters/sorceress-board-v1.png",
+    "witch": "/images/campaign/characters/witch-board-v1.png"
+  }
+}

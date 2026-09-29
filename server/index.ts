@@ -5,6 +5,7 @@ import { getItem, getCatalog, listItems } from './catalog';
 import { InvalidQuery, parseQuery } from './query';
 import { getSession, loginCampaign, logout } from './auth';
 import { getCampaignMap, removeMapCard, updateLocationCard, updateMapEventNotes, updateMapPosition, updateMapTile, upsertMapCard, updateCampaignCardProgress } from './map';
+import { getCampaignCharacters, saveCampaignCharacter } from './characters';
 import { addWagonEquipment, createTimeToken, getWagon, removeTimeToken, removeWagonEquipment, updateCampaignName, updateWagonDay, updateSharedGold, updateWagonEquipment, updateWagonResource, updateWagonUpgrade, updateWagonNotes } from './wagon';
 
 type Bindings = { DB: D1Database; ASSETS: Fetcher };
@@ -19,6 +20,8 @@ app.use('/api/campaign/*', csrf());
 app.post('/api/auth/campaign/login', loginCampaign);
 app.get('/api/auth/session', getSession);
 app.post('/api/auth/logout', logout);
+app.get('/api/campaign/characters', getCampaignCharacters);
+app.put('/api/campaign/characters/:playerNumber', saveCampaignCharacter);
 app.get('/api/campaign/map', getCampaignMap);
 app.patch('/api/campaign/map/tiles/:mapCode', updateMapTile);
 app.patch('/api/campaign/map/position', updateMapPosition);

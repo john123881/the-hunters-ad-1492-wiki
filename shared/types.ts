@@ -181,3 +181,23 @@ export interface CampaignCardProgress {
 }
 
 export interface CampaignMapResponse { data: CampaignMap }
+
+export interface CampaignCharacter {
+  id: number;
+  playerNumber: number;
+  heroSlug: string;
+  customName: string;
+  moralePosition: number;
+  strengthLevel: number;
+  knowledgeLevel: number;
+  perceptionLevel: number;
+  agilityLevel: number;
+  maxHealthLevel: number;
+  currentHealth: number;
+  xpTens: number;
+  xpOnes: number;
+  isPoisoned: boolean;
+  notes: string;
+  version: number;
+}
+export interface CampaignCharactersResponse { data: { characters: CampaignCharacter[] } }
