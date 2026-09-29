@@ -37,3 +37,6 @@ pdf_text.txt
 public/images/campaign/maps/clear-*-sheet.png
 public/images/campaign/maps/red-frame-uniform-base/
 public/images/campaign/maps/uniform-name-blanks/
+
+# 角色母版掃描圖與中繼裁切預覽
+campaign_characters/
