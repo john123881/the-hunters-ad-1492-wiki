@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { ArrowUpRight, LogIn, UserRound } from 'lucide-react';
+import { ArrowUpRight, LogIn, LogOut, UserRound } from 'lucide-react';
 import type { AuthSession, AuthSessionResponse } from '../shared/types';
 import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
@@ -67,7 +67,10 @@ export function App() {
                     </li>;
                   })}
                 </ol>
-                <Link to="/campaigns/wagon">進入戰役面板</Link>
+                <div className="player-roster-actions">
+                  <Link to="/campaigns/wagon">進入戰役面板</Link>
+                  <button type="button" onClick={async () => { await logout(); window.location.assign('/login'); }}><LogOut size={13} />登出</button>
+                </div>
               </div>
             </details>
           : <NavLink to="/login" className="login-link"><LogIn size={15} />登入</NavLink>}

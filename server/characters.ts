@@ -43,7 +43,6 @@ export async function saveCampaignCharacter(c: Ctx) {
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const playerNumber = integer(c.req.param('playerNumber'), 1, 4);
   if (!playerNumber) return error(c, 404, 'PLAYER_NOT_FOUND', '找不到這個玩家席位。');
-  if (playerNumber !== session.playerNumber) return error(c, 403, 'CHARACTER_READ_ONLY', '只能修改自己的角色。');
   const input = await body(c);
   if (!input) return error(c, 400, 'INVALID_JSON', '請提供有效的角色資料。');
   const heroSlug = typeof input.heroSlug === 'string' ? input.heroSlug : '';

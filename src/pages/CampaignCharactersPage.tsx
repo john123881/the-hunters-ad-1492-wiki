@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BookOpen, FlaskConical, Image, Minus, Plus, Save, Shield, UserRound } from 'lucide-react';
+import { BookOpen, FlaskConical, Image, Minus, Plus, RefreshCw, Save, Shield, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
@@ -55,6 +55,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   const [busy, setBusy] = useState<'load' | 'save' | null>('load');
   const [message, setMessage] = useState('');
   const [modal, setModal] = useState<'story' | 'layout' | null>(null);
+  const [choosingHero, setChoosingHero] = useState(false);
 
   useEffect(() => {
     if (!session) return;
@@ -70,9 +71,10 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   }, [session]);
 
   const character = characters.find(entry => entry.playerNumber === selectedNumber) ?? null;
-  useEffect(() => setDraft(character ? toDraft(character) : null), [character?.id, character?.version, selectedNumber]);
+  useEffect(() => { setDraft(character ? toDraft(character) : null); setChoosingHero(false); }, [character?.id, character?.version, selectedNumber]);
   const selectedPlayer = session?.players.find(player => player.playerNumber === selectedNumber);
   const isSelf = selectedNumber === session?.playerNumber;
+  const canEdit = Boolean(selectedPlayer && session?.isActive);
   const hero = draft ? heroDefinitionBySlug[draft.heroSlug] : null;
   const usedHeroes = useMemo(() => new Set(characters.filter(item => item.playerNumber !== selectedNumber).map(item => item.heroSlug)), [characters, selectedNumber]);
   const update = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft(current => current ? { ...current, [key]: value } : current);
@@ -100,7 +102,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
 
   return <section className="campaign-page campaign-characters-page" aria-labelledby="campaign-characters-title">
     <header className="campaign-module-heading">
-      <div><p className="eyebrow">HUNTER RECORDS</p><h1 id="campaign-characters-title">角色面板</h1><p>保存獵人的面板位置；同戰役隊友可唯讀查看。</p></div>
+      <div><p className="eyebrow">HUNTER RECORDS</p><h1 id="campaign-characters-title">角色面板</h1><p>保存獵人的面板位置；同戰役隊友可以協助修改。</p></div>
       <span><UserRound aria-hidden="true" />玩家 {session.playerNumber}</span>
     </header>
     <nav className="character-roster-tabs" aria-label="戰役角色">
@@ -116,11 +118,20 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
     {message && <div className={message.includes('已儲存') ? 'character-notice success' : 'character-notice'} role="status">{message}</div>}
     {busy === 'load' ? <div className="character-loading">正在載入角色資料…</div>
       : !selectedPlayer ? <article className="character-preview-panel"><p className="eyebrow">EMPTY PLAYER SLOT</p><h2>玩家席位 {selectedNumber} 從缺</h2><p>此席位尚未加入戰役。</p></article>
-      : !draft ? <article className="hero-picker">
-        <div><p className="eyebrow">{isSelf ? 'CHOOSE YOUR HUNTER' : 'NO HUNTER SELECTED'}</p><h2>{isSelf ? '選擇獵人' : selectedPlayer.playerAlias + ' 尚未選角'}</h2></div>
-        {isSelf && <div className="hero-picker-grid">{heroDefinitions.map(option => <button type="button" key={option.slug} disabled={usedHeroes.has(option.slug)} onClick={() => setDraft(emptyDraft(option.slug))}>
-          <img src={option.boardImageUrl} alt="" /><span><strong>{option.displayNameZhTw}</strong><small>{option.roleNameZhTw}{usedHeroes.has(option.slug) ? ' · 已被選擇' : ''}</small></span>
-        </button>)}</div>}
+      : (!draft || choosingHero) ? <article className="hero-picker">
+        <div className="hero-picker-heading"><div><p className="eyebrow">{choosingHero ? 'CHANGE HUNTER' : 'CHOOSE HUNTER'}</p><h2>{choosingHero ? '更換 ' + selectedPlayer.playerAlias + ' 的角色' : '為 ' + selectedPlayer.playerAlias + ' 選擇獵人'}</h2><p>{choosingHero ? '選擇後會重設面板數值；按下儲存才會正式套用。' : '同戰役玩家皆可協助選角。'}</p></div>{choosingHero && <button className="button secondary" type="button" onClick={() => setChoosingHero(false)}>取消</button>}</div>
+        <div className="hero-picker-grid">{heroDefinitions.map(option => {
+          const used = usedHeroes.has(option.slug);
+          const current = choosingHero && draft?.heroSlug === option.slug;
+          return <button type="button" key={option.slug} disabled={used || current} onClick={() => {
+            const next = emptyDraft(option.slug);
+            setDraft({ ...next, version: draft?.version ?? null });
+            setChoosingHero(false);
+            setMessage('已選擇新角色，尚未儲存。');
+          }}>
+            <img src={option.boardImageUrl} alt="" /><span><strong>{option.displayNameZhTw}</strong><small>{option.roleNameZhTw}{used ? ' · 已被選擇' : current ? ' · 目前角色' : ''}</small></span>
+          </button>;
+        })}</div>
       </article>
       : hero && <div className="character-workspace">
         <div className="character-board-stage">
@@ -139,28 +150,29 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
           </div>
         </div>
         <aside className="character-control-panel">
-          <header><div><p className="eyebrow">{isSelf ? 'YOUR HUNTER' : 'TEAMMATE · READ ONLY'}</p><h2>{selectedPlayer.playerAlias}</h2></div><span>版本 {draft.version ?? '新建'}</span></header>
+          <header><div><p className="eyebrow">{isSelf ? 'YOUR HUNTER' : 'TEAMMATE · CO-EDIT'}</p><h2>{selectedPlayer.playerAlias}</h2></div><span>版本 {draft.version ?? '新建'}</span></header>
           <div className="character-reference-actions">
             <button type="button" className="button secondary" onClick={() => setModal('story')}><BookOpen />角色故事</button>
             <button type="button" className="button secondary" onClick={() => setModal('layout')}><Image />初始面板</button>
+            <button type="button" className="button secondary" disabled={!canEdit} onClick={() => setChoosingHero(true)}><RefreshCw />更換角色</button>
           </div>
-          <label className="field"><span>角色名稱</span><input disabled={!isSelf} maxLength={40} value={draft.customName} placeholder={hero.displayNameZhTw} onChange={event => update('customName', event.target.value)} /></label>
+          <label className="field"><span>角色名稱</span><input disabled={!canEdit} maxLength={40} value={draft.customName} placeholder={hero.displayNameZhTw} onChange={event => update('customName', event.target.value)} /></label>
           <section className="character-track-grid" aria-label="角色面板位置">
-            <Stepper label="士氣位置" value={draft.moralePosition} min={-2} max={4} disabled={!isSelf} onChange={value => update('moralePosition', value)} />
-            <Stepper label="經驗值 (XP)" value={draft.xpTens + draft.xpOnes} min={0} max={99} disabled={!isSelf} onChange={value => {
+            <Stepper label="士氣位置" value={draft.moralePosition} min={-2} max={4} disabled={!canEdit} onChange={value => update('moralePosition', value)} />
+            <Stepper label="經驗值 (XP)" value={draft.xpTens + draft.xpOnes} min={0} max={99} disabled={!canEdit} onChange={value => {
               update('xpTens', Math.floor(value / 10) * 10);
               update('xpOnes', value % 10);
             }} />
-            <Stepper label="力量" value={draft.strengthLevel} min={0} max={4} disabled={!isSelf} onChange={value => update('strengthLevel', value)} />
-            <Stepper label="知識" value={draft.knowledgeLevel} min={0} max={4} disabled={!isSelf} onChange={value => update('knowledgeLevel', value)} />
-            <Stepper label="洞察" value={draft.perceptionLevel} min={0} max={4} disabled={!isSelf} onChange={value => update('perceptionLevel', value)} />
-            <Stepper label="敏捷" value={draft.agilityLevel} min={0} max={4} disabled={!isSelf} onChange={value => update('agilityLevel', value)} />
-            <Stepper label="最大生命軌" value={draft.maxHealthLevel} min={0} max={5} disabled={!isSelf} onChange={value => update('maxHealthLevel', value)} />
-            <Stepper label="當前生命" value={draft.currentHealth} min={0} max={12} disabled={!isSelf} onChange={value => update('currentHealth', value)} />
+            <Stepper label="力量" value={draft.strengthLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('strengthLevel', value)} />
+            <Stepper label="知識" value={draft.knowledgeLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('knowledgeLevel', value)} />
+            <Stepper label="洞察" value={draft.perceptionLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('perceptionLevel', value)} />
+            <Stepper label="敏捷" value={draft.agilityLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('agilityLevel', value)} />
+            <Stepper label="最大生命軌" value={draft.maxHealthLevel} min={0} max={5} disabled={!canEdit} onChange={value => update('maxHealthLevel', value)} />
+            <Stepper label="當前生命" value={draft.currentHealth} min={0} max={12} disabled={!canEdit} onChange={value => update('currentHealth', value)} />
           </section>
-          <label className="character-poison"><input type="checkbox" disabled={!isSelf} checked={draft.isPoisoned} onChange={event => update('isPoisoned', event.target.checked)} /><FlaskConical />中毒狀態</label>
-          <label className="field"><span>角色備註</span><textarea disabled={!isSelf} maxLength={2000} value={draft.notes} onChange={event => update('notes', event.target.value)} /></label>
-          {isSelf && <div className="character-save-bar"><button className="button" type="button" disabled={busy === 'save'} onClick={save}><Save />{busy === 'save' ? '儲存中…' : '儲存角色面板'}</button></div>}
+          <label className="character-poison"><input type="checkbox" disabled={!canEdit} checked={draft.isPoisoned} onChange={event => update('isPoisoned', event.target.checked)} /><FlaskConical />中毒狀態</label>
+          <label className="field"><span>角色備註</span><textarea disabled={!canEdit} maxLength={2000} value={draft.notes} onChange={event => update('notes', event.target.value)} /></label>
+          {canEdit && <div className="character-save-bar"><button className="button" type="button" disabled={busy === 'save'} onClick={save}><Save />{busy === 'save' ? '儲存中…' : '儲存角色面板'}</button></div>}
         </aside>
       </div>}
 
