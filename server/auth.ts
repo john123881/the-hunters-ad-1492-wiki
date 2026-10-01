@@ -1,7 +1,15 @@
 import type { Context } from 'hono';
+import { eq, and, sql } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import type { AuthSession } from '../shared/types';
+import { getDb } from './db';
+import {
+  campaigns,
+  campaignPlayers,
+  authSessions,
+  authLoginAttempts,
+} from './db/schema/index';
 
 type Env = { Bindings: { DB: D1Database; ASSETS: Fetcher } };
 type Ctx = Context<Env>;
@@ -55,27 +63,62 @@ export async function readSession(c: Ctx): Promise<{ hash: string; data: AuthSes
   if (!token) return null;
   const hash = await digest(token);
   const now = Math.floor(Date.now() / 1000);
-  const row = await c.env.DB.prepare(`
-    SELECT s.campaign_id, s.player_number, s.expires_at, c.campaign_name, c.is_active, p.player_alias
-    FROM auth_sessions s
-    JOIN campaigns c ON c.id = s.campaign_id
-    JOIN campaign_players p ON p.campaign_id = s.campaign_id AND p.player_number = s.player_number
-    WHERE s.token_hash = ? AND s.expires_at > ? AND c.deleted_at IS NULL
-  `).bind(hash, now).first<{
-    campaign_id: string; player_number: number; expires_at: number;
-    campaign_name: string; is_active: number; player_alias: string;
-  }>();
+  const db = getDb(c.env.DB);
+
+  const [row] = await db
+    .select({
+      campaignId: authSessions.campaignId,
+      playerNumber: authSessions.playerNumber,
+      expiresAt: authSessions.expiresAt,
+      campaignName: campaigns.campaignName,
+      isActive: campaigns.isActive,
+      playerAlias: campaignPlayers.playerAlias,
+    })
+    .from(authSessions)
+    .innerJoin(campaigns, eq(campaigns.id, authSessions.campaignId))
+    .innerJoin(
+      campaignPlayers,
+      and(
+        eq(campaignPlayers.campaignId, authSessions.campaignId),
+        eq(campaignPlayers.playerNumber, authSessions.playerNumber),
+      ),
+    )
+    .where(
+      and(
+        eq(authSessions.tokenHash, hash),
+        sql`${authSessions.expiresAt} > ${now}`,
+        sql`${campaigns.deletedAt} IS NULL`,
+      ),
+    );
+
   if (!row) return null;
-  const players = await c.env.DB.prepare(
-    'SELECT player_number, player_alias FROM campaign_players WHERE campaign_id = ? ORDER BY player_number',
-  ).bind(row.campaign_id).all<{ player_number: number; player_alias: string }>();
-  return { hash, data: {
-    campaignId: row.campaign_id, campaignName: row.campaign_name,
-    playerNumber: row.player_number, playerAlias: row.player_alias,
-    isActive: row.is_active === 1, expiresAt: new Date(row.expires_at * 1000).toISOString(),
-    players: players.results.map(player => ({ playerNumber: player.player_number, playerAlias: player.player_alias })),
-  } };
+
+  const players = await db
+    .select({
+      playerNumber: campaignPlayers.playerNumber,
+      playerAlias: campaignPlayers.playerAlias,
+    })
+    .from(campaignPlayers)
+    .where(eq(campaignPlayers.campaignId, row.campaignId))
+    .orderBy(campaignPlayers.playerNumber);
+
+  return {
+    hash,
+    data: {
+      campaignId: row.campaignId,
+      campaignName: row.campaignName,
+      playerNumber: row.playerNumber,
+      playerAlias: row.playerAlias,
+      isActive: row.isActive === true,
+      expiresAt: new Date(row.expiresAt * 1000).toISOString(),
+      players: players.map(player => ({
+        playerNumber: player.playerNumber,
+        playerAlias: player.playerAlias,
+      })),
+    },
+  };
 }
+
 export async function loginCampaign(c: Ctx) {
   let body: Record<string, unknown>;
   try { body = await c.req.json(); } catch { return fail(c, 400, 'INVALID_JSON', '請提供有效的登入資料。'); }
@@ -90,60 +133,104 @@ export async function loginCampaign(c: Ctx) {
 
   const now = Math.floor(Date.now() / 1000);
   const key = clientKey(c);
-  const attempt = await c.env.DB.prepare('SELECT locked_until FROM auth_login_attempts WHERE campaign_id = ? AND client_key = ?')
-    .bind(campaignId, key).first<{ locked_until: number | null }>();
-  if (attempt?.locked_until && attempt.locked_until > now) return fail(c, 423, 'LOGIN_LOCKED', '登入嘗試過多，請稍後再試。');
+  const db = getDb(c.env.DB);
 
-  const campaign = await c.env.DB.prepare(
-    'SELECT id, campaign_name, password_hash, max_players, is_active FROM campaigns WHERE id = ? AND deleted_at IS NULL',
-  ).bind(campaignId).first<{
-    id: string; campaign_name: string; password_hash: string; max_players: number; is_active: number;
-  }>();
-  if (!campaign || !(await verifyPassword(password, campaign.password_hash))) {
+  const [attempt] = await db
+    .select({ lockedUntil: authLoginAttempts.lockedUntil })
+    .from(authLoginAttempts)
+    .where(
+      and(
+        eq(authLoginAttempts.campaignId, campaignId),
+        eq(authLoginAttempts.clientKey, key),
+      ),
+    );
+  if (attempt?.lockedUntil && attempt.lockedUntil > now) return fail(c, 423, 'LOGIN_LOCKED', '登入嘗試過多，請稍後再試。');
+
+  const [campaign] = await db
+    .select({
+      id: campaigns.id,
+      campaignName: campaigns.campaignName,
+      passwordHash: campaigns.passwordHash,
+      maxPlayers: campaigns.maxPlayers,
+      isActive: campaigns.isActive,
+    })
+    .from(campaigns)
+    .where(
+      and(
+        eq(campaigns.id, campaignId),
+        sql`${campaigns.deletedAt} IS NULL`,
+      ),
+    );
+
+  if (!campaign || !(await verifyPassword(password, campaign.passwordHash))) {
     await recordFailure(c.env.DB, campaignId, key, now);
     return fail(c, 401, 'INVALID_CREDENTIALS', '戰役 ID 或密碼不正確。');
   }
-  if (playerNumber > campaign.max_players) {
-    return fail(c, 400, 'INVALID_PLAYER_NUMBER', `此戰役僅開放 ${campaign.max_players} 個玩家席位。`);
+  if (playerNumber > campaign.maxPlayers) {
+    return fail(c, 400, 'INVALID_PLAYER_NUMBER', `此戰役僅開放 ${campaign.maxPlayers} 個玩家席位。`);
   }
-
-  await c.env.DB.prepare(`
-    INSERT INTO campaign_players (campaign_id, player_number, player_alias) VALUES (?, ?, ?)
-    ON CONFLICT(campaign_id, player_number) DO UPDATE SET
-      player_alias = excluded.player_alias, updated_at = datetime('now')
-  `).bind(campaignId, playerNumber, playerAlias).run();
 
   const token = b64(crypto.getRandomValues(new Uint8Array(32)));
   const tokenHash = await digest(token);
   const expiresAt = now + WEEK;
-  await c.env.DB.batch([
-    c.env.DB.prepare('INSERT INTO auth_sessions (token_hash, campaign_id, player_number, expires_at) VALUES (?, ?, ?, ?)')
-      .bind(tokenHash, campaignId, playerNumber, expiresAt),
-    c.env.DB.prepare('DELETE FROM auth_login_attempts WHERE campaign_id = ? AND client_key = ?').bind(campaignId, key),
-    c.env.DB.prepare('DELETE FROM auth_sessions WHERE expires_at <= ?').bind(now),
+
+  const d1 = c.env.DB;
+  await d1.batch([
+    d1.prepare(`
+      INSERT INTO campaign_players (campaign_id, player_number, player_alias)
+      VALUES (?, ?, ?)
+      ON CONFLICT(campaign_id, player_number) DO UPDATE SET player_alias = excluded.player_alias, updated_at = datetime('now')
+    `).bind(campaignId, playerNumber, playerAlias),
+    d1.prepare(`
+      INSERT INTO auth_sessions (token_hash, campaign_id, player_number, expires_at)
+      VALUES (?, ?, ?, ?)
+    `).bind(tokenHash, campaignId, playerNumber, expiresAt),
+    d1.prepare(`
+      DELETE FROM auth_login_attempts WHERE campaign_id = ? AND client_key = ?
+    `).bind(campaignId, key),
+    d1.prepare(`
+      DELETE FROM auth_sessions WHERE expires_at <= ?
+    `).bind(now),
   ]);
+
   setCookie(c, COOKIE, token, {
     httpOnly: true, secure: new URL(c.req.url).protocol === 'https:', sameSite: 'Lax', path: '/', maxAge: WEEK,
   });
-  const players = await c.env.DB.prepare(
-    'SELECT player_number, player_alias FROM campaign_players WHERE campaign_id = ? ORDER BY player_number',
-  ).bind(campaignId).all<{ player_number: number; player_alias: string }>();
+
+  const players = await db
+    .select({
+      playerNumber: campaignPlayers.playerNumber,
+      playerAlias: campaignPlayers.playerAlias,
+    })
+    .from(campaignPlayers)
+    .where(eq(campaignPlayers.campaignId, campaignId))
+    .orderBy(campaignPlayers.playerNumber);
+
   return c.json({ data: {
-    campaignId, campaignName: campaign.campaign_name, playerNumber, playerAlias,
-    isActive: campaign.is_active === 1, expiresAt: new Date(expiresAt * 1000).toISOString(),
-    players: players.results.map(player => ({ playerNumber: player.player_number, playerAlias: player.player_alias })),
+    campaignId, campaignName: campaign.campaignName, playerNumber, playerAlias,
+    isActive: campaign.isActive === true, expiresAt: new Date(expiresAt * 1000).toISOString(),
+    players: players.map(player => ({ playerNumber: player.playerNumber, playerAlias: player.playerAlias })),
   } satisfies AuthSession });
 }
+
 export async function getSession(c: Ctx) {
   const session = await readSession(c);
   if (!session) { deleteCookie(c, COOKIE, { path: '/' }); return c.json({ data: null }); }
-  await c.env.DB.prepare("UPDATE auth_sessions SET last_seen_at = datetime('now') WHERE token_hash = ?")
-    .bind(session.hash).run();
+  const db = getDb(c.env.DB);
+  await db
+    .update(authSessions)
+    .set({ lastSeenAt: sql`(datetime('now'))` })
+    .where(eq(authSessions.tokenHash, session.hash));
   return c.json({ data: session.data });
 }
+
 export async function logout(c: Ctx) {
   const token = getCookie(c, COOKIE);
-  if (token) await c.env.DB.prepare('DELETE FROM auth_sessions WHERE token_hash = ?').bind(await digest(token)).run();
+  if (token) {
+    const db = getDb(c.env.DB);
+    const hash = await digest(token);
+    await db.delete(authSessions).where(eq(authSessions.tokenHash, hash));
+  }
   deleteCookie(c, COOKIE, { path: '/' });
   return c.json({ data: { loggedOut: true } });
 }

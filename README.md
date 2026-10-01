@@ -34,15 +34,16 @@
 
 - React 19、TypeScript、Vite
 - Hono API（Worker 邊緣運行）
+- Drizzle ORM（型別安全的 Cloudflare D1 資料庫操作與 Schema 定義）
 - Cloudflare D1（關聯式 SQLite 邊緣資料庫）
 - Cloudflare Workers（全球部署，結合 Assets 靜態託管）
 - Playwright（視覺回歸與行動裝置適配測試）
 - 已部署至 [Cloudflare Workers](https://the-hunters-ad-1492.boardgame-wiki.workers.dev)
 
-前端資料嚴格透過 `/api` 讀取，重要操作均採 D1 batch 原子批次交易防護。
+前端資料嚴格透過 `/api` 讀取，資料存取全面由 Drizzle ORM 處理，重要操作均採 D1 batch 原子批次交易防護。
 
 ```text
-React (SPA) → /api → Hono Router → Cloudflare D1 (hunters-db)
+React (SPA) → /api → Hono Router → Drizzle ORM → Cloudflare D1 (hunters-db)
 ```
 
 詳細設計請參閱 [系統架構](docs/architecture.md) 與 [資料庫設計](docs/database-review.md)。
@@ -84,6 +85,7 @@ npm run dev
 | --- | --- |
 | `src/` | React 頁面（圖鑑、馬車、地圖、角色）、元件與 CSS 樣式 |
 | `server/` | Hono 路由模組（items, campaigns, wagon, map）與 D1 SQL 交易 |
+| `server/db/schema/` | Drizzle ORM 資料表定義與關聯模型 |
 | `shared/` | 前後端共用 TypeScript 資料契約與常數定義 |
 | `data/` | 裝備與材料來源資料 |
 | `migrations/` | Cloudflare D1 資料庫 schema 增量遷移檔案 |

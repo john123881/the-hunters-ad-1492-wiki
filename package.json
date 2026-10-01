@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.cache/wrangler vite --host 0.0.0.0",
+    "dev:log": "WRANGLER_LOG_PATH=.cache/wrangler vite --host 0.0.0.0 2>&1 | tee -a dev.log",
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && WRANGLER_LOG_PATH=.cache/wrangler vite build",
     "preview": "WRANGLER_LOG_PATH=.cache/wrangler vite preview --host 0.0.0.0 --port 4173",
@@ -16,14 +17,17 @@
     "db:seed": "WRANGLER_LOG_PATH=.cache/wrangler wrangler d1 execute hunters-db --local --file seeds/equipment_catalog.sql",
     "db:setup": "npm run db:migrate && npm run db:seed",
     "check": "npm run build",
+    "test": "tsx --test test/**/*.test.ts",
     "test:visual": "playwright test",
     "images:optimize": "node scripts/optimize-images.mjs",
     "deploy:prod": "./scripts/deploy-cloudflare.sh",
     "auth:hash-password": "node scripts/hash-campaign-password.mjs",
     "admin:hash-password": "node scripts/hash-admin-password.mjs",
-    "admin:create-local": "node scripts/create-local-admin.mjs"
+    "admin:create-local": "node scripts/create-local-admin.mjs",
+    "db:check": "drizzle-kit check"
   },
   "dependencies": {
+    "drizzle-orm": "^0.45.3",
     "hono": "^4.9.0",
     "lucide-react": "^0.468.0",
     "react": "^19.1.0",
@@ -38,6 +42,7 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "drizzle-kit": "^0.31.11",
     "sharp": "^0.35.4",
     "typescript": "~5.9.2",
     "vite": "^7.1.0",

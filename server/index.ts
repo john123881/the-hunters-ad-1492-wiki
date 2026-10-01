@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { csrf } from 'hono/csrf';
 import { HTTPException } from 'hono/http-exception';
+import { sql } from 'drizzle-orm';
 import { getItem, getCatalog, listItems } from './catalog';
 import { InvalidQuery, parseQuery } from './query';
 import { createAdminCampaign, deleteAdminActivityLogs, exportAdminCampaignBackup, importAdminCampaignBackup, getAdminCampaigns, getAdminSession, loginAdmin, logoutAdmin, getAdminActivityLogs, resetAdminCampaignPassword, revokeAdminCampaignSessions, updateAdminCampaignStatus } from './admin';
@@ -8,6 +9,8 @@ import { getSession, loginCampaign, logout, requireCampaignSession } from './aut
 import { getCampaignMap, removeMapCard, updateLocationCard, updateMapEventNotes, updateMapPosition, updateMapTile, upsertMapCard, updateCampaignCardProgress } from './map';
 import { getCampaignCharacters, saveCampaignCharacter } from './characters';
 import { addWagonEquipment, createTimeToken, getWagon, removeTimeToken, removeWagonEquipment, updateCampaignName, updateWagonDay, updateSharedGold, updateWagonEquipment, updateWagonResource, updateWagonUpgrade, updateWagonNotes } from './wagon';
+import { getDb } from './db';
+import { items } from './db/schema/index';
 
 type Bindings = { DB: D1Database; ASSETS: Fetcher };
 const app = new Hono<{ Bindings: Bindings }>();
@@ -66,7 +69,8 @@ app.post('/api/campaign/wagon/equipment', addWagonEquipment);
 app.patch('/api/campaign/wagon/equipment/:equipmentId', updateWagonEquipment);
 app.delete('/api/campaign/wagon/equipment/:equipmentId', removeWagonEquipment);
 app.get('/api/health', async c => {
-  await c.env.DB.prepare('SELECT COUNT(*) FROM items').first();
+  const db = getDb(c.env.DB);
+  await db.select({ count: sql`1` }).from(items).limit(1);
   return c.json({ status: 'ok', database: 'ok' });
 });
 app.get('/api/catalog', async c => c.json(await getCatalog(c.env.DB)));
@@ -83,6 +87,13 @@ app.onError((error, c) => {
     return c.json({ error: { code: error.status === 403 ? 'FORBIDDEN' : 'HTTP_ERROR', message: error.status === 403 ? '請求來源驗證失敗。' : error.message } }, error.status);
   }
   console.error('API request failed', error);
-  return c.json({ error: { code: 'INTERNAL_ERROR', message: '目前無法讀取資料，請稍後再試。' } }, 500);
+  const isDev = Boolean(import.meta.env?.DEV);
+  return c.json({
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: '目前無法讀取資料，請稍後再試。',
+      ...(isDev ? { details: error instanceof Error ? error.message : String(error) } : {}),
+    },
+  }, 500);
 });
 export default app;
