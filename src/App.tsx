@@ -6,6 +6,9 @@ import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
 import { DetailPage } from './pages/DetailPage';
 import { AboutPage } from './pages/AboutPage';
+import { AdminActivityPage } from './pages/AdminActivityPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { AdminLoginPage } from './pages/AdminLoginPage';
 import { LoginPage } from './pages/LoginPage';
 import { CampaignPage } from './pages/CampaignPage';
 import { CampaignMapPage } from './pages/CampaignMapPage';
@@ -88,6 +91,9 @@ export function App() {
         <Route path="/campaigns/map" element={<CampaignMapPage session={session} loading={sessionLoading} />} />
         <Route path="/campaigns/characters" element={<CampaignCharactersPage session={session} loading={sessionLoading} />} />
         <Route path="/campaigns/characters/:playerNumber" element={<CampaignCharactersPage session={session} loading={sessionLoading} />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/activity" element={<AdminActivityPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/login" element={<LoginPage session={session} onLogin={setSession} />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<div className="empty-state"><p className="eyebrow">404 · LOST IN THE MIST</p><h1>你走進了迷霧</h1><p>此頁不存在，讓我們回到熟悉的路上。</p><Link className="button" to="/">返回首頁</Link></div>} />

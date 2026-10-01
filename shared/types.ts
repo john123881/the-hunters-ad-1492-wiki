@@ -201,3 +201,38 @@ export interface CampaignCharacter {
   version: number;
 }
 export interface CampaignCharactersResponse { data: { characters: CampaignCharacter[] } }
+
+export interface AdminSession { id: number; username: string; displayName: string; expiresAt: string }
+export interface AdminSessionResponse { data: AdminSession | null }
+export interface AdminCampaignPlayer { playerNumber: number; playerAlias: string; heroSlug: string | null; customName: string | null }
+export interface AdminCampaignSummary {
+  id: string; name: string; isActive: boolean; maxPlayers: number; playerCount: number;
+  characterCount: number; activeSessionCount: number; wagonVersion: number; mapVersion: number;
+  createdAt: string; updatedAt: string; players: AdminCampaignPlayer[];
+}
+export interface AdminCampaignsResponse {
+  data: {
+    summary: { campaignCount: number; activeCampaignCount: number; playerCount: number; characterCount: number; activeSessionCount: number };
+    campaigns: AdminCampaignSummary[];
+  };
+}
+
+export type AdminActivityCategory = 'CAMPAIGN' | 'WAGON' | 'MAP' | 'CHARACTER';
+export interface AdminActivityLog {
+  id: number;
+  category: AdminActivityCategory;
+  actionType: string;
+  entityType: string;
+  entityId: string | null;
+  campaignId: string | null;
+  campaignName: string | null;
+  actorLabel: string;
+  actorDetail: string;
+  before: Record<string, unknown> | null;
+  after: Record<string, unknown> | null;
+  createdAt: string;
+}
+export interface AdminActivityResponse { data: { category: AdminActivityCategory; campaignId: string | null; logs: AdminActivityLog[] } }
+export interface AdminActivityDeleteResponse { data: { category: AdminActivityCategory; deletedCount: number; deletedIds: number[] } }
+export interface AdminPasswordResetResponse { data: { campaignId: string; revokedSessionCount: number } }
+export interface AdminBackupImportResponse { data: { campaignId: string; importedAt: string; restoredTables: Record<string, number> } }

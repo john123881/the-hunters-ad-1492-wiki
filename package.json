@@ -19,7 +19,9 @@
     "test:visual": "playwright test",
     "images:optimize": "node scripts/optimize-images.mjs",
     "deploy:prod": "./scripts/deploy-cloudflare.sh",
-    "auth:hash-password": "node scripts/hash-campaign-password.mjs"
+    "auth:hash-password": "node scripts/hash-campaign-password.mjs",
+    "admin:hash-password": "node scripts/hash-admin-password.mjs",
+    "admin:create-local": "node scripts/create-local-admin.mjs"
   },
   "dependencies": {
     "hono": "^4.9.0",

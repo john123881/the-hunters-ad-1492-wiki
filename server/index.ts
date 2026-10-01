@@ -3,7 +3,8 @@ import { csrf } from 'hono/csrf';
 import { HTTPException } from 'hono/http-exception';
 import { getItem, getCatalog, listItems } from './catalog';
 import { InvalidQuery, parseQuery } from './query';
-import { getSession, loginCampaign, logout } from './auth';
+import { createAdminCampaign, deleteAdminActivityLogs, exportAdminCampaignBackup, importAdminCampaignBackup, getAdminCampaigns, getAdminSession, loginAdmin, logoutAdmin, getAdminActivityLogs, resetAdminCampaignPassword, revokeAdminCampaignSessions, updateAdminCampaignStatus } from './admin';
+import { getSession, loginCampaign, logout, requireCampaignSession } from './auth';
 import { getCampaignMap, removeMapCard, updateLocationCard, updateMapEventNotes, updateMapPosition, updateMapTile, upsertMapCard, updateCampaignCardProgress } from './map';
 import { getCampaignCharacters, saveCampaignCharacter } from './characters';
 import { addWagonEquipment, createTimeToken, getWagon, removeTimeToken, removeWagonEquipment, updateCampaignName, updateWagonDay, updateSharedGold, updateWagonEquipment, updateWagonResource, updateWagonUpgrade, updateWagonNotes } from './wagon';
@@ -16,7 +17,29 @@ app.use('/api/*', async (c, next) => {
   await next();
 });
 app.use('/api/auth/*', csrf());
+app.use('/api/admin/*', csrf());
 app.use('/api/campaign/*', csrf());
+app.use('/api/campaign/*', async (c, next) => {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(c.req.method)) return next();
+  const session = await requireCampaignSession(c);
+  if (!session.isActive) {
+    return c.json({ error: { code: 'CAMPAIGN_INACTIVE', message: '此戰役目前已凍結，不能修改資料。' } }, 409);
+  }
+  await next();
+});
+app.post('/api/admin/auth/login', loginAdmin);
+app.get('/api/admin/auth/session', getAdminSession);
+app.post('/api/admin/auth/logout', logoutAdmin);
+app.get('/api/admin/campaigns', getAdminCampaigns);
+app.post('/api/admin/campaigns', createAdminCampaign);
+app.patch('/api/admin/campaigns/:campaignId/status', updateAdminCampaignStatus);
+app.delete('/api/admin/campaigns/:campaignId/sessions', revokeAdminCampaignSessions);
+app.patch('/api/admin/campaigns/:campaignId/password', resetAdminCampaignPassword);
+app.get('/api/admin/campaigns/:campaignId/backup', exportAdminCampaignBackup);
+app.put('/api/admin/campaigns/:campaignId/backup', importAdminCampaignBackup);
+app.put('/api/admin/campaign-backup', importAdminCampaignBackup);
+app.get('/api/admin/activity', getAdminActivityLogs);
+app.delete('/api/admin/activity', deleteAdminActivityLogs);
 app.post('/api/auth/campaign/login', loginCampaign);
 app.get('/api/auth/session', getSession);
 app.post('/api/auth/logout', logout);
