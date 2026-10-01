@@ -193,6 +193,7 @@ async function loadMap(d1: D1Database, session: AuthSession) {
     .leftJoin(
       campaignCardTimeTokens,
       and(
+        eq(campaignCardTimeTokens.campaignId, session.campaignId),
         eq(campaignCardTimeTokens.storyCardProgressId, campaignCardsProgress.id),
         eq(campaignCardTimeTokens.status, 'ACTIVE'),
       ),
@@ -236,6 +237,7 @@ async function loadMap(d1: D1Database, session: AuthSession) {
     .leftJoin(
       campaignCardTimeTokens,
       and(
+        eq(campaignCardTimeTokens.campaignId, session.campaignId),
         eq(campaignCardTimeTokens.storyCardProgressId, campaignCardsProgress.id),
         eq(campaignCardTimeTokens.status, 'ACTIVE'),
       ),
