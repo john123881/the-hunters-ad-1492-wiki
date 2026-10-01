@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BookOpen, FlaskConical, Image, Minus, Plus, RefreshCw, Save, Shield, UserRound } from 'lucide-react';
+import { BookOpen, FlaskConical, Image, Loader2, Minus, Plus, RefreshCw, Save, Shield, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
@@ -69,6 +69,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   const [message, setMessage] = useState('');
   const [modal, setModal] = useState<'story' | 'layout' | null>(null);
   const [choosingHero, setChoosingHero] = useState(false);
+  const [boardImageLoaded, setBoardImageLoaded] = useState(false);
   const [versionConflict,setVersionConflict]=useState<{fields:string[];expectedVersion:number|null;currentVersion:number;latest:CampaignCharacter}|null>(null);
 
   useEffect(() => {
@@ -85,7 +86,12 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   }, [session]);
 
   const character = characters.find(entry => entry.playerNumber === selectedNumber) ?? null;
-  useEffect(() => { if(versionConflict)return;setDraft(character ? toDraft(character) : null); setChoosingHero(false); }, [character?.id, character?.version, selectedNumber,versionConflict]);
+  useEffect(() => {
+    if(versionConflict)return;
+    setDraft(character ? toDraft(character) : null);
+    setChoosingHero(false);
+    setBoardImageLoaded(false);
+  }, [character?.id, character?.version, selectedNumber, versionConflict]);
   const selectedPlayer = session?.players.find(player => player.playerNumber === selectedNumber);
   const isSelf = selectedNumber === session?.playerNumber;
   const canEdit = Boolean(selectedPlayer && session?.isActive);
@@ -156,6 +162,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
             const next = emptyDraft(option.slug);
             setDraft({ ...next, version: draft?.version ?? null });
             setChoosingHero(false);
+            setBoardImageLoaded(false);
             setMessage('已選擇新角色，尚未儲存。');
           }}>
             <img src={option.boardImageUrl} alt="" /><span><strong>{option.displayNameZhTw}</strong><small>{option.roleNameZhTw}{used ? ' · 已被選擇' : current ? ' · 目前角色' : ''}</small></span>
@@ -164,19 +171,33 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
       </article>
       : hero && <div className="character-workspace">
         <div className="character-board-stage">
-          <img src={hero.boardImageUrl} alt={hero.displayNameZhTw + '角色面板'} />
-          <BoardHighlights draft={draft} />
-          <div
-            className="character-board-caption"
-            style={{
-              left: `${heroBoardHotspots[hero.slug]?.caption?.left ?? 20}%`,
-              right: `${heroBoardHotspots[hero.slug]?.caption?.right ?? 8}%`,
-              top: `${heroBoardHotspots[hero.slug]?.caption?.top ?? 3.5}%`,
-            }}
-          >
-            <span>{hero.roleNameZhTw}</span>
-            <h2>{draft.customName || hero.displayNameZhTw}</h2>
-          </div>
+          <img
+            key={hero.boardImageUrl}
+            src={hero.boardImageUrl}
+            alt={hero.displayNameZhTw + '角色面板'}
+            onLoad={() => setBoardImageLoaded(true)}
+            onError={() => setBoardImageLoaded(true)}
+          />
+          {!boardImageLoaded && (
+            <div className="character-board-loading-overlay" aria-live="polite">
+              <Loader2 className="spinning-icon" aria-hidden="true" />
+              <span>載入角色面板中…</span>
+            </div>
+          )}
+          {boardImageLoaded && <BoardHighlights draft={draft} />}
+          {boardImageLoaded && (
+            <div
+              className="character-board-caption"
+              style={{
+                left: `${heroBoardHotspots[hero.slug]?.caption?.left ?? 20}%`,
+                right: `${heroBoardHotspots[hero.slug]?.caption?.right ?? 8}%`,
+                top: `${heroBoardHotspots[hero.slug]?.caption?.top ?? 3.5}%`,
+              }}
+            >
+              <span>{hero.roleNameZhTw}</span>
+              <h2>{draft.customName || hero.displayNameZhTw}</h2>
+            </div>
+          )}
         </div>
         <aside className="character-control-panel">
           <header><div><p className="eyebrow">{isSelf ? 'YOUR HUNTER' : 'TEAMMATE · CO-EDIT'}</p><h2>{selectedPlayer.playerAlias}</h2></div><span>版本 {draft.version ?? '新建'}</span></header>

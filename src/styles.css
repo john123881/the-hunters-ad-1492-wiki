@@ -1724,11 +1724,41 @@ svg { flex-shrink: 0; }
 }
 
 /* Crop the few pale source pixels that remain around generated character boards. */
-.character-board-stage { overflow: hidden; }
+.character-board-stage { overflow: hidden; aspect-ratio: 3 / 4; }
 .character-board-stage > img,
 .character-board-stage > .character-board-highlights {
   transform: scale(1.035);
   transform-origin: center;
+}
+
+.character-board-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: radial-gradient(circle at center, #111d21 0%, #060b0d 75%);
+  color: #d8c290;
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: .12em;
+}
+.character-board-loading-overlay .spinning-icon {
+  width: 36px;
+  height: 36px;
+  color: #dfba6b;
+  animation: board-spin 1.2s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(223, 186, 107, 0.45));
+}
+@keyframes board-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .character-board-loading-overlay .spinning-icon { animation: none; }
 }
 
 .player-roster-actions { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-top: 13px; padding-top: 10px; border-top: 1px solid #334144; }
