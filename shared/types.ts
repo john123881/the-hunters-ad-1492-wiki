@@ -73,7 +73,13 @@ export interface CatalogResponse {
   };
 }
 export interface DetailResponse { data: ItemDetail }
-export interface ApiErrorResponse { error: { code: string; message: string } }
+export interface VersionConflictDetails {
+  scope: 'WAGON' | 'MAP' | 'CHARACTER';
+  expectedVersion: number | null;
+  currentVersion: number;
+  latest: CampaignWagon | CampaignMap | CampaignCharacter[];
+}
+export interface ApiErrorResponse { error: { code: string; message: string; conflict?: VersionConflictDetails } }
 
 export interface CampaignPlayerSeat { playerNumber: number; playerAlias: string }
 export interface AuthSession {

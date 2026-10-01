@@ -1,10 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Clock3, MapPin, MapPinned, Save, Shield, Trash2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import type { ApiErrorResponse, AuthSession, CampaignLocationCard, CampaignMap, CampaignMapCard, CampaignMapResponse, CampaignMapTile, CampaignWagonResponse } from '../../shared/types';
 
 function errorMessage(payload: unknown, fallback: string) {
   return (payload as ApiErrorResponse | null)?.error?.message ?? fallback;
+}
+
+
+function changedMapFields(before:CampaignMap,latest:CampaignMap){
+  const fields:string[]=[];
+  if(before.currentLocationType!==latest.currentLocationType||before.currentLocationCode!==latest.currentLocationCode)fields.push('獵人目前位置');
+  if(before.roadEventNotes!==latest.roadEventNotes)fields.push('道路事件紀錄');
+  if(before.townEventNotes!==latest.townEventNotes)fields.push('城鎮事件紀錄');
+  if(JSON.stringify(before.tiles)!==JSON.stringify(latest.tiles))fields.push('地圖卡狀態或備註');
+  if(JSON.stringify(before.locations)!==JSON.stringify(latest.locations))fields.push('地點卡狀態或備註');
+  if(JSON.stringify(before.cards)!==JSON.stringify(latest.cards))fields.push('放置卡片');
+  if(JSON.stringify(before.cardProgress)!==JSON.stringify(latest.cardProgress))fields.push('劇情／任務卡進度');
+  return fields.length?fields:['地圖版本'];
 }
 
 type MutationRequest = {
@@ -34,6 +48,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const [returnToProgress, setReturnToProgress] = useState(false);
   const [savedAction, setSavedAction] = useState('');
   const [failedMutation, setFailedMutation] = useState<MutationRequest | null>(null);
+  const [versionConflict,setVersionConflict]=useState<{fields:string[];expectedVersion:number;currentVersion:number}|null>(null);
   const [reauthRequired, setReauthRequired] = useState(false);
   const [tokenCardCode, setTokenCardCode] = useState('');
   const [tokenCode, setTokenCode] = useState<'A' | 'B' | 'C' | 'D'>('A');
@@ -177,6 +192,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     setBusy('time-token-' + storyCardCode);
     setMessage('');
     setFailedMutation(null);
+    setVersionConflict(null);
     setReauthRequired(false);
     try {
       const response = await fetch('/api/campaign/wagon/time-tokens', {
@@ -250,6 +266,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     setBusy(action);
     setSavedAction('');
     setFailedMutation(null);
+    setVersionConflict(null);
     setReauthRequired(false);
     setMessage('');
     setMessageKind('success');
@@ -264,10 +281,15 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         if (response.status === 401) {
           setReauthRequired(true);
           setMessage('登入已失效，請重新登入後再操作。');
-        } else if (response.status === 409) {
-          await loadMap().catch(() => undefined);
+        } else if(response.status===409&&result&&'error' in result&&result.error.code==='MAP_VERSION_CONFLICT'&&result.error.conflict?.scope==='MAP'){
+          const latest=result.error.conflict.latest as CampaignMap;
+          const fields=changedMapFields(map,latest);
+          setMap(latest);
           setFailedMutation(request);
-          setMessage('資料已被其他玩家更新，已載入最新版本。請檢查後再重試。');
+          setVersionConflict({fields,expectedVersion:map.version,currentVersion:latest.version});
+          setMessage('');
+        } else if (response.status === 409) {
+          setMessage(errorMessage(result,'資料發生衝突，請檢查後再試。'));
         } else if (response.status >= 500) {
           setFailedMutation(request);
           setMessage('伺服器暫時無法完成儲存，請稍後重試。');
@@ -277,6 +299,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         return false;
       }
       setMap(result.data);
+      setVersionConflict(null);
       setMessageKind('success');
       setMessage(response.status === 201 ? '已新增卡片紀錄。' : '地圖紀錄已更新。');
       setSavedAction(action);
@@ -364,6 +387,8 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
       <div><p className="eyebrow">CAMPAIGN MAP · CORE SET</p><h1 id="campaign-map-title">戰役地圖</h1><p>{session.campaignName} · 核心地圖 M01～M20</p></div>
       <span><MapPinned aria-hidden="true" />4 × 5</span>
     </header>
+
+    {versionConflict&&failedMutation&&<VersionConflictPanel title="地圖資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={Boolean(busy)} onReload={()=>{setFailedMutation(null);setVersionConflict(null);setMessageKind('success');setMessage('已採用最新地圖資料。');}} onReapply={()=>void mutate(failedMutation.path,failedMutation.method,failedMutation.payload,failedMutation.action)}/>}
 
     {message && <div className={'toast map-toast ' + messageKind} role={messageKind === 'error' ? 'alert' : 'status'}><span>{message}</span><div className="map-toast-actions">{failedMutation && <button onClick={() => void mutate(failedMutation.path, failedMutation.method, failedMutation.payload, failedMutation.action)} type="button">重新嘗試</button>}{reauthRequired && <button onClick={() => window.location.assign('/login')} type="button">重新登入</button>}<button aria-label="關閉通知" onClick={() => setMessage('')} type="button"><X aria-hidden="true" /></button></div></div>}
 

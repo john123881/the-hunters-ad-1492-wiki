@@ -8,6 +8,12 @@ type Ctx = Context<Env>;
 function error(c: Ctx, status: 400 | 404 | 409, code: string, message: string) {
   return c.json({ error: { code, message } }, status);
 }
+
+async function mapConflict(c:Ctx,session:AuthSession,expectedVersion:number){
+  const latest=await loadMap(c.env.DB,session);
+  return c.json({error:{code:'MAP_VERSION_CONFLICT',message:'地圖資料已被其他玩家更新。',conflict:{scope:'MAP',expectedVersion:Number.isInteger(expectedVersion)?expectedVersion:null,currentVersion:latest.version,latest}}},409);
+}
+
 async function body(c: Ctx) {
   try { return await c.req.json<Record<string, unknown>>(); } catch { return null; }
 }
@@ -229,7 +235,7 @@ export async function updateMapTile(c: Ctx) {
     `).bind(isRevealed ? 1 : 0, face, resourceNotes, notes, session.campaignId, mapCode, session.campaignId, expectedVersion),
     guardedMapLog(c.env.DB, session, expectedVersion, 'UPDATE_MAP_TILE', 'MAP_TILE', mapCode, before, { isRevealed, face, resourceNotes, notes }),
   ]);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -257,7 +263,7 @@ export async function updateMapPosition(c: Ctx) {
   const updated = await runMapBatch(c, session, expectedVersion, [
     guardedMapLog(c.env.DB, session, expectedVersion, 'SET_HUNTER_LOCATION', 'MAP', session.campaignId, before, { locationType, locationCode }),
   ], finalUpdate);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -351,7 +357,7 @@ export async function upsertMapCard(c: Ctx) {
     ),
   );
   const updated = await runMapBatch(c, session, expectedVersion, statements);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) }, before ? 200 : 201);
 }
 
@@ -422,7 +428,7 @@ export async function updateCampaignCardProgress(c: Ctx) {
     { isResolved, removedTimeToken: Boolean(activeToken) },
   ));
   const updated = await runMapBatch(c, session, expectedVersion, statements);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -442,7 +448,7 @@ export async function removeMapCard(c: Ctx) {
     `).bind(id, session.campaignId, session.campaignId, expectedVersion),
     guardedMapLog(c.env.DB, session, expectedVersion, 'REMOVE_CARD', 'MAP_CARD', String(id), before, null),
   ]);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -469,7 +475,7 @@ export async function updateLocationCard(c: Ctx) {
     `).bind(isRevealed ? 1 : 0, face, resourceNotes, notes, session.campaignId, locationCode, session.campaignId, expectedVersion),
     guardedMapLog(c.env.DB, session, expectedVersion, 'UPDATE_LOCATION_CARD', 'LOCATION_CARD', locationCode, before, { isRevealed, face, resourceNotes, notes }),
   ]);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
@@ -493,6 +499,6 @@ export async function updateMapEventNotes(c: Ctx) {
   const updated = await runMapBatch(c, session, expectedVersion, [
     guardedMapLog(c.env.DB, session, expectedVersion, 'UPDATE_EVENT_NOTES', 'MAP', session.campaignId, before, { roadEventNotes, townEventNotes }),
   ], finalUpdate);
-  if (!updated) return error(c, 409, 'MAP_VERSION_CONFLICT', '另一位玩家剛剛更新了地圖，已重新載入最新資料。');
+  if (!updated) return mapConflict(c,session,expectedVersion);
   return c.json({ data: await loadMap(c.env.DB, session) });
 }

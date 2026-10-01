@@ -67,7 +67,10 @@ export async function saveCampaignCharacter(c: Ctx) {
   const expectedVersion = input.expectedVersion == null ? null : integer(input.expectedVersion, 1, 1_000_000);
   const before = await c.env.DB.prepare('SELECT * FROM campaign_characters WHERE campaign_id = ? AND player_number = ?')
     .bind(session.campaignId, playerNumber).first<Record<string, unknown>>();
-  if (before && expectedVersion !== Number(before.version)) return error(c, 409, 'CHARACTER_VERSION_CONFLICT', '角色資料已被更新，請重新載入後再試。');
+  if (before && expectedVersion !== Number(before.version)) {
+    const latest=await loadCharacters(c.env.DB,session);
+    return c.json({error:{code:'CHARACTER_VERSION_CONFLICT',message:'角色資料已被其他玩家更新。',conflict:{scope:'CHARACTER',expectedVersion,currentVersion:Number(before.version),latest}}},409);
+  }
   try {
     const statements = [
       c.env.DB.prepare(`

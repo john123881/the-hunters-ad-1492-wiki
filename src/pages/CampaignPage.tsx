@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Clock3, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import type { ApiErrorResponse, AuthSession, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const DAY_ROWS = [Array.from({ length: 10 }, (_, index) => index + 1), Array.from({ length: 10 }, (_, index) => index + 11), Array.from({ length: 10 }, (_, index) => index + 21)];
@@ -11,6 +12,21 @@ const WORKSHOP_GEOMETRY: Record<string, { centers: [number, number][] }> = {
   workshop: { centers: [[813, 413], [813, 362], [813, 310]] },
   blacksmiths_tools: { centers: [[1132, 553], [1132, 504], [1132, 455]] },
 };
+
+type WagonMutationRequest={path:string;payload:Record<string,unknown>;successMessage:string};
+function changedWagonFields(before:CampaignWagon,latest:CampaignWagon){
+  const fields:string[]=[];
+  if(before.elapsedDays!==latest.elapsedDays)fields.push('累計時間');
+  if(before.sharedGold!==latest.sharedGold)fields.push('團隊共用金錢');
+  if(before.notes!==latest.notes)fields.push('馬車備註');
+  if(before.campaignName!==latest.campaignName)fields.push('戰役名稱');
+  if(JSON.stringify(before.upgrades)!==JSON.stringify(latest.upgrades))fields.push('工坊等級');
+  if(JSON.stringify(before.resources)!==JSON.stringify(latest.resources))fields.push('素材庫存');
+  if(JSON.stringify(before.timeTokens)!==JSON.stringify(latest.timeTokens))fields.push('Time Token');
+  if(JSON.stringify(before.equipment)!==JSON.stringify(latest.equipment))fields.push('裝備庫存');
+  return fields.length?fields:['馬車版本'];
+}
+
 function diamondPoints(cx: number, cy: number, halfX: number, halfY: number) {
   return cx + ',' + (cy - halfY) + ' ' + (cx + halfX) + ',' + cy + ' ' + cx + ',' + (cy + halfY) + ' ' + (cx - halfX) + ',' + cy;
 }
@@ -40,6 +56,8 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [savingUpgradeCode, setSavingUpgradeCode] = useState('');
   const savingUpgradeRef = useRef(false);
   const [activeFocusTab, setActiveFocusTab] = useState<'workshops' | 'timetrack'>('workshops');
+  const [versionConflict,setVersionConflict]=useState<{request:WagonMutationRequest;fields:string[];expectedVersion:number;currentVersion:number}|null>(null);
+  const [retryingConflict,setRetryingConflict]=useState(false);
 
   useEffect(() => { document.title = '馬車面板｜THE HUNTERS A.D. 1492 WIKI'; }, []);
 
@@ -98,6 +116,27 @@ export function CampaignPage({ session, loading, onLogout }: {
     setLoggingOut(false);
   }
 
+  function showWagonConflict(problem:ApiErrorResponse,request:WagonMutationRequest){
+    if(!wagon||problem.error.conflict?.scope!=='WAGON'){setFailure(problem.error.message);return;}
+    const latest=problem.error.conflict.latest as CampaignWagon;
+    setVersionConflict({request,fields:changedWagonFields(wagon,latest),expectedVersion:wagon.version,currentVersion:latest.version});
+    setWagon(latest);setFailure('');
+  }
+  async function retryWagonConflict(){
+    if(!wagon||!versionConflict)return;
+    setRetryingConflict(true);
+    try{
+      const response=await fetch(versionConflict.request.path,{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({...versionConflict.request.payload,expectedVersion:wagon.version})});
+      const payload=await response.json() as CampaignWagonResponse|ApiErrorResponse;
+      if(!response.ok||'error' in payload){
+        if('error' in payload&&payload.error.code==='WAGON_VERSION_CONFLICT'){showWagonConflict(payload,versionConflict.request);return;}
+        throw new Error('error' in payload?payload.error.message:'無法重新套用修改。');
+      }
+      setWagon(payload.data);setVersionConflict(null);setPendingDay(null);setToast(versionConflict.request.successMessage);
+    }catch(cause){setFailure(cause instanceof Error?cause.message:'無法重新套用修改。');}
+    finally{setRetryingConflict(false);}
+  }
+
   async function updateDay() {
     if (!wagon || pendingDay === null) return;
     setSavingDay(true);
@@ -106,7 +145,11 @@ export function CampaignPage({ session, loading, onLogout }: {
         method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ elapsedDays: pendingDay, expectedVersion: wagon.version }),
       });
-      if (!response.ok) throw new Error(await readError(response));
+      if(!response.ok){
+        const problem=await response.json() as ApiErrorResponse;
+        if(problem.error.code==='WAGON_VERSION_CONFLICT'){showWagonConflict(problem,{path:'/api/campaign/wagon/day',payload:{elapsedDays:pendingDay},successMessage:'時間已更新為第 '+pendingDay+' 天'});return;}
+        throw new Error(problem.error.message);
+      }
       const result = await response.json() as CampaignWagonResponse;
       setWagon(result.data);
       setToast(`時間已更新為第 ${result.data.elapsedDays} 天`);
@@ -140,10 +183,8 @@ export function CampaignPage({ session, loading, onLogout }: {
       });
       if (!response.ok) {
         const problem = (await response.json()) as ApiErrorResponse;
-        if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
-          await loadWagon();
-          setFailure('另一位玩家剛剛更新了馬車，已重新載入最新資料。');
-        } else setFailure(problem.error.message);
+        if(problem.error.code==='WAGON_VERSION_CONFLICT')showWagonConflict(problem,{path:'/api/campaign/wagon/upgrades/'+stationCode,payload:{level},successMessage:'工坊等級已更新'});
+        else setFailure(problem.error.message);
         return;
       }
       const result = await response.json() as CampaignWagonResponse;
@@ -207,6 +248,8 @@ export function CampaignPage({ session, loading, onLogout }: {
       <span className={session.isActive ? 'campaign-state active' : 'campaign-state'}>{session.isActive ? '進行中' : '已凍結'}</span>
     </header>
 
+    {versionConflict&&<VersionConflictPanel title="馬車資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={retryingConflict} onReload={()=>{setVersionConflict(null);setPendingDay(null);setToast('已採用最新馬車資料。');}} onReapply={()=>void retryWagonConflict()}/>}
+
     <div className="campaign-session-card">
       <UserRound aria-hidden="true" />
       <div><small>目前玩家</small><strong>{session.playerAlias}</strong><span>玩家席位 {session.playerNumber}</span></div>
@@ -217,7 +260,7 @@ export function CampaignPage({ session, loading, onLogout }: {
       <header className="wagon-board-head">
         <div><p className="eyebrow">WAGON RECORD</p><h2>馬車全景總覽</h2></div>
         <div className="wagon-board-status">
-          <SharedGold value={wagon.sharedGold} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={loadWagon} />
+          <SharedGold value={wagon.sharedGold} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
           <div className="elapsed-day">
             <small>累計時間</small>
             <strong>{wagon.elapsedDays}</strong>
@@ -443,9 +486,9 @@ export function CampaignPage({ session, loading, onLogout }: {
         </div>
       </article>
 
-      <ResourceInventory resources={wagon.resources} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={loadWagon} />
+      <ResourceInventory resources={wagon.resources} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
       <EquipmentInventory equipment={wagon.equipment} onChange={setWagon} onError={setFailure} onToast={setToast} />
-      <WagonNotes notes={wagon.notes} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={loadWagon} />
+      <WagonNotes notes={wagon.notes} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
     </section>
 
     {pendingDay !== null && <div className="confirm-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPendingDay(null); }}>
@@ -469,7 +512,7 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
   onChange: (wagon: CampaignWagon) => void;
   onError: (message: string) => void;
   onToast: (message: string) => void;
-  onConflict: () => Promise<void>;
+  onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
 }) {
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
@@ -484,10 +527,8 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
     });
     if (!response.ok) {
       const problem = (await response.json()) as ApiErrorResponse;
-      if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
-        await onConflict();
-        onError('另一位玩家剛剛更新了馬車，已重新載入最新資料。');
-      } else onError(problem.error.message);
+      if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/gold',payload:{sharedGold},successMessage:'團隊共用金錢已更新為 '+sharedGold});
+      else onError(problem.error.message);
     } else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);
@@ -509,7 +550,7 @@ function ResourceInventory({ resources, version, onChange, onError, onToast, onC
   onChange: (wagon: CampaignWagon) => void;
   onError: (message: string) => void;
   onToast: (message: string) => void;
-  onConflict: () => Promise<void>;
+  onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
 }) {
   const [busyCode, setBusyCode] = useState('');
   const busyRef = useRef(false);
@@ -524,10 +565,8 @@ function ResourceInventory({ resources, version, onChange, onError, onToast, onC
     });
     if (!response.ok) {
       const problem = (await response.json()) as ApiErrorResponse;
-      if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
-        await onConflict();
-        onError('另一位玩家剛剛更新了馬車，已重新載入最新資料。');
-      } else onError(problem.error.message);
+      if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/resources/'+resource.code,payload:{quantity:nextQuantity},successMessage:resource.name+'已更新為 '+nextQuantity});
+      else onError(problem.error.message);
     } else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);
@@ -561,7 +600,7 @@ function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: 
   onChange: (wagon: CampaignWagon) => void;
   onError: (message: string) => void;
   onToast: (message: string) => void;
-  onConflict: () => Promise<void>;
+  onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
 }) {
   const [draft, setDraft] = useState(notes);
   const [saving, setSaving] = useState(false);
@@ -582,10 +621,8 @@ function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: 
       });
       if (!response.ok) {
         const problem = (await response.json()) as ApiErrorResponse;
-        if (problem.error.code === 'WAGON_VERSION_CONFLICT') {
-          await onConflict();
-          onError('另一位玩家剛剛更新了馬車，已重新載入最新資料。請確認備註後再儲存。');
-        } else onError(problem.error.message);
+        if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/notes',payload:{notes:draft},successMessage:'馬車備註已儲存'});
+        else onError(problem.error.message);
         return;
       }
       const result = await response.json() as CampaignWagonResponse;

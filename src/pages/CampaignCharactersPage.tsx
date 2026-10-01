@@ -3,7 +3,20 @@ import { BookOpen, FlaskConical, Image, Minus, Plus, RefreshCw, Save, Shield, Us
 import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
+import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import type { ApiErrorResponse, AuthSession, CampaignCharacter, CampaignCharactersResponse } from '../../shared/types';
+
+
+const characterFieldLabels:Record<string,string>={
+  heroSlug:'角色',customName:'角色名稱',moralePosition:'士氣位置',strengthLevel:'力量',
+  knowledgeLevel:'知識',perceptionLevel:'洞察',agilityLevel:'敏捷',maxHealthLevel:'最大生命軌',
+  currentHealth:'當前生命',xpTens:'經驗值十位',xpOnes:'經驗值個位',isPoisoned:'中毒狀態',notes:'角色備註',
+};
+function changedCharacterFields(before:CampaignCharacter|null,latest:CampaignCharacter){
+  if(!before)return ['角色已由其他玩家建立'];
+  const fields=Object.keys(characterFieldLabels).filter(key=>before[key as keyof CampaignCharacter]!==latest[key as keyof CampaignCharacter]);
+  return fields.length?fields.map(key=>characterFieldLabels[key]):['角色版本'];
+}
 
 type Draft = Omit<CampaignCharacter, 'id' | 'playerNumber' | 'version'> & { version: number | null };
 const emptyDraft = (heroSlug: string): Draft => ({
@@ -56,6 +69,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   const [message, setMessage] = useState('');
   const [modal, setModal] = useState<'story' | 'layout' | null>(null);
   const [choosingHero, setChoosingHero] = useState(false);
+  const [versionConflict,setVersionConflict]=useState<{fields:string[];expectedVersion:number|null;currentVersion:number;latest:CampaignCharacter}|null>(null);
 
   useEffect(() => {
     if (!session) return;
@@ -71,7 +85,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   }, [session]);
 
   const character = characters.find(entry => entry.playerNumber === selectedNumber) ?? null;
-  useEffect(() => { setDraft(character ? toDraft(character) : null); setChoosingHero(false); }, [character?.id, character?.version, selectedNumber]);
+  useEffect(() => { if(versionConflict)return;setDraft(character ? toDraft(character) : null); setChoosingHero(false); }, [character?.id, character?.version, selectedNumber,versionConflict]);
   const selectedPlayer = session?.players.find(player => player.playerNumber === selectedNumber);
   const isSelf = selectedNumber === session?.playerNumber;
   const canEdit = Boolean(selectedPlayer && session?.isActive);
@@ -88,10 +102,23 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
         body: JSON.stringify({ ...draft, expectedVersion: draft.version }),
       });
       const payload = await response.json() as CampaignCharactersResponse | ApiErrorResponse;
+      if(!response.ok&&'error' in payload&&payload.error.code==='CHARACTER_VERSION_CONFLICT'&&payload.error.conflict?.scope==='CHARACTER'){
+        const latestCharacters=payload.error.conflict.latest as CampaignCharacter[];
+        const latest=latestCharacters.find(entry=>entry.playerNumber===selectedNumber);
+        if(latest){
+          const base=characters.find(entry=>entry.playerNumber===selectedNumber)??null;
+          setCharacters(latestCharacters);
+          setDraft({...draft,version:latest.version});
+          setVersionConflict({fields:changedCharacterFields(base,latest),expectedVersion:draft.version,currentVersion:latest.version,latest});
+          setMessage('');
+          return;
+        }
+      }
       if (!response.ok || 'error' in payload) throw new Error('error' in payload ? payload.error.message : '角色儲存失敗。');
       const savedCharacter = payload.data.characters.find(entry => entry.playerNumber === selectedNumber);
       if (savedCharacter) setDraft(toDraft(savedCharacter));
       setCharacters(payload.data.characters);
+      setVersionConflict(null);
       setMessage('角色面板已儲存。');
     } catch (error) { setMessage(error instanceof Error ? error.message : '角色儲存失敗。'); }
     finally { setBusy(null); }
@@ -114,6 +141,8 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
         </Link>;
       })}
     </nav>
+
+    {versionConflict&&<VersionConflictPanel title="角色資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={busy==='save'} onReload={()=>{setDraft(toDraft(versionConflict.latest));setVersionConflict(null);setMessage('已載入最新角色資料。');}} onReapply={()=>void save()}/>}
 
     {message && <div className={message.includes('已儲存') ? 'character-notice success' : 'character-notice'} role="status">{message}</div>}
     {busy === 'load' ? <div className="character-loading">正在載入角色資料…</div>

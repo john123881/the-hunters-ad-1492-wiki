@@ -11,6 +11,12 @@ function error(c: Ctx, status: 400 | 401 | 404 | 409, code: string, message: str
   return c.json({ error: { code, message } }, status);
 }
 
+async function wagonConflict(c:Ctx,session:AuthSession,expectedVersion:number){
+  const latest=await loadWagon(c.env.DB,session);
+  return c.json({error:{code:'WAGON_VERSION_CONFLICT',message:'馬車資料已被其他玩家更新。',conflict:{scope:'WAGON',expectedVersion:Number.isInteger(expectedVersion)?expectedVersion:null,currentVersion:latest.version,latest}}},409);
+}
+
+
 async function parseBody(c: Ctx) {
   try { return await c.req.json<Record<string, unknown>>(); }
   catch { return null; }
@@ -136,7 +142,7 @@ export async function updateWagonDay(c: Ctx) {
     SET elapsed_days = ?, version = version + 1, updated_by_player = ?, updated_at = datetime('now')
     WHERE campaign_id = ? AND version = ?
   `).bind(elapsedDays, session.playerNumber, session.campaignId, expectedVersion).run();
-  if (!result.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '馬車資料已被其他玩家更新，請重新整理後再試。');
+  if (!result.meta.changes) return wagonConflict(c,session,expectedVersion);
   await c.env.DB.prepare(`
     INSERT INTO wagon_activity_logs
       (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json)
@@ -188,7 +194,7 @@ export async function updateWagonUpgrade(c: Ctx) {
   `).bind(session.campaignId, stationCode).first<{ level: number }>();
   const claimed = await c.env.DB.prepare("UPDATE campaign_wagons SET version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?")
     .bind(session.playerNumber, session.campaignId, expectedVersion).run();
-  if (!claimed.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
+  if (!claimed.meta.changes) return wagonConflict(c,session,expectedVersion);
   await c.env.DB.batch([
     c.env.DB.prepare(`
       UPDATE campaign_wagon_upgrades SET level = ?, updated_at = datetime('now')
@@ -319,7 +325,7 @@ export async function updateWagonResource(c: Ctx) {
   const before = await c.env.DB.prepare('SELECT quantity FROM campaign_wagon_resources WHERE campaign_id = ? AND resource_id = ?').bind(session.campaignId, resource.id).first<{ quantity: number }>();
   const claimed = await c.env.DB.prepare("UPDATE campaign_wagons SET version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?")
     .bind(session.playerNumber, session.campaignId, expectedVersion).run();
-  if (!claimed.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
+  if (!claimed.meta.changes) return wagonConflict(c,session,expectedVersion);
   await c.env.DB.batch([
     c.env.DB.prepare("INSERT INTO campaign_wagon_resources (campaign_id, resource_id, quantity) VALUES (?, ?, ?) ON CONFLICT(campaign_id, resource_id) DO UPDATE SET quantity = excluded.quantity, updated_at = datetime('now')").bind(session.campaignId, resource.id, quantity),
     c.env.DB.prepare("INSERT INTO wagon_activity_logs (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json) VALUES (?, ?, 'SET_RESOURCE_QUANTITY', 'RESOURCE', ?, ?, ?)").bind(session.campaignId, session.playerNumber, resourceCode, JSON.stringify({ quantity: before?.quantity ?? 0 }), JSON.stringify({ quantity })),
@@ -385,7 +391,7 @@ export async function updateSharedGold(c: Ctx) {
   const before = await c.env.DB.prepare('SELECT shared_gold FROM campaign_wagons WHERE campaign_id = ?').bind(session.campaignId).first<{ shared_gold: number }>();
   const claimed = await c.env.DB.prepare("UPDATE campaign_wagons SET shared_gold = ?, version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?")
     .bind(sharedGold, session.playerNumber, session.campaignId, expectedVersion).run();
-  if (!claimed.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
+  if (!claimed.meta.changes) return wagonConflict(c,session,expectedVersion);
   await c.env.DB.batch([
     c.env.DB.prepare("INSERT INTO wagon_activity_logs (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json) VALUES (?, ?, 'SET_SHARED_GOLD', 'WAGON', ?, ?, ?)").bind(session.campaignId, session.playerNumber, session.campaignId, JSON.stringify({ sharedGold: before?.shared_gold ?? 0 }), JSON.stringify({ sharedGold })),
   ]);
@@ -405,7 +411,7 @@ export async function updateWagonNotes(c: Ctx) {
   const updated = await c.env.DB.prepare(
     "UPDATE campaign_wagons SET notes = ?, version = version + 1, updated_by_player = ?, updated_at = datetime('now') WHERE campaign_id = ? AND version = ?",
   ).bind(notes, session.playerNumber, session.campaignId, expectedVersion).run();
-  if (!updated.meta.changes) return error(c, 409, 'WAGON_VERSION_CONFLICT', '另一位玩家剛剛更新了馬車。');
+  if (!updated.meta.changes) return wagonConflict(c,session,expectedVersion);
   await c.env.DB.prepare(
     "INSERT INTO wagon_activity_logs (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json) VALUES (?, ?, 'UPDATE_WAGON_NOTES', 'WAGON', ?, ?, ?)",
   ).bind(
