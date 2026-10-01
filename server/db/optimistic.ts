@@ -1,25 +1,32 @@
 import { sql } from 'drizzle-orm';
 import type { BatchItem } from 'drizzle-orm/batch';
+import { toD1PreparedStatement } from './batch';
+
+export { toD1PreparedStatement };
 
 /**
  * 樂觀鎖 Batch 執行選項：
  * 明確區分 beforeUpdate（例如帶有條件的日誌）、主要 update、以及 afterUpdate
  */
 export interface OptimisticBatchOptions {
-  beforeUpdate?: BatchItem<'sqlite'>[];
+  beforeUpdate?: readonly BatchItem<'sqlite'>[];
   update: BatchItem<'sqlite'>;
-  afterUpdate?: BatchItem<'sqlite'>[];
+  afterUpdate?: readonly BatchItem<'sqlite'>[];
 }
 
 /**
- * 將 Drizzle Query 或 db.run(sql`...`) 轉為 Cloudflare 原生 D1PreparedStatement
+ * 樂觀鎖 Batch 執行結果結構
  */
-export function toD1PreparedStatement(d1: D1Database, query: BatchItem<'sqlite'>): D1PreparedStatement {
-  const prepared = (
-    query as unknown as { _prepare(): { getQuery(): { sql: string; params: unknown[] } } }
-  )._prepare();
-  const built = prepared.getQuery();
-  return d1.prepare(built.sql).bind(...built.params);
+export type OptimisticBatchResult =
+  | { status: 'updated'; results: D1Result[] }
+  | { status: 'conflict'; results: D1Result[] };
+
+/**
+ * 安全轉換 JSON 字串，統一處理 undefined, null, 物件與陣列
+ */
+export function safeJsonStringify(value: unknown): string | null {
+  if (value === undefined || value === null) return null;
+  return JSON.stringify(value);
 }
 
 /**
@@ -27,12 +34,12 @@ export function toD1PreparedStatement(d1: D1Database, query: BatchItem<'sqlite'>
  * 確保 Log 先於 Update 執行（避免 Update 變更版本後 Log 無法匹配），
  * 並精確檢查主要 Update statement 的 meta.changes 是否大於 0。
  *
- * @returns boolean - true 表示主更新成功（changes > 0）；false 表示版本衝突或條件不符（changes === 0）
+ * @returns OptimisticBatchResult - 包含 status ('updated' | 'conflict') 與原生 D1Result[]
  */
 export async function executeOptimisticBatch(
   d1: D1Database,
   options: OptimisticBatchOptions,
-): Promise<boolean> {
+): Promise<OptimisticBatchResult> {
   const before = options.beforeUpdate ?? [];
   const after = options.afterUpdate ?? [];
 
@@ -45,11 +52,16 @@ export async function executeOptimisticBatch(
   const results = await d1.batch(statements);
   // 精準定位 update statement 的結果
   const updateResult = results[before.length];
-  return (updateResult?.meta.changes ?? 0) > 0;
+  const isUpdated = (updateResult?.meta.changes ?? 0) > 0;
+
+  return {
+    status: isUpdated ? 'updated' : 'conflict',
+    results,
+  };
 }
 
 /**
- * 馬車日誌 Builder（受限於 campaigns.version = expectedVersion）
+ * 馬車日誌 Builder（受限於 campaign_wagons.version = expectedVersion）
  */
 export function buildWagonGuardedLog(params: {
   campaignId: string;
@@ -58,9 +70,14 @@ export function buildWagonGuardedLog(params: {
   actionType: string;
   entityType: string;
   entityId: string;
+  before?: unknown;
+  after?: unknown;
   beforeJson?: string | null;
   afterJson?: string | null;
 }) {
+  const beforeVal = params.beforeJson !== undefined ? params.beforeJson : safeJsonStringify(params.before);
+  const afterVal = params.afterJson !== undefined ? params.afterJson : safeJsonStringify(params.after);
+
   return sql`
     INSERT INTO wagon_activity_logs (
       campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json
@@ -71,8 +88,8 @@ export function buildWagonGuardedLog(params: {
       ${params.actionType},
       ${params.entityType},
       ${params.entityId},
-      ${params.beforeJson ?? null},
-      ${params.afterJson ?? null}
+      ${beforeVal},
+      ${afterVal}
     WHERE EXISTS (
       SELECT 1 FROM campaign_wagons
       WHERE campaign_id = ${params.campaignId}
@@ -92,9 +109,14 @@ export function buildCharacterGuardedLog(params: {
   actionType: string;
   entityType: string;
   entityId: string;
+  before?: unknown;
+  after?: unknown;
   beforeJson?: string | null;
   afterJson?: string | null;
 }) {
+  const beforeVal = params.beforeJson !== undefined ? params.beforeJson : safeJsonStringify(params.before);
+  const afterVal = params.afterJson !== undefined ? params.afterJson : safeJsonStringify(params.after);
+
   return sql`
     INSERT INTO character_activity_logs (
       campaign_id, actor_player_number, target_player_number, action_type, entity_type, entity_id, before_json, after_json
@@ -106,8 +128,8 @@ export function buildCharacterGuardedLog(params: {
       ${params.actionType},
       ${params.entityType},
       ${params.entityId},
-      ${params.beforeJson ?? null},
-      ${params.afterJson ?? null}
+      ${beforeVal},
+      ${afterVal}
     WHERE EXISTS (
       SELECT 1 FROM campaign_characters
       WHERE campaign_id = ${params.campaignId}
@@ -127,9 +149,14 @@ export function buildMapGuardedLog(params: {
   actionType: string;
   entityType: string;
   entityId: string;
+  before?: unknown;
+  after?: unknown;
   beforeJson?: string | null;
   afterJson?: string | null;
 }) {
+  const beforeVal = params.beforeJson !== undefined ? params.beforeJson : safeJsonStringify(params.before);
+  const afterVal = params.afterJson !== undefined ? params.afterJson : safeJsonStringify(params.after);
+
   return sql`
     INSERT INTO map_activity_logs (
       campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json
@@ -140,8 +167,8 @@ export function buildMapGuardedLog(params: {
       ${params.actionType},
       ${params.entityType},
       ${params.entityId},
-      ${params.beforeJson ?? null},
-      ${params.afterJson ?? null}
+      ${beforeVal},
+      ${afterVal}
     WHERE EXISTS (
       SELECT 1 FROM campaign_maps
       WHERE campaign_id = ${params.campaignId}

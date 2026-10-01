@@ -78,11 +78,11 @@ type OptimisticBatchResult =
 
 ### 階段 A：穩定共用基礎
 
-- [ ] 集中 query 轉換邏輯，移除兩份重複實作。
-- [ ] 修正 Wagon guarded log，守衛 `campaign_wagons.campaign_id` 與 `campaign_wagons.version`。
-- [ ] 確認 Map、Character builder 包含完整識別鍵。
-- [ ] 集中 before／after JSON 序列化，定義 `undefined`、`null` 的處理。
-- [ ] 讓 executor 回傳結構化結果，以指定 update 的 `meta.changes` 判定衝突。
+- [x] 集中 query 轉換邏輯，移除兩份重複實作（抽取至 `server/db/batch.ts`）。
+- [x] 修正 Wagon guarded log，守衛 `campaign_wagons.campaign_id` 與 `campaign_wagons.version`。
+- [x] 確認 Map、Character builder 包含完整識別鍵。
+- [x] 集中 before／after JSON 序列化，定義 `undefined`、`null` 的處理（`safeJsonStringify`）。
+- [x] 讓 executor 回傳結構化結果，以指定 update 的 `meta.changes` 判定衝突（`OptimisticBatchResult`）。
 
 ### 階段 B：逐模組導入
 

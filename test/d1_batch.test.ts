@@ -139,11 +139,11 @@ describe('D1 Batch & Optimistic Concurrency Tests', () => {
 
     const updateStmt = dbSuccess.update(campaignWagons).set({ elapsedDays: 20 });
 
-    const isSuccess = await executeOptimisticBatch(successD1, {
+    const successResult = await executeOptimisticBatch(successD1, {
       beforeUpdate: [logStmt],
       update: updateStmt,
     });
-    assert.equal(isSuccess, true, '當 update 影響大於 0 時應回傳 true');
+    assert.equal(successResult.status, 'updated', '當 update 影響大於 0 時 status 應為 updated');
 
     // 模擬版本衝突情境：Update 影響 0 筆（因 WHERE version = expectedVersion 不成立）
     const conflictD1: any = {
@@ -162,11 +162,11 @@ describe('D1 Batch & Optimistic Concurrency Tests', () => {
       },
     };
 
-    const isConflictSuccess = await executeOptimisticBatch(conflictD1, {
+    const conflictResult = await executeOptimisticBatch(conflictD1, {
       beforeUpdate: [logStmt],
       update: updateStmt,
     });
-    assert.equal(isConflictSuccess, false, '當 update 影響為 0 時應回傳 false (表示版本衝突)');
+    assert.equal(conflictResult.status, 'conflict', '當 update 影響為 0 時 status 應為 conflict');
   });
 });
 

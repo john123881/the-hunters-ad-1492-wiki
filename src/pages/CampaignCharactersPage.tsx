@@ -90,8 +90,12 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
     if(versionConflict)return;
     setDraft(character ? toDraft(character) : null);
     setChoosingHero(false);
-    setBoardImageLoaded(false);
   }, [character?.id, character?.version, selectedNumber, versionConflict]);
+
+  // 只有在英雄底圖更換時（例如切換角色或切換席位）才重設圖片載入狀態
+  useEffect(() => {
+    setBoardImageLoaded(false);
+  }, [character?.heroSlug, selectedNumber]);
   const selectedPlayer = session?.players.find(player => player.playerNumber === selectedNumber);
   const isSelf = selectedNumber === session?.playerNumber;
   const canEdit = Boolean(selectedPlayer && session?.isActive);
@@ -173,6 +177,11 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
         <div className="character-board-stage">
           <img
             key={hero.boardImageUrl}
+            ref={element => {
+              if (element && element.complete && element.naturalWidth > 0 && !boardImageLoaded) {
+                setBoardImageLoaded(true);
+              }
+            }}
             src={hero.boardImageUrl}
             alt={hero.displayNameZhTw + '角色面板'}
             onLoad={() => setBoardImageLoaded(true)}
