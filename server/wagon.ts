@@ -5,6 +5,7 @@ import { requireCampaignSession } from './auth';
 import { getDb, runD1Batch } from './db';
 import { executeOptimisticBatch, buildWagonGuardedLog } from './db/optimistic';
 import { respondVersionConflict } from './http/conflict';
+import { parseJsonBody } from './http/json';
 import {
   campaigns,
   campaignWagons,
@@ -41,10 +42,8 @@ async function wagonConflict(c: Ctx, session: AuthSession, expectedVersion: numb
   });
 }
 
-
 async function parseBody(c: Ctx) {
-  try { return await c.req.json<Record<string, unknown>>(); }
-  catch { return null; }
+  return parseJsonBody(c, { code: 'INVALID_JSON', message: '請提供有效的資料。' });
 }
 
 async function ensureWagon(d1: D1Database, campaignId: string) {
@@ -256,7 +255,9 @@ export async function getWagon(c: Ctx) {
 export async function updateWagonDay(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const elapsedDays = Number(body?.elapsedDays);
   const expectedVersion = Number(body?.expectedVersion);
   if (!Number.isInteger(elapsedDays) || elapsedDays < 1 || elapsedDays > 60) {
@@ -316,7 +317,9 @@ export async function updateWagonDay(c: Ctx) {
 export async function updateCampaignName(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const campaignName = typeof body?.campaignName === 'string' ? body.campaignName.trim() : '';
   if (campaignName.length < 1 || campaignName.length > 60) {
     return error(c, 400, 'INVALID_CAMPAIGN_NAME', '戰役名稱需為 1 至 60 個字元。');
@@ -349,7 +352,9 @@ export async function updateWagonUpgrade(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const stationCode = c.req.param('stationCode') ?? '';
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const level = Number(body?.level);
   const expectedVersion = Number(body?.expectedVersion);
   if (!STATIONS.includes(stationCode)) return error(c, 404, 'STATION_NOT_FOUND', '找不到這個工坊。');
@@ -422,7 +427,9 @@ export async function updateWagonUpgrade(c: Ctx) {
 export async function createTimeToken(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const storyCardCode = typeof body?.storyCardCode === 'string' ? body.storyCardCode.trim().toUpperCase() : '';
   const tokenCode = typeof body?.tokenCode === 'string' ? body.tokenCode.toUpperCase() : '';
   const unlockAfterDays = Number(body?.unlockAfterDays);
@@ -584,7 +591,9 @@ export async function updateWagonResource(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const resourceCode = c.req.param('resourceCode') ?? '';
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const quantity = Number(body?.quantity);
   const expectedVersion = Number(body?.expectedVersion);
   if (!Number.isInteger(quantity) || quantity < 0 || quantity > 999) return error(c, 400, 'INVALID_RESOURCE_QUANTITY', '素材數量需為 0 至 999 的整數。');
@@ -661,7 +670,9 @@ export async function updateWagonResource(c: Ctx) {
 export async function addWagonEquipment(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const itemId = Number(body?.itemId);
   if (!Number.isInteger(itemId) || itemId < 1) return error(c, 400, 'INVALID_ITEM', '請選擇有效的物品。');
 
@@ -713,7 +724,9 @@ export async function updateWagonEquipment(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const equipmentId = Number(c.req.param('equipmentId'));
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const damageMarkers = Number(body?.damageMarkers);
   const notes = typeof body?.notes === 'string' ? body.notes.trim() : '';
   if (!Number.isInteger(equipmentId) || equipmentId < 1) return error(c, 404, 'EQUIPMENT_NOT_FOUND', '找不到這件裝備。');
@@ -832,7 +845,9 @@ export async function removeWagonEquipment(c: Ctx) {
 export async function updateSharedGold(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const sharedGold = Number(body?.sharedGold);
   const expectedVersion = Number(body?.expectedVersion);
   if (!Number.isInteger(sharedGold) || sharedGold < 0 || sharedGold > 99999) {
@@ -886,7 +901,9 @@ export async function updateSharedGold(c: Ctx) {
 export async function updateWagonNotes(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const body = await parseBody(c);
+  const parsedBody = await parseBody(c);
+  if (!parsedBody.success) return parsedBody.response;
+  const body = parsedBody.data;
   const notes = typeof body?.notes === 'string' ? body.notes.trim() : '';
   const expectedVersion = Number(body?.expectedVersion);
   if (notes.length > 5000) return error(c, 400, 'INVALID_WAGON_NOTES', '馬車備註最多 5000 個字元。');

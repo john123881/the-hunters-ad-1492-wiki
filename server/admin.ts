@@ -5,6 +5,7 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import type { AdminSession } from '../shared/types';
 import { buildCampaignBackup, restoreCampaignBackup } from './campaignBackup';
 import { getDb, runD1Batch } from './db';
+import { parseJsonBody } from './http/json';
 import {
   adminUsers,
   adminSessions,
@@ -114,8 +115,12 @@ export async function getAdminSession(c: Ctx) {
 }
 
 export async function loginAdmin(c: Ctx) {
-  let input: Record<string, unknown>;
-  try { input = await c.req.json(); } catch { return fail(c, 400, 'INVALID_JSON', '請提供有效的登入資料。'); }
+  const parsed = await parseJsonBody<Record<string, unknown>>(c, {
+    code: 'INVALID_JSON',
+    message: '請提供有效的登入資料。',
+  });
+  if (!parsed.success) return parsed.response;
+  const input = parsed.data;
   const username = typeof input.username === 'string' ? input.username.trim().toLowerCase() : '';
   const password = typeof input.password === 'string' ? input.password : '';
   if (!/^[a-z0-9._-]{3,40}$/.test(username) || password.length < 12 || password.length > 128) {
@@ -314,13 +319,14 @@ async function hashPassword(password: string) {
 }
 
 async function parseBody(c: Ctx) {
-  try { return await c.req.json<Record<string, unknown>>(); } catch { return null; }
+  return parseJsonBody(c, { code: 'INVALID_JSON', message: '請提供有效的戰役資料。' });
 }
 
 export async function createAdminCampaign(c: Ctx) {
   const admin = await requireAdmin(c);
-  const input = await parseBody(c);
-  if (!input) return fail(c, 400, 'INVALID_JSON', '請提供有效的戰役資料。');
+  const parsedInput = await parseBody(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const id = typeof input.id === 'string' ? input.id.trim().toLowerCase() : '';
   const name = typeof input.name === 'string' ? input.name.trim() : '';
   const password = typeof input.password === 'string' ? input.password : '';
@@ -376,7 +382,9 @@ export async function updateAdminCampaignStatus(c: Ctx) {
   const admin = await requireAdmin(c);
   const id = c.req.param('campaignId') ?? '';
   if (!id) return fail(c, 400, 'INVALID_CAMPAIGN_ID', '缺少戰役 ID。');
-  const input = await parseBody(c);
+  const parsedInput = await parseBody(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   if (!input || typeof input.isActive !== 'boolean') return fail(c, 400, 'INVALID_CAMPAIGN_STATUS', '請提供有效的戰役狀態。');
 
   const db = getDb(c.env.DB);
@@ -456,7 +464,9 @@ export async function resetAdminCampaignPassword(c: Ctx) {
   const admin = await requireAdmin(c);
   const id = c.req.param('campaignId') ?? '';
   if (!id) return fail(c, 400, 'INVALID_CAMPAIGN_ID', '缺少戰役 ID。');
-  const input = await parseBody(c);
+  const parsedInput = await parseBody(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const password = typeof input?.password === 'string' ? input.password : '';
   const revokeSessions = input?.revokeSessions !== false;
   if (password.length < 8 || password.length > 128) return fail(c, 400, 'INVALID_CAMPAIGN_PASSWORD', '戰役密碼需為 8 至 128 個字元。');
@@ -694,7 +704,9 @@ export async function getAdminActivityLogs(c: Ctx) {
 
 export async function deleteAdminActivityLogs(c: Ctx) {
   await requireAdmin(c);
-  const input = await parseBody(c);
+  const parsedInput = await parseBody(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const category = typeof input?.category === 'string' ? input.category.toUpperCase() : '';
   const rawIds = Array.isArray(input?.ids) ? input.ids : [];
   const ids = [...new Set(rawIds.map(Number).filter(id => Number.isInteger(id) && id > 0))];
@@ -738,11 +750,15 @@ export async function exportAdminCampaignBackup(c:Ctx){
   return c.body(JSON.stringify(backup,null,2));
 }
 
-export async function importAdminCampaignBackup(c:Ctx){
-  const admin=await requireAdmin(c);
-  let input:unknown;
-  try{input=await c.req.json();}catch{return fail(c,400,'INVALID_BACKUP_JSON','備份檔不是有效的 JSON。');}
-  const routeCampaignId=c.req.param('campaignId')??'';
+export async function importAdminCampaignBackup(c: Ctx) {
+  const admin = await requireAdmin(c);
+  const parsed = await parseJsonBody(c, {
+    code: 'INVALID_BACKUP_JSON',
+    message: '備份檔不是有效的 JSON。',
+  });
+  if (!parsed.success) return parsed.response;
+  const input = parsed.data;
+  const routeCampaignId = c.req.param('campaignId') ?? '';
   const fileCampaignId=typeof input==='object'&&input!==null&&'campaignId' in input&&typeof input.campaignId==='string'?input.campaignId:'';
   const campaignId=routeCampaignId||fileCampaignId;
   if(!campaignId)return fail(c,400,'INVALID_CAMPAIGN_BACKUP','備份檔缺少戰役 ID。');

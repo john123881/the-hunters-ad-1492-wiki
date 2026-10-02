@@ -10,6 +10,7 @@ import {
   buildWagonGuardedLogOnMapResolution,
 } from './db/optimistic';
 import { respondVersionConflict } from './http/conflict';
+import { parseJsonBody } from './http/json';
 import {
   campaignMaps,
   campaignMapTiles,
@@ -39,7 +40,7 @@ async function mapConflict(c: Ctx, session: AuthSession, expectedVersion: number
 }
 
 async function body(c: Ctx) {
-  try { return await c.req.json<Record<string, unknown>>(); } catch { return null; }
+  return parseJsonBody(c, { code: 'INVALID_JSON', message: '請提供有效的地圖資料。' });
 }
 function validMapCode(code: string) {
   const value = Number(code.slice(1));
@@ -376,7 +377,9 @@ export async function updateMapTile(c: Ctx) {
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const mapCode = (c.req.param('mapCode') ?? '').toUpperCase();
   if (!validMapCode(mapCode)) return error(c, 404, 'MAP_TILE_NOT_FOUND', '找不到這張核心地圖卡。');
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const isRevealed = input?.isRevealed;
   const face = isRevealed === true ? 'FRONT' : 'BACK';
@@ -416,7 +419,9 @@ export async function updateMapTile(c: Ctx) {
 export async function updateMapPosition(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const locationType = input?.locationType === null ? null : String(input?.locationType ?? '');
   const locationCode = input?.locationCode === null ? null : String(input?.locationCode ?? '').trim().toUpperCase();
@@ -462,7 +467,9 @@ export async function updateMapPosition(c: Ctx) {
 export async function upsertMapCard(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const cardCode = typeof input?.cardCode === 'string' ? input.cardCode.trim().toUpperCase() : '';
   const type = cardType(cardCode);
@@ -582,7 +589,9 @@ export async function updateCampaignCardProgress(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const cardCode = (c.req.param('cardCode') ?? '').trim().toUpperCase();
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const isResolved = input?.isResolved;
   const type = cardType(cardCode);
@@ -672,7 +681,9 @@ export async function removeMapCard(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const id = Number(c.req.param('placementId'));
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const db = getDb(c.env.DB);
   const [before] = await db
@@ -701,7 +712,9 @@ export async function updateLocationCard(c: Ctx) {
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const locationCode = (c.req.param('locationCode') ?? '').toUpperCase();
   if (!validLocationCode(locationCode)) return error(c, 404, 'LOCATION_CARD_NOT_FOUND', '找不到這張地點卡。');
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const isRevealed = input?.isRevealed;
   const face = isRevealed === true ? 'FRONT' : 'BACK';
@@ -739,7 +752,9 @@ export async function updateLocationCard(c: Ctx) {
 export async function updateMapEventNotes(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
-  const input = await body(c);
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const expectedVersion = Number(input?.expectedVersion);
   const roadEventNotes = typeof input?.roadEventNotes === 'string' ? input.roadEventNotes.trim() : '';
   const townEventNotes = typeof input?.townEventNotes === 'string' ? input.townEventNotes.trim() : '';

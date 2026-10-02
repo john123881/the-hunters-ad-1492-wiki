@@ -11,6 +11,8 @@ import {
   authLoginAttempts,
 } from './db/schema/index';
 
+import { parseJsonBody } from './http/json';
+
 type Env = { Bindings: { DB: D1Database; ASSETS: Fetcher } };
 type Ctx = Context<Env>;
 const COOKIE = 'hunter_session';
@@ -120,8 +122,12 @@ export async function readSession(c: Ctx): Promise<{ hash: string; data: AuthSes
 }
 
 export async function loginCampaign(c: Ctx) {
-  let body: Record<string, unknown>;
-  try { body = await c.req.json(); } catch { return fail(c, 400, 'INVALID_JSON', '請提供有效的登入資料。'); }
+  const parsed = await parseJsonBody<Record<string, unknown>>(c, {
+    code: 'INVALID_JSON',
+    message: '請提供有效的登入資料。',
+  });
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const campaignId = typeof body.campaignId === 'string' ? body.campaignId.trim().toLowerCase() : '';
   const password = typeof body.password === 'string' ? body.password : '';
   const playerNumber = Number(body.playerNumber);

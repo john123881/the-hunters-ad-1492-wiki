@@ -1,6 +1,8 @@
 import { categoryCodes, consumptionLabels, usageLabels, attackLabels, attributeLabels } from '../shared/types';
 
 export class InvalidQuery extends Error {}
+
+
 const enumFilters = {
   category: categoryCodes,
   consumption: Object.keys(consumptionLabels), usage: Object.keys(usageLabels),

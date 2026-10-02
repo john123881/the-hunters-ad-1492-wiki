@@ -6,6 +6,7 @@ import { requireCampaignSession } from './auth';
 import { getDb, runD1Batch } from './db';
 import { executeOptimisticBatch, buildCharacterGuardedLog } from './db/optimistic';
 import { respondVersionConflict } from './http/conflict';
+import { parseJsonBody } from './http/json';
 import { campaignCharacters, characterActivityLogs } from './db/schema';
 
 type Env = { Bindings: { DB: D1Database; ASSETS: Fetcher } };
@@ -16,11 +17,7 @@ function error(c: Ctx, status: 400 | 403 | 404 | 409, code: string, message: str
 }
 
 async function body(c: Ctx) {
-  try {
-    return await c.req.json<Record<string, unknown>>();
-  } catch {
-    return null;
-  }
+  return parseJsonBody(c, { code: 'INVALID_JSON', message: '請提供有效的角色資料。' });
 }
 
 const integer = (value: unknown, min: number, max: number) => {
@@ -66,8 +63,9 @@ export async function saveCampaignCharacter(c: Ctx) {
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
   const playerNumber = integer(c.req.param('playerNumber'), 1, 4);
   if (!playerNumber) return error(c, 404, 'PLAYER_NOT_FOUND', '找不到這個玩家席位。');
-  const input = await body(c);
-  if (!input) return error(c, 400, 'INVALID_JSON', '請提供有效的角色資料。');
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
   const heroSlug = typeof input.heroSlug === 'string' ? input.heroSlug : '';
   if (!heroDefinitionBySlug[heroSlug]) return error(c, 400, 'INVALID_HERO', '請選擇有效的獵人。');
   const customName = typeof input.customName === 'string' ? input.customName.trim() : '';
