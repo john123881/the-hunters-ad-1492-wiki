@@ -86,19 +86,19 @@ type OptimisticBatchResult =
 
 ### 階段 B：逐模組導入
 
-1. [ ] Wagon：先替換天數、金錢、備註等單一資料列更新。
-2. [ ] Wagon：再替換工坊與資源等明細加 Wagon 版本的操作。
-3. [ ] Character：統一資料更新與版本遞增責任，改用共用 character log。
-4. [ ] Map：以共用 executor 取代 `runMapBatch`。
-5. [ ] Map：處理完成卡片時跨 Map／Wagon Log 與 Time Token 的複合 batch。
-6. [ ] 移除各模組已無用途的區域 helper 與重複註解。
+1. [x] Wagon：先替換天數、金錢、備註等單一資料列更新（`executeOptimisticBatch` + `buildWagonGuardedLog`）。
+2. [x] Wagon：再替換工坊與資源等明細加 Wagon 版本的操作（結構化 `status === 'conflict'` 檢查）。
+3. [x] Character：統一資料更新與版本遞增責任，改用共用 character log（單一 atomic update + `buildCharacterGuardedLog`）。
+4. [x] Map：以共用 executor 取代 `runMapBatch`。
+5. [x] Map：處理完成卡片時跨 Map／Wagon Log 與 Time Token 的複合 batch（`buildWagonGuardedLogOnMapResolution`）。
+6. [x] 移除各模組已無用途的區域 helper 與重複註解。
 
 ### 階段 C：衝突回應與權限整理
 
-- [ ] 統一版本參數驗證與 conflict payload 型別。
-- [ ] 各模組保留 latest loader，透過共用 responder 回傳 409。
-- [ ] 確認所有 mutation route 受全域凍結保護後，再移除 handler 重複檢查。
-- [ ] 維持前端重新載入／保留修改流程相容。
+- [x] 統一版本參數驗證與 conflict payload 型別（`server/http/conflict.ts`、`parseExpectedVersion`、`buildConflictPayload`）。
+- [x] 各模組保留 latest loader，透過共用 responder 回傳 409（`respondVersionConflict` 套用至 Wagon、Map、Character）。
+- [x] 確認所有 mutation route 受全域凍結保護（`server/index.ts` 中 `/api/campaign/*` 統一阻擋凍結戰役的非 GET/HEAD/OPTIONS 寫入請求）。
+- [x] 維持前端重新載入／保留修改流程相容（payload 結構 `code`, `message`, `conflict: { scope, expectedVersion, currentVersion, latest }` 嚴格相容）。
 
 ### 階段 D：後續候選
 

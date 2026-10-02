@@ -176,3 +176,37 @@ export function buildMapGuardedLog(params: {
     )
   `;
 }
+
+/**
+ * 馬車日誌 Builder（受限於地圖版本 campaign_maps.version = expectedVersion，例如完成卡片時跨表連帶移除 Time Token）
+ */
+export function buildWagonGuardedLogOnMapResolution(params: {
+  campaignId: string;
+  expectedMapVersion: number;
+  playerNumber: number;
+  tokenId: number;
+  cardCode: string;
+  tokenCode: string;
+}) {
+  const beforeJson = safeJsonStringify({ status: 'ACTIVE', storyCardCode: params.cardCode, tokenCode: params.tokenCode });
+  const afterJson = safeJsonStringify({ status: 'REMOVED', storyCardCode: params.cardCode, reason: 'CARD_RESOLVED' });
+
+  return sql`
+    INSERT INTO wagon_activity_logs (
+      campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json
+    )
+    SELECT
+      ${params.campaignId},
+      ${params.playerNumber},
+      'REMOVE_TIME_TOKEN_ON_CARD_RESOLUTION',
+      'TIME_TOKEN',
+      ${String(params.tokenId)},
+      ${beforeJson},
+      ${afterJson}
+    WHERE EXISTS (
+      SELECT 1 FROM campaign_maps
+      WHERE campaign_id = ${params.campaignId}
+        AND version = ${params.expectedMapVersion}
+    )
+  `;
+}

@@ -4,6 +4,7 @@ import type { AuthSession } from '../shared/types';
 import { requireCampaignSession } from './auth';
 import { getDb, runD1Batch } from './db';
 import { executeOptimisticBatch, buildWagonGuardedLog } from './db/optimistic';
+import { respondVersionConflict } from './http/conflict';
 import {
   campaigns,
   campaignWagons,
@@ -30,9 +31,14 @@ function error(c: Ctx, status: 400 | 401 | 404 | 409, code: string, message: str
   return c.json({ error: { code, message } }, status);
 }
 
-async function wagonConflict(c:Ctx,session:AuthSession,expectedVersion:number){
-  const latest=await loadWagon(c.env.DB,session);
-  return c.json({error:{code:'WAGON_VERSION_CONFLICT',message:'馬車資料已被其他玩家更新。',conflict:{scope:'WAGON',expectedVersion:Number.isInteger(expectedVersion)?expectedVersion:null,currentVersion:latest.version,latest}}},409);
+async function wagonConflict(c: Ctx, session: AuthSession, expectedVersion: number) {
+  const latest = await loadWagon(c.env.DB, session);
+  return respondVersionConflict(c, {
+    scope: 'WAGON',
+    expectedVersion,
+    currentVersion: latest.version,
+    latest,
+  });
 }
 
 
@@ -294,11 +300,11 @@ export async function updateWagonDay(c: Ctx) {
         ),
       );
 
-    const isSuccess = await executeOptimisticBatch(c.env.DB, {
+    const batchResult = await executeOptimisticBatch(c.env.DB, {
       beforeUpdate: [logStmt],
       update: updateStmt,
     });
-    if (!isSuccess) return wagonConflict(c, session, expectedVersion);
+    if (batchResult.status === 'conflict') return wagonConflict(c, session, expectedVersion);
 
     return c.json({ data: await loadWagon(c.env.DB, session) });
   } catch (err) {
@@ -403,11 +409,11 @@ export async function updateWagonUpgrade(c: Ctx) {
       ),
     );
 
-  const isSuccess = await executeOptimisticBatch(c.env.DB, {
+  const batchResult = await executeOptimisticBatch(c.env.DB, {
     beforeUpdate: [updateStationStmt, logStmt],
     update: updateWagonStmt,
   });
-  if (!isSuccess) return wagonConflict(c, session, expectedVersion);
+  if (batchResult.status === 'conflict') return wagonConflict(c, session, expectedVersion);
 
   return c.json({ data: await loadWagon(c.env.DB, session) });
 }
@@ -643,11 +649,11 @@ export async function updateWagonResource(c: Ctx) {
       ),
     );
 
-  const isSuccess = await executeOptimisticBatch(c.env.DB, {
+  const batchResult = await executeOptimisticBatch(c.env.DB, {
     beforeUpdate: [upsertResourceStmt, logStmt],
     update: updateWagonStmt,
   });
-  if (!isSuccess) return wagonConflict(c, session, expectedVersion);
+  if (batchResult.status === 'conflict') return wagonConflict(c, session, expectedVersion);
 
   return c.json({ data: await loadWagon(c.env.DB, session) });
 }
@@ -868,11 +874,11 @@ export async function updateSharedGold(c: Ctx) {
       ),
     );
 
-  const isSuccess = await executeOptimisticBatch(c.env.DB, {
+  const batchResult = await executeOptimisticBatch(c.env.DB, {
     beforeUpdate: [logStmt],
     update: updateStmt,
   });
-  if (!isSuccess) return wagonConflict(c, session, expectedVersion);
+  if (batchResult.status === 'conflict') return wagonConflict(c, session, expectedVersion);
 
   return c.json({ data: await loadWagon(c.env.DB, session) });
 }
@@ -893,7 +899,6 @@ export async function updateWagonNotes(c: Ctx) {
     .from(campaignWagons)
     .where(eq(campaignWagons.campaignId, session.campaignId));
 
-  // [原因備註]: D1 batch 衝突時不拋出例外，使用 Drizzle sql + WHERE EXISTS 確保只有在預期版本相符時才寫入日誌
   // [原因備註]: D1 batch 衝突時不拋出例外，使用 buildWagonGuardedLog 確保只有在預期版本相符時才寫入日誌
   const logStmt = db.run(buildWagonGuardedLog({
     campaignId: session.campaignId,
@@ -921,11 +926,11 @@ export async function updateWagonNotes(c: Ctx) {
       ),
     );
 
-  const isSuccess = await executeOptimisticBatch(c.env.DB, {
+  const batchResult = await executeOptimisticBatch(c.env.DB, {
     beforeUpdate: [logStmt],
     update: updateStmt,
   });
-  if (!isSuccess) return wagonConflict(c, session, expectedVersion);
+  if (batchResult.status === 'conflict') return wagonConflict(c, session, expectedVersion);
 
   return c.json({ data: await loadWagon(c.env.DB, session) });
 }

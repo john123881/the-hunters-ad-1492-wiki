@@ -8,6 +8,7 @@ import {
   buildWagonGuardedLog,
   buildMapGuardedLog,
   buildCharacterGuardedLog,
+  buildWagonGuardedLogOnMapResolution,
   safeJsonStringify,
 } from '../../server/db/optimistic';
 import { toD1PreparedStatement } from '../../server/db/batch';
@@ -167,5 +168,118 @@ describe('Optimistic Concurrency & Guarded Logs Unit Tests', () => {
     assert.ok(executed[1].sql.includes('SELECT 2'), '第 2 條應為 beforeUpdate[1]');
     assert.match(executed[2].sql, /update "campaign_wagons" set/i, '第 3 條應為主要的 update');
     assert.ok(executed[3].sql.includes('SELECT 3'), '第 4 條應為 afterUpdate[0]');
+  });
+
+  it('buildWagonGuardedLogOnMapResolution 正確守衛 campaign_maps.version', () => {
+    const { mockD1 } = createSpyD1();
+    const db = drizzle(mockD1);
+
+    const logSql = buildWagonGuardedLogOnMapResolution({
+      campaignId: 'camp-map-token-1',
+      expectedMapVersion: 12,
+      playerNumber: 2,
+      tokenId: 45,
+      cardCode: 'S001',
+      tokenCode: 'A',
+    });
+    const logStmt = db.run(logSql);
+
+    const stmt: any = toD1PreparedStatement(mockD1, logStmt);
+    assert.ok(stmt.sql.includes('INSERT INTO wagon_activity_logs'));
+    assert.ok(stmt.sql.includes('FROM campaign_maps'), '必須守衛 campaign_maps 表');
+    assert.ok(stmt.sql.includes('version = ?'), '必須守衛 version');
+    assert.deepEqual(stmt.params, [
+      'camp-map-token-1',
+      2,
+      '45',
+      '{"status":"ACTIVE","storyCardCode":"S001","tokenCode":"A"}',
+      '{"status":"REMOVED","storyCardCode":"S001","reason":"CARD_RESOLVED"}',
+      'camp-map-token-1',
+      12,
+    ]);
+  });
+
+  it('executeOptimisticBatch 當 update 的 changes = 0 時精準回傳 conflict，不被其他語句的 changes 影響', async () => {
+    // 模擬：beforeUpdate 執行成功 (changes = 1)，但 update 遭遇版本衝突 (changes = 0)，afterUpdate 亦為 1
+    const mockD1: any = {
+      prepare(sqlString: string) {
+        return {
+          bind(...params: unknown[]) {
+            return { sql: sqlString, params };
+          },
+        };
+      },
+      async batch(stmts: any[]) {
+        return [
+          { success: true, meta: { changes: 1 }, results: [] }, // beforeUpdate[0]
+          { success: true, meta: { changes: 0 }, results: [] }, // update (發生衝突，0 rows updated)
+          { success: true, meta: { changes: 1 }, results: [] }, // afterUpdate[0]
+        ];
+      },
+    };
+    const db = drizzle(mockD1);
+
+    const result = await executeOptimisticBatch(mockD1, {
+      beforeUpdate: [db.run(sql`SELECT 1`)],
+      update: db.update(campaignWagons).set({ elapsedDays: 10 }),
+      afterUpdate: [db.run(sql`SELECT 2`)],
+    });
+
+    assert.equal(result.status, 'conflict');
+    assert.equal(result.results.length, 3);
+    assert.equal(result.results[1].meta?.changes, 0);
+  });
+
+  it('executeOptimisticBatch 在沒有 beforeUpdate 與 afterUpdate 時（單一 update）正確運作', async () => {
+    let batchLength = 0;
+    const mockD1: any = {
+      prepare(sqlString: string) {
+        return {
+          bind(...params: unknown[]) {
+            return { sql: sqlString, params };
+          },
+        };
+      },
+      async batch(stmts: any[]) {
+        batchLength = stmts.length;
+        return [{ success: true, meta: { changes: 1 }, results: [] }];
+      },
+    };
+    const db = drizzle(mockD1);
+
+    const result = await executeOptimisticBatch(mockD1, {
+      update: db.update(campaignWagons).set({ elapsedDays: 20 }),
+    });
+
+    assert.equal(result.status, 'updated');
+    assert.equal(batchLength, 1);
+  });
+
+  it('executeOptimisticBatch 當 D1 batch 拋出錯誤時，不吞掉例外並忠實向上拋出', async () => {
+    const mockD1: any = {
+      prepare(sqlString: string) {
+        return {
+          bind(...params: unknown[]) {
+            return { sql: sqlString, params };
+          },
+        };
+      },
+      async batch() {
+        throw new Error('D1 database connection failed');
+      },
+    };
+    const db = drizzle(mockD1);
+
+    await assert.rejects(
+      async () => {
+        await executeOptimisticBatch(mockD1, {
+          update: db.update(campaignWagons).set({ elapsedDays: 20 }),
+        });
+      },
+      {
+        name: 'Error',
+        message: 'D1 database connection failed',
+      },
+    );
   });
 });

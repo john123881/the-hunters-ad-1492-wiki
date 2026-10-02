@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { getCampaignMap } from '../server/map';
+import { getCampaignMap } from '../../server/map';
 
 describe('Campaign Map API (/api/campaign/map)', () => {
   function createMockD1() {

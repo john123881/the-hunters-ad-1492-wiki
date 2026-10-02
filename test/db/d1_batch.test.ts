@@ -2,8 +2,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
-import { campaignWagons } from '../server/db/schema/wagon';
-import { runD1Batch } from '../server/db/index';
+import { campaignWagons } from '../../server/db/schema/wagon';
+import { runD1Batch } from '../../server/db/index';
 
 describe('D1 Batch & Optimistic Concurrency Tests', () => {
   // 建立符合 Cloudflare D1 介面的 Mock 物件
@@ -108,7 +108,7 @@ describe('D1 Batch & Optimistic Concurrency Tests', () => {
   });
 
   it('驗證 executeOptimisticBatch 正確執行並精準依據 update 的 meta.changes 判定成功或衝突', async () => {
-    const { executeOptimisticBatch, buildWagonGuardedLog } = await import('../server/db/optimistic');
+    const { executeOptimisticBatch, buildWagonGuardedLog } = await import('../../server/db/optimistic');
     
     // 模擬成功情境：Update 影響 1 筆
     const successD1: any = {

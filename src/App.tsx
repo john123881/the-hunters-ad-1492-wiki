@@ -71,7 +71,7 @@ export function App() {
                   })}
                 </ol>
                 <div className="player-roster-actions">
-                  <Link to="/campaigns/wagon">進入戰役面板</Link>
+                  <Link to="/campaigns/characters">進入戰役面板</Link>
                   <button type="button" onClick={async () => { await logout(); window.location.assign('/login'); }}><LogOut size={13} />登出</button>
                 </div>
               </div>
@@ -86,7 +86,7 @@ export function App() {
         <Route path="/items" element={<CatalogPage />} />
         <Route path="/items/:slug" element={<DetailPage />} />
         <Route path="/crafting" element={<Navigate to="/items" replace />} />
-        <Route path="/campaigns" element={<Navigate to="/campaigns/wagon" replace />} />
+        <Route path="/campaigns" element={<Navigate to="/campaigns/characters" replace />} />
         <Route path="/campaigns/wagon" element={<CampaignPage session={session} loading={sessionLoading} onLogout={logout} />} />
         <Route path="/campaigns/map" element={<CampaignMapPage session={session} loading={sessionLoading} />} />
         <Route path="/campaigns/characters" element={<CampaignCharactersPage session={session} loading={sessionLoading} />} />

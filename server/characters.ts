@@ -5,6 +5,7 @@ import { heroDefinitionBySlug } from '../shared/heroesData';
 import { requireCampaignSession } from './auth';
 import { getDb, runD1Batch } from './db';
 import { executeOptimisticBatch, buildCharacterGuardedLog } from './db/optimistic';
+import { respondVersionConflict } from './http/conflict';
 import { campaignCharacters, characterActivityLogs } from './db/schema';
 
 type Env = { Bindings: { DB: D1Database; ASSETS: Fetcher } };
@@ -176,16 +177,16 @@ export async function saveCampaignCharacter(c: Ctx) {
         actionType: 'UPDATE_CHARACTER',
         entityType: 'CHARACTER',
         entityId: String(playerNumber),
-        beforeJson: JSON.stringify(before),
-        afterJson: JSON.stringify({ heroSlug, customName, ...values, isPoisoned, notes }),
+        before,
+        after: { heroSlug, customName, ...values, isPoisoned, notes },
       }));
 
-      const isSuccess = await executeOptimisticBatch(c.env.DB, {
+      const batchResult = await executeOptimisticBatch(c.env.DB, {
         beforeUpdate: [logStmt],
         update: updateDataStmt,
       });
 
-      if (!isSuccess) {
+      if (batchResult.status === 'conflict') {
         const latest = await loadCharacters(db, session);
         const [current] = await db
           .select({ version: campaignCharacters.version })
@@ -196,18 +197,12 @@ export async function saveCampaignCharacter(c: Ctx) {
               eq(campaignCharacters.playerNumber, playerNumber),
             ),
           );
-        return c.json({
-          error: {
-            code: 'CHARACTER_VERSION_CONFLICT',
-            message: '角色資料已被其他玩家更新。',
-            conflict: {
-              scope: 'CHARACTER',
-              expectedVersion,
-              currentVersion: Number(current?.version ?? before.version),
-              latest,
-            },
-          },
-        }, 409);
+        return respondVersionConflict(c, {
+          scope: 'CHARACTER',
+          expectedVersion,
+          currentVersion: Number(current?.version ?? before.version),
+          latest,
+        });
       }
     } else {
       const insertStmt = db.insert(campaignCharacters).values({

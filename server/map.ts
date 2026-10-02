@@ -3,7 +3,13 @@ import type { Context } from 'hono';
 import { eq, and, sql } from 'drizzle-orm';
 import type { AuthSession } from '../shared/types';
 import { requireCampaignSession } from './auth';
-import { getDb, runD1Batch } from './db';
+import { getDb } from './db';
+import {
+  executeOptimisticBatch,
+  buildMapGuardedLog,
+  buildWagonGuardedLogOnMapResolution,
+} from './db/optimistic';
+import { respondVersionConflict } from './http/conflict';
 import {
   campaignMaps,
   campaignMapTiles,
@@ -24,18 +30,12 @@ function error(c: Ctx, status: 400 | 404 | 409, code: string, message: string) {
 
 async function mapConflict(c: Ctx, session: AuthSession, expectedVersion: number) {
   const latest = await loadMap(c.env.DB, session);
-  return c.json({
-    error: {
-      code: 'MAP_VERSION_CONFLICT',
-      message: '地圖資料已被其他玩家更新。',
-      conflict: {
-        scope: 'MAP',
-        expectedVersion: Number.isInteger(expectedVersion) ? expectedVersion : null,
-        currentVersion: latest.version,
-        latest,
-      },
-    },
-  }, 409);
+  return respondVersionConflict(c, {
+    scope: 'MAP',
+    expectedVersion,
+    currentVersion: latest.version,
+    latest,
+  });
 }
 
 async function body(c: Ctx) {
@@ -247,7 +247,7 @@ async function loadMap(d1: D1Database, session: AuthSession) {
   return {
     campaignId: session.campaignId,
     version: map?.version ?? 1,
-    currentLocationType: map?.currentLocationType ?? null,
+    currentLocationType: (map?.currentLocationType as 'MAP' | 'LOCATION' | null) ?? null,
     currentLocationCode: map?.currentLocationCode ?? null,
     currentMapCode: map?.currentLocationType === 'MAP'
       ? map.currentLocationCode
@@ -293,7 +293,7 @@ async function loadMap(d1: D1Database, session: AuthSession) {
   };
 }
 
-// [原因備註]: D1 batch 衝突時不拋出例外，使用 Drizzle sql + WHERE EXISTS 確保只有在地圖預期版本相符時才寫入活動日誌
+// [原因備註]: 使用共用 buildMapGuardedLog 確保在地圖版本吻合時才寫入日誌
 function guardedMapLog(
   db: ReturnType<typeof getDb>,
   session: AuthSession,
@@ -304,17 +304,19 @@ function guardedMapLog(
   before: unknown,
   after: unknown,
 ) {
-  return db.run(sql`
-    INSERT INTO map_activity_logs
-      (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json)
-    SELECT ${session.campaignId}, ${session.playerNumber}, ${action}, ${entity}, ${id}, ${JSON.stringify(before)}, ${JSON.stringify(after)}
-    WHERE EXISTS (
-      SELECT 1 FROM campaign_maps WHERE campaign_id = ${session.campaignId} AND version = ${expectedVersion}
-    )
-  `);
+  return db.run(buildMapGuardedLog({
+    campaignId: session.campaignId,
+    playerNumber: session.playerNumber,
+    expectedVersion,
+    actionType: action,
+    entityType: entity,
+    entityId: id,
+    before,
+    after,
+  }));
 }
 
-// [原因備註]: D1 batch 衝突時不拋出例外，使用 Drizzle sql + WHERE EXISTS 確保只有在地圖預期版本相符時才寫入馬車時間標記移除日誌
+// [原因備註]: 完成卡片時連帶移除 Time Token，使用共用 buildWagonGuardedLogOnMapResolution
 function guardedWagonLog(
   db: ReturnType<typeof getDb>,
   session: AuthSession,
@@ -323,14 +325,14 @@ function guardedWagonLog(
   cardCode: string,
   tokenCode: string,
 ) {
-  return db.run(sql`
-    INSERT INTO wagon_activity_logs
-      (campaign_id, player_number, action_type, entity_type, entity_id, before_json, after_json)
-    SELECT ${session.campaignId}, ${session.playerNumber}, 'REMOVE_TIME_TOKEN_ON_CARD_RESOLUTION', 'TIME_TOKEN', ${String(tokenId)}, ${JSON.stringify({ status: 'ACTIVE', storyCardCode: cardCode, tokenCode })}, ${JSON.stringify({ status: 'REMOVED', storyCardCode: cardCode, reason: 'CARD_RESOLVED' })}
-    WHERE EXISTS (
-      SELECT 1 FROM campaign_maps WHERE campaign_id = ${session.campaignId} AND version = ${expectedVersion}
-    )
-  `);
+  return db.run(buildWagonGuardedLogOnMapResolution({
+    campaignId: session.campaignId,
+    playerNumber: session.playerNumber,
+    expectedMapVersion: expectedVersion,
+    tokenId,
+    cardCode,
+    tokenCode,
+  }));
 }
 
 async function runMapBatch(
@@ -357,8 +359,11 @@ async function runMapBatch(
       ),
     );
 
-  const results = await runD1Batch(c.env.DB, [...statements, versionUpdate]);
-  return Boolean(results[results.length - 1]?.meta.changes);
+  const batchResult = await executeOptimisticBatch(c.env.DB, {
+    beforeUpdate: statements,
+    update: versionUpdate,
+  });
+  return batchResult.status === 'updated';
 }
 
 export async function getCampaignMap(c: Ctx) {
