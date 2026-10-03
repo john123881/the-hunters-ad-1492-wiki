@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Clock3, MapPin, MapPinned, Save, Shield, Trash2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignLocationCard, CampaignMap, CampaignMapCard, CampaignMapResponse, CampaignMapTile, CampaignWagonResponse } from '../../shared/types';
 
 function errorMessage(payload: unknown, fallback: string) {
@@ -125,6 +126,8 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     || draft.resourceNotes !== savedSelectedTile.resourceNotes
     || draft.notes !== savedSelectedTile.notes
   ));
+
+  useUnsavedChangesWarning(mapDraftDirty);
 
   function closeMapEditor() {
     if (mapDraftDirty && !window.confirm('這張地圖卡有尚未儲存的修改，確定要放棄嗎？')) return;

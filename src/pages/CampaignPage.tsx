@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Clock3, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const DAY_ROWS = [Array.from({ length: 10 }, (_, index) => index + 1), Array.from({ length: 10 }, (_, index) => index + 11), Array.from({ length: 10 }, (_, index) => index + 21)];
@@ -608,6 +609,8 @@ function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: 
   const dirty = draft !== notes;
 
   useEffect(() => { if (!dirty) setDraft(notes); }, [notes, dirty]);
+
+  useUnsavedChangesWarning(dirty);
 
   async function saveNotes() {
     if (!dirty || savingRef.current) return;

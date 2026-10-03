@@ -4,18 +4,19 @@ import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { useOptimisticSave } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignCharacter, CampaignCharactersResponse } from '../../shared/types';
 
-
-const characterFieldLabels:Record<string,string>={
-  heroSlug:'角色',customName:'角色名稱',moralePosition:'士氣位置',strengthLevel:'力量',
-  knowledgeLevel:'知識',perceptionLevel:'洞察',agilityLevel:'敏捷',maxHealthLevel:'最大生命軌',
-  currentHealth:'當前生命',xpTens:'經驗值十位',xpOnes:'經驗值個位',isPoisoned:'中毒狀態',notes:'角色備註',
+const characterFieldLabels: Record<string, string> = {
+  heroSlug: '角色', customName: '角色名稱', moralePosition: '士氣位置', strengthLevel: '力量',
+  knowledgeLevel: '知識', perceptionLevel: '洞察', agilityLevel: '敏捷', maxHealthLevel: '最大生命軌',
+  currentHealth: '當前生命', xpTens: '經驗值十位', xpOnes: '經驗值個位', isPoisoned: '中毒狀態', notes: '角色備註',
 };
-function changedCharacterFields(before:CampaignCharacter|null,latest:CampaignCharacter){
-  if(!before)return ['角色已由其他玩家建立'];
-  const fields=Object.keys(characterFieldLabels).filter(key=>before[key as keyof CampaignCharacter]!==latest[key as keyof CampaignCharacter]);
-  return fields.length?fields.map(key=>characterFieldLabels[key]):['角色版本'];
+
+function changedCharacterFields(before: CampaignCharacter | null, latest: CampaignCharacter) {
+  if (!before) return ['角色已由其他玩家建立'];
+  const fields = Object.keys(characterFieldLabels).filter(key => before[key as keyof CampaignCharacter] !== latest[key as keyof CampaignCharacter]);
+  return fields.length ? fields.map(key => characterFieldLabels[key]) : ['角色版本'];
 }
 
 type Draft = Omit<CampaignCharacter, 'id' | 'playerNumber' | 'version'> & { version: number | null };
@@ -36,7 +37,6 @@ function Stepper({ label, value, min, max, step = 1, disabled, onChange }: {
       <button type="button" disabled={disabled || value >= max} onClick={() => onChange(Math.min(max, value + step))} aria-label={label + '增加'}><Plus /></button></div>
   </div>;
 }
-
 
 function BoardMarker({ point, kind, label }: { point: BoardPoint; kind: 'square' | 'diamond'; label: string }) {
   return <span className={'character-board-marker ' + kind} style={{ left: point.x + '%', top: point.y + '%' }} aria-label={label}><span /></span>;
@@ -65,77 +65,84 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   const selectedNumber = Number.isInteger(requested) && requested >= 1 && requested <= 4 ? requested : session?.playerNumber ?? 1;
   const [characters, setCharacters] = useState<CampaignCharacter[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [busy, setBusy] = useState<'load' | 'save' | null>('load');
-  const [message, setMessage] = useState('');
+  const [busyLoading, setBusyLoading] = useState(true);
   const [modal, setModal] = useState<'story' | 'layout' | null>(null);
   const [choosingHero, setChoosingHero] = useState(false);
   const [boardImageLoaded, setBoardImageLoaded] = useState(false);
-  const [versionConflict,setVersionConflict]=useState<{fields:string[];expectedVersion:number|null;currentVersion:number;latest:CampaignCharacter}|null>(null);
+
+  const character = characters.find(entry => entry.playerNumber === selectedNumber) ?? null;
+
+  const optimisticSave = useOptimisticSave<CampaignCharactersResponse['data'], Draft, CampaignCharacter[]>({
+    successMessage: '角色面板已儲存。',
+    computeChangedFields: latest => {
+      const latestChar = latest.find(entry => entry.playerNumber === selectedNumber);
+      return latestChar ? changedCharacterFields(character, latestChar) : ['角色版本'];
+    },
+    onSuccess: data => {
+      const savedCharacter = data.characters.find(entry => entry.playerNumber === selectedNumber);
+      if (savedCharacter) setDraft(toDraft(savedCharacter));
+      setCharacters(data.characters);
+    },
+  });
+
+  const { saving, isDirty, setIsDirty, message, setMessage, conflict, resetConflict } = optimisticSave;
 
   useEffect(() => {
     if (!session) return;
-    setBusy('load'); setMessage('');
+    setBusyLoading(true);
+    setMessage('');
     fetch('/api/campaign/characters', { credentials: 'same-origin' })
       .then(async response => {
-        const payload = await response.json() as CampaignCharactersResponse | ApiErrorResponse;
+        const payload = (await response.json()) as CampaignCharactersResponse | ApiErrorResponse;
         if (!response.ok || 'error' in payload) throw new Error('error' in payload ? payload.error.message : '角色資料載入失敗。');
         setCharacters(payload.data.characters);
       })
       .catch(error => setMessage(error instanceof Error ? error.message : '角色資料載入失敗。'))
-      .finally(() => setBusy(null));
-  }, [session]);
+      .finally(() => setBusyLoading(false));
+  }, [session, setMessage]);
 
-  const character = characters.find(entry => entry.playerNumber === selectedNumber) ?? null;
   useEffect(() => {
-    if(versionConflict)return;
+    if (conflict) return;
     setDraft(character ? toDraft(character) : null);
+    setIsDirty(false);
     setChoosingHero(false);
-  }, [character?.id, character?.version, selectedNumber, versionConflict]);
+  }, [character?.id, character?.version, selectedNumber, conflict, setIsDirty]);
 
   // 只有在英雄底圖更換時（例如切換角色或切換席位）才重設圖片載入狀態
   useEffect(() => {
     setBoardImageLoaded(false);
   }, [character?.heroSlug, selectedNumber]);
+
   const selectedPlayer = session?.players.find(player => player.playerNumber === selectedNumber);
   const isSelf = selectedNumber === session?.playerNumber;
   const canEdit = Boolean(selectedPlayer && session?.isActive);
   const hero = draft ? heroDefinitionBySlug[draft.heroSlug] : null;
   const usedHeroes = useMemo(() => new Set(characters.filter(item => item.playerNumber !== selectedNumber).map(item => item.heroSlug)), [characters, selectedNumber]);
-  const update = <K extends keyof Draft>(key: K, value: Draft[K]) => setDraft(current => current ? { ...current, [key]: value } : current);
+  const update = <K extends keyof Draft>(key: K, value: Draft[K]) => {
+    setIsDirty(true);
+    setDraft(current => (current ? { ...current, [key]: value } : current));
+  };
 
   async function save() {
     if (!draft || !session) return;
-    setBusy('save'); setMessage('');
-    try {
-      const response = await fetch('/api/campaign/characters/' + selectedNumber, {
-        method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...draft, expectedVersion: draft.version }),
-      });
-      const payload = await response.json() as CampaignCharactersResponse | ApiErrorResponse;
-      if(!response.ok&&'error' in payload&&payload.error.code==='CHARACTER_VERSION_CONFLICT'&&payload.error.conflict?.scope==='CHARACTER'){
-        const latestCharacters=payload.error.conflict.latest as CampaignCharacter[];
-        const latest=latestCharacters.find(entry=>entry.playerNumber===selectedNumber);
-        if(latest){
-          const base=characters.find(entry=>entry.playerNumber===selectedNumber)??null;
-          setCharacters(latestCharacters);
-          setDraft({...draft,version:latest.version});
-          setVersionConflict({fields:changedCharacterFields(base,latest),expectedVersion:draft.version,currentVersion:latest.version,latest});
-          setMessage('');
-          return;
-        }
+    const result = await optimisticSave.save('/api/campaign/characters/' + selectedNumber, draft, {
+      method: 'PUT',
+      expectedVersion: draft.version,
+    });
+    if (result.status === 'conflict') {
+      const latestChars = result.conflict.latest;
+      const latest = latestChars.find(entry => entry.playerNumber === selectedNumber);
+      if (latest) {
+        setCharacters(latestChars);
+        setDraft(current => (current ? { ...current, version: latest.version } : null));
       }
-      if (!response.ok || 'error' in payload) throw new Error('error' in payload ? payload.error.message : '角色儲存失敗。');
-      const savedCharacter = payload.data.characters.find(entry => entry.playerNumber === selectedNumber);
-      if (savedCharacter) setDraft(toDraft(savedCharacter));
-      setCharacters(payload.data.characters);
-      setVersionConflict(null);
-      setMessage('角色面板已儲存。');
-    } catch (error) { setMessage(error instanceof Error ? error.message : '角色儲存失敗。'); }
-    finally { setBusy(null); }
+    }
   }
 
   if (loading) return <section className="campaign-gate"><p className="eyebrow">VERIFYING SESSION</p><h1>正在確認戰役憑證…</h1></section>;
   if (!session) return <section className="campaign-gate"><Shield aria-hidden="true" /><p className="eyebrow">CAMPAIGN ACCESS REQUIRED</p><h1>登入後查看角色</h1><Link className="button" to="/login" state={{ from: '/campaigns/characters' }}>登入戰役</Link></section>;
+
+  const conflictLatest = conflict?.latest.find(entry => entry.playerNumber === selectedNumber);
 
   return <section className="campaign-page campaign-characters-page" aria-labelledby="campaign-characters-title">
     <header className="campaign-module-heading">
@@ -143,7 +150,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
       <span><UserRound aria-hidden="true" />玩家 {session.playerNumber}</span>
     </header>
     <nav className="character-roster-tabs" aria-label="戰役角色">
-      {[1,2,3,4].map(playerNumber => {
+      {[1, 2, 3, 4].map(playerNumber => {
         const player = session.players.find(entry => entry.playerNumber === playerNumber);
         const entry = characters.find(item => item.playerNumber === playerNumber);
         return <Link className={playerNumber === selectedNumber ? 'active' : ''} to={'/campaigns/characters/' + playerNumber} key={playerNumber}>
@@ -152,10 +159,25 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
       })}
     </nav>
 
-    {versionConflict&&<VersionConflictPanel title="角色資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={busy==='save'} onReload={()=>{setDraft(toDraft(versionConflict.latest));setVersionConflict(null);setMessage('已載入最新角色資料。');}} onReapply={()=>void save()}/>}
+    {conflict && <VersionConflictPanel
+      title="角色資料已被其他玩家更新"
+      changedFields={conflict.changedFields}
+      expectedVersion={conflict.expectedVersion}
+      currentVersion={conflict.currentVersion}
+      busy={saving}
+      onReload={() => {
+        if (conflictLatest) {
+          setDraft(toDraft(conflictLatest));
+          setIsDirty(false);
+          resetConflict();
+          setMessage('已載入最新角色資料。');
+        }
+      }}
+      onReapply={() => void save()}
+    />}
 
     {message && <div className={message.includes('已儲存') ? 'character-notice success' : 'character-notice'} role="status">{message}</div>}
-    {busy === 'load' ? <div className="character-loading">正在載入角色資料…</div>
+    {busyLoading ? <div className="character-loading">正在載入角色資料…</div>
       : !selectedPlayer ? <article className="character-preview-panel"><p className="eyebrow">EMPTY PLAYER SLOT</p><h2>玩家席位 {selectedNumber} 從缺</h2><p>此席位尚未加入戰役。</p></article>
       : (!draft || choosingHero) ? <article className="hero-picker">
         <div className="hero-picker-heading"><div><p className="eyebrow">{choosingHero ? 'CHANGE HUNTER' : 'CHOOSE HUNTER'}</p><h2>{choosingHero ? '更換 ' + selectedPlayer.playerAlias + ' 的角色' : '為 ' + selectedPlayer.playerAlias + ' 選擇獵人'}</h2><p>{choosingHero ? '選擇後會重設面板數值；按下儲存才會正式套用。' : '同戰役玩家皆可協助選角。'}</p></div>{choosingHero && <button className="button secondary" type="button" onClick={() => setChoosingHero(false)}>取消</button>}</div>
@@ -165,6 +187,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
           return <button type="button" key={option.slug} disabled={used || current} onClick={() => {
             const next = emptyDraft(option.slug);
             setDraft({ ...next, version: draft?.version ?? null });
+            setIsDirty(true);
             setChoosingHero(false);
             setBoardImageLoaded(false);
             setMessage('已選擇新角色，尚未儲存。');
@@ -231,7 +254,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
           </section>
           <label className="character-poison"><input type="checkbox" disabled={!canEdit} checked={draft.isPoisoned} onChange={event => update('isPoisoned', event.target.checked)} /><FlaskConical />中毒狀態</label>
           <label className="field"><span>角色備註</span><textarea disabled={!canEdit} maxLength={2000} value={draft.notes} onChange={event => update('notes', event.target.value)} /></label>
-          {canEdit && <div className="character-save-bar"><button className="button" type="button" disabled={busy === 'save'} onClick={save}><Save />{busy === 'save' ? '儲存中…' : '儲存角色面板'}</button></div>}
+          {canEdit && <div className="character-save-bar"><button className="button" type="button" disabled={saving} onClick={save}><Save />{saving ? '儲存中…' : isDirty ? '儲存角色面板 *' : '儲存角色面板'}</button></div>}
         </aside>
       </div>}
 

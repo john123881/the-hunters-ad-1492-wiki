@@ -106,8 +106,8 @@ type OptimisticBatchResult =
 - [x] 分頁與搜尋參數邊界驗證（`server/query.ts`；目前 Catalog 使用參數化 `instr()`，不需要 LIKE escaping）。
 - [ ] 若未來搜尋改用 SQL `LIKE`，再加入搭配 `ESCAPE` 子句的 wildcard escaping 與實際 SQLite 測試。
 - [x] API JSON body 解析與一致錯誤格式（`server/http/json.ts`、`parseJsonBody` 統一應用於 wagon、map、characters、admin、auth）。
-- [ ] 前端 `useOptimisticSave`，統一 dirty、saving、saved、conflict、error。
-- [ ] 離開未儲存表單的確認流程。
+- [x] 前端 `useOptimisticSave`，統一 dirty、saving、saved、conflict、error（`src/lib/useOptimisticSave.ts` 已建立並導入角色頁面）。
+- [x] 離開未儲存表單的確認流程（角色、地圖卡與馬車備註具備重新整理／關閉及站內連結導航防護；各編輯面板保留放棄確認）。
 
 ## 6. 測試計畫
 
@@ -115,30 +115,39 @@ type OptimisticBatchResult =
 
 擴充 `test/d1_batch.test.ts`，並新增 `test/db/optimistic.test.ts`：
 
-- [ ] raw query 與 Drizzle query builder 都能轉成 prepared statement。
-- [ ] 所有值均透過 `.bind()`，不直接拼接使用者資料。
-- [ ] statement 順序為 `beforeUpdate → update → afterUpdate`。
-- [ ] beforeUpdate 為 0、1、多筆時都能定位正確 update 結果。
-- [ ] update `changes = 1` 回傳 `updated`。
-- [ ] update `changes = 0` 回傳 `conflict`，不受其他結果影響。
-- [ ] D1 batch 拋錯時 helper 不吞例外。
-- [ ] Wagon builder 守衛 `campaign_wagons`。
-- [ ] Map builder 守衛 `campaign_maps`。
-- [ ] Character builder守衛 campaign、player 與 version。
-- [ ] before／after JSON 正確處理 object、array、null。
+- [x] raw query 與 Drizzle query builder 都能轉成 prepared statement。
+- [x] 所有值均透過 `.bind()`，不直接拼接使用者資料。
+- [x] statement 順序為 `beforeUpdate → update → afterUpdate`。
+- [x] beforeUpdate 為 0、1、多筆時都能定位正確 update 結果。
+- [x] update `changes = 1` 回傳 `updated`。
+- [x] update `changes = 0` 回傳 `conflict`，不受其他結果影響。
+- [x] D1 batch 拋錯時 helper 不吞例外。
+- [x] Wagon builder 守衛 `campaign_wagons`。
+- [x] Map builder 守衛 `campaign_maps`。
+- [x] Character builder守衛 campaign、player 與 version。
+- [x] before／after JSON 正確處理 object、array、null。
+
+### Hono route 單元測試
+
+使用 `app.request` 驗證 Hono 路由、錯誤 payload 與是否送出 D1 batch；DB 目前為 mock，因此不視為實際 D1 整合測試：
+
+- [x] 正確版本請求會進入 D1 batch。
+- [x] 過期版本回傳 409 並包含 latest payload。
+- [x] 缺少或錯誤版本維持既有 400 錯誤 code。
+- [x] 凍結戰役回傳 409 `CAMPAIGN_INACTIVE` 且不送出 batch。
+- [x] Wagon 金錢、備註、資源與 Character 覆蓋包含成功／衝突 route 案例。
 
 ### Hono → 本機 D1 整合測試
 
-必須使用 migrations 建立的本機 D1，不用 mock 取代資料庫行為：
+必須使用 migrations 建立的隔離本機 D1，並查詢寫入後資料與 Log；不能以 mock 取代：
 
 - [ ] 正確版本更新成功，版本只增加一次，只新增一筆 Log。
 - [ ] 過期版本回傳 409，主資料、明細與 Log 均不改變。
-- [ ] 缺少或錯誤版本維持既有錯誤 code。
-- [ ] 兩個請求帶相同版本時只有一個成功，另一個收到 latest payload。
-- [ ] 凍結戰役的 mutation 均被拒絕且不寫 Log。
-- [ ] Wagon 天數、金錢、備註、工坊、資源均有成功及衝突案例。
-- [ ] Character 覆蓋成功、衝突及更新其他玩家角色。
-- [ ] Map 覆蓋翻牌、位置、放置、完成與移除卡片。
+- [ ] 兩個請求使用相同版本時只有一個成功。
+- [ ] 凍結戰役的 mutation 不修改資料且不寫 Log。
+- [ ] Wagon 天數、金錢、備註、工坊與資源。
+- [ ] Character 覆蓋與更新其他玩家角色。
+- [ ] Map 翻牌、位置、放置、完成與移除卡片。
 - [ ] 完成卡片並移除 Time Token 時，Map、Token、卡片與兩類 Log 同批成功或同批不變。
 
 ### API 契約回歸

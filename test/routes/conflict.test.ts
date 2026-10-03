@@ -72,6 +72,12 @@ describe('Campaign Mutation Routes Conflict & Freeze Unit Tests', () => {
                     ],
                   ];
                 }
+                if (sqlString.includes('crafting_resources')) {
+                  return [[1]]; // id: 1
+                }
+                if (sqlString.includes('campaign_wagon_resources')) {
+                  return [[5]]; // quantity: 5
+                }
                 if (sqlString.includes('count(*)')) {
                   return [[20]];
                 }
@@ -207,4 +213,110 @@ describe('Campaign Mutation Routes Conflict & Freeze Unit Tests', () => {
     assert.equal(data.error.conflict.currentVersion, 3);
     assert.ok(Array.isArray(data.error.conflict.latest), 'Character conflict latest 必須為角色陣列');
   });
+
+  it('馬車正常版本更新：更新金錢成功且執行 D1 batch', async () => {
+    const { mockD1, executedBatch } = createMockD1({ wagonVersion: 5 });
+
+    const res = await app.request('/api/campaign/wagon/gold', {
+      method: 'PATCH',
+      headers: {
+        'Cookie': 'hunter_session=test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ sharedGold: 100, expectedVersion: 5 }),
+    }, { DB: mockD1 } as any);
+
+    assert.equal(res.status, 200);
+    const data: any = await res.json();
+    assert.ok(data.data, '回傳更新後馬車資料');
+    assert.ok(executedBatch.length > 0, '成功更新時必須送出 D1 batch');
+  });
+
+  it('馬車正常版本更新：更新素材數量成功', async () => {
+    const { mockD1, executedBatch } = createMockD1({ wagonVersion: 5 });
+
+    const res = await app.request('/api/campaign/wagon/resources/material_wood', {
+      method: 'PATCH',
+      headers: {
+        'Cookie': 'hunter_session=test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ quantity: 12, expectedVersion: 5 }),
+    }, { DB: mockD1 } as any);
+
+    assert.equal(res.status, 200);
+    const data: any = await res.json();
+    assert.ok(data.data, '回傳更新後馬車資料');
+    assert.ok(executedBatch.length > 0, '成功更新素材時送出 D1 batch');
+  });
+
+  it('馬車正常版本更新：更新馬車備註成功', async () => {
+    const { mockD1, executedBatch } = createMockD1({ wagonVersion: 5 });
+
+    const res = await app.request('/api/campaign/wagon/notes', {
+      method: 'PATCH',
+      headers: {
+        'Cookie': 'hunter_session=test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ notes: '團隊在第 10 天發現神秘遺跡', expectedVersion: 5 }),
+    }, { DB: mockD1 } as any);
+
+    assert.equal(res.status, 200);
+    const data: any = await res.json();
+    assert.ok(data.data, '回傳更新後馬車資料');
+    assert.ok(executedBatch.length > 0, '成功更新備註時送出 D1 batch');
+  });
+
+  it('角色正常版本請求：覆蓋角色面板成功且送出 D1 batch', async () => {
+    const { mockD1, executedBatch } = createMockD1({ characterVersion: 2 });
+
+    const res = await app.request('/api/campaign/characters/1', {
+      method: 'PUT',
+      headers: {
+        'Cookie': 'hunter_session=test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        heroSlug: 'huntress',
+        customName: '獵人小隊隊長',
+        moralePosition: 1,
+        strengthLevel: 2,
+        knowledgeLevel: 1,
+        perceptionLevel: 2,
+        agilityLevel: 2,
+        maxHealthLevel: 5,
+        currentHealth: 11,
+        xpTens: 10,
+        xpOnes: 5,
+        isPoisoned: false,
+        notes: '身手敏捷',
+        expectedVersion: 2,
+      }),
+    }, { DB: mockD1 } as any);
+
+    assert.equal(res.status, 200);
+    const data: any = await res.json();
+    assert.ok(data.data.characters, '回傳包含更新後的角色清單');
+    assert.ok(executedBatch.length > 0, '成功更新角色時送出 D1 batch');
+  });
+
+  it('無效 expectedVersion 由共用驗證回傳 400 錯誤', async () => {
+    const { mockD1, executedBatch } = createMockD1({ wagonVersion: 3 });
+
+    const res = await app.request('/api/campaign/wagon/day', {
+      method: 'PATCH',
+      headers: {
+        'Cookie': 'hunter_session=test-token',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ elapsedDays: 15, expectedVersion: 'not-a-number' }),
+    }, { DB: mockD1 } as any);
+
+    assert.equal(res.status, 400);
+    const data: any = await res.json();
+    assert.equal(data.error.code, 'INVALID_VERSION');
+    assert.equal(executedBatch.length, 0, '版本驗證失敗不執行任何 D1 寫入');
+  });
 });
+
