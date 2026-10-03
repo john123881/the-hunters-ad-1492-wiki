@@ -28,6 +28,37 @@ type MutationRequest = {
   payload: object;
   action: string;
 };
+
+const mapImageLoadCache = new Map<string, Promise<void>>();
+
+function mapImageUrl(mapCode: string, revealed: boolean) {
+  return '/images/campaign/maps/' + mapCode + '-' + (revealed ? 'front' : 'back') + '.webp?v=12';
+}
+
+function preloadMapImage(url: string) {
+  const cached = mapImageLoadCache.get(url);
+  if (cached) return cached;
+
+  const pending = new Promise<void>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      if (typeof image.decode !== 'function') {
+        resolve();
+        return;
+      }
+      image.decode().then(resolve).catch(() => resolve());
+    };
+    image.onerror = () => reject(new Error('地圖圖片載入失敗'));
+    image.src = url;
+  }).catch(error => {
+    mapImageLoadCache.delete(url);
+    throw error;
+  });
+
+  mapImageLoadCache.set(url, pending);
+  return pending;
+}
+
 export function CampaignMapPage({ session, loading }: { session: AuthSession | null; loading: boolean }) {
   const [map, setMap] = useState<CampaignMap | null>(null);
   const [selectedCode, setSelectedCode] = useState('M01');
@@ -46,6 +77,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const [progressStateFilter, setProgressStateFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
   const [progressQuery, setProgressQuery] = useState('');
   const [flippingCode, setFlippingCode] = useState('');
+  const [loadingFlipCode, setLoadingFlipCode] = useState('');
   const [returnToProgress, setReturnToProgress] = useState(false);
   const [savedAction, setSavedAction] = useState('');
   const [failedMutation, setFailedMutation] = useState<MutationRequest | null>(null);
@@ -83,6 +115,11 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     const location = map?.locations.find(item => item.locationCode === selectedLocationCode);
     setLocationDraft(location ? { ...location } : null);
   }, [map, selectedLocationCode]);
+
+  useEffect(() => {
+    if (!draft || !editorOpen) return;
+    void preloadMapImage(mapImageUrl(draft.mapCode, !draft.isRevealed)).catch(() => undefined);
+  }, [draft?.mapCode, draft?.isRevealed, editorOpen]);
 
   useEffect(() => {
     if (!map) return;
@@ -243,13 +280,34 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   }
 
   async function flipDraftCard() {
-    if (!draft || flippingCode) return;
-    const nextDraft = { ...draft, isRevealed: !draft.isRevealed, face: draft.isRevealed ? 'BACK' as const : 'FRONT' as const };
+    if (!draft || flippingCode || loadingFlipCode) return;
+
+    const mapCode = draft.mapCode;
+    const nextRevealed = !draft.isRevealed;
+    const nextDraft = {
+      ...draft,
+      isRevealed: nextRevealed,
+      face: nextRevealed ? 'FRONT' as const : 'BACK' as const,
+    };
+
+    setLoadingFlipCode(mapCode);
+    setMessage('');
+    try {
+      await preloadMapImage(mapImageUrl(mapCode, nextRevealed));
+    } catch {
+      setMessageKind('error');
+      setMessage('地圖圖片載入失敗，請檢查網路後重試。');
+      return;
+    } finally {
+      setLoadingFlipCode('');
+    }
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setDraft(nextDraft);
       return;
     }
-    setFlippingCode(draft.mapCode);
+
+    setFlippingCode(mapCode);
     await new Promise(resolve => window.setTimeout(resolve, 170));
     setDraft(nextDraft);
     window.requestAnimationFrame(() => {
@@ -403,12 +461,12 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           const displayRevealed = editorOpen && draft?.mapCode === tile.mapCode ? draft.isRevealed : tile.isRevealed;
           return <button
             className={'map-card-placeholder' + (displayRevealed ? ' is-revealed' : '') + (selectedCode === tile.mapCode ? ' is-selected' : '') + (flippingCode === tile.mapCode ? ' is-flipping' : '')}
-            key={tile.mapCode} onClick={() => { if (flippingCode) return; openMapEditor(tile.mapCode); }} type="button"
+            key={tile.mapCode} onClick={() => { if (flippingCode || loadingFlipCode) return; openMapEditor(tile.mapCode); }} type="button"
             aria-pressed={selectedCode === tile.mapCode}
           >
             <img
               alt={tile.mapCode + (displayRevealed ? ' 正面' : ' 背面')}
-              src={'/images/campaign/maps/' + tile.mapCode + '-' + (displayRevealed ? 'front' : 'back') + '.webp?v=12'}
+              src={mapImageUrl(tile.mapCode, displayRevealed)}
             />
             <span className="map-tile-state">{displayRevealed ? '已揭示' : '未揭示'}</span>
             {occupied && <span className="hunter-marker" title={map.currentLocationType === 'LOCATION' ? '獵人目前位於 ' + map.currentLocationCode : '獵人目前位置'}><MapPin aria-hidden="true" /></span>}
@@ -432,8 +490,17 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         <header><div><p className="eyebrow">SELECTED MAP CARD</p><h2 id="map-editor-title">{draft.mapCode}</h2>{mapDraftDirty && <span className="unsaved-badge">尚未儲存</span>}</div><div className="map-editor-header-actions">{returnToProgress && <button className="text-button" onClick={returnToCardProgress} type="button">返回卡片清單</button>}<button className="icon-button" aria-label="關閉地圖卡紀錄" onClick={closeMapEditor} type="button"><X aria-hidden="true" /></button></div></header>
 
         <div className="map-editor-actions">
-          <button className={'reveal-toggle ' + (draft.isRevealed ? 'is-revealed' : '')} disabled={Boolean(flippingCode)} onClick={() => void flipDraftCard()} type="button">
-            {draft.isRevealed ? <><Check aria-hidden="true" />正面 · 已揭示</> : <>背面 · 未揭示</>}
+          <button
+            className={'reveal-toggle ' + (draft.isRevealed ? 'is-revealed' : '')}
+            disabled={Boolean(flippingCode || loadingFlipCode)}
+            onClick={() => void flipDraftCard()}
+            type="button"
+          >
+            {loadingFlipCode === draft.mapCode
+              ? <>圖片載入中…</>
+              : draft.isRevealed
+                ? <><Check aria-hidden="true" />正面 · 已揭示</>
+                : <>背面 · 未揭示</>}
           </button>
         </div>
 

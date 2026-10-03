@@ -22,7 +22,7 @@ echo -e "${GREEN}✔ 建置成功！${NC}"
 
 # 2. 遠端 D1 結構遷移（Migrations）
 echo -e "\n${YELLOW}>>> [2/4] 檢查並套用遠端 D1 Migrations...${NC}"
-npx wrangler d1 migrations apply hunters-db --remote
+CI=true npx wrangler d1 migrations apply hunters-db --remote
 
 # 3. 遠端 D1 資料匯入（Seed）
 echo -e "\n${YELLOW}>>> [3/4] 匯入最新裝備資料庫至遠端 D1 (seeds/equipment_catalog.sql)...${NC}"
