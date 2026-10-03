@@ -102,7 +102,7 @@ type OptimisticBatchResult =
 
 ### 階段 D：後續候選
 
-- [ ] 活動 Log JSON 解析與後台顯示格式。
+- [x] 活動 Log JSON 解析與後台顯示格式（`shared/activityDiff.ts`、`formatActivityDiff` 比對前後差異並在後台顯示人性化標籤）。
 - [x] 分頁與搜尋參數邊界驗證（`server/query.ts`；目前 Catalog 使用參數化 `instr()`，不需要 LIKE escaping）。
 - [ ] 若未來搜尋改用 SQL `LIKE`，再加入搭配 `ESCAPE` 子句的 wildcard escaping 與實際 SQLite 測試。
 - [x] API JSON body 解析與一致錯誤格式（`server/http/json.ts`、`parseJsonBody` 統一應用於 wagon、map、characters、admin、auth）。

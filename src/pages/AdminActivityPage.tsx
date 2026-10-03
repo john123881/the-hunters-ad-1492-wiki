@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LogOut, RefreshCw, Search, ShieldCheck, Trash2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { AdminActivityDeleteResponse, AdminActivityLog, AdminActivityResponse, AdminCampaignSummary, AdminCampaignsResponse, AdminSession, AdminSessionResponse, ApiErrorResponse } from '../../shared/types';
+import { formatActivityDiff } from '../../shared/activityDiff';
 import { AdminTabs } from '../components/AdminTabs';
 
 const categories=[['CAMPAIGN','戰役'],['WAGON','馬車'],['MAP','地圖'],['CHARACTER','角色']] as const;
@@ -15,6 +16,16 @@ const actionLabels:Record<string,string>={
   UPDATE_TILE:'更新地圖卡',UPDATE_POSITION:'更新獵人位置',UPSERT_CARD:'放置或更新卡片',
   REMOVE_CARD:'移除卡片',UPDATE_LOCATION:'更新地點卡',UPDATE_EVENT_NOTES:'更新事件紀錄',
   UPDATE_CARD_PROGRESS:'更新卡片進度',CREATE_CHARACTER:'建立角色',UPDATE_CHARACTER:'更新角色',
+};
+
+const activityFieldAliases: Record<string, Record<string, string>> = {
+  SET_HUNTER_LOCATION: {
+    locationType: 'currentLocationType',
+    locationCode: 'currentLocationCode',
+  },
+  MOVE_OR_UPDATE_CARD: {
+    type: 'cardType',
+  },
 };
 
 export function AdminActivityPage(){
@@ -95,7 +106,58 @@ export function AdminActivityPage(){
     {error&&<div className="character-notice" role="alert">{error}</div>}
     <section className="admin-activity-list"><header><div><p className="eyebrow">{category} ACTIVITY</p><h2>{categories.find(([value])=>value===category)?.[1]}紀錄</h2></div><label className="admin-log-search"><Search/><span className="sr-only">搜尋操作紀錄</span><input type="search" value={search} placeholder="搜尋操作者、操作、目標…" onChange={event=>updateFilters({q:event.target.value})}/></label><div className="admin-activity-actions"><span>{search?'找到 '+filteredLogs.length+' 筆':'目前 '+logs.length+' 筆'}</span><button type="button" disabled={!selectedIds.length||deleting} onClick={deleteSelected}><Trash2/>{deleting?'刪除中…':`刪除已選（${selectedIds.length}）`}</button></div></header>
       {loading?<div className="character-loading">正在讀取操作紀錄…</div>:<div className="admin-table-wrap"><table><thead><tr><th className="admin-log-check"><input type="checkbox" aria-label="選取目前所有紀錄" checked={filteredLogs.length>0&&filteredLogs.every(log=>selectedIds.includes(log.id))} onChange={event=>setSelectedIds(event.target.checked?[...new Set([...selectedIds,...filteredLogs.map(log=>log.id)])]:selectedIds.filter(id=>!filteredLogs.some(log=>log.id===id)))}/></th><th>時間</th><th>操作者</th><th>戰役</th><th>操作</th><th>目標</th><th>變更資料</th></tr></thead><tbody>
-        {filteredLogs.map(log=><tr key={log.category+'-'+log.id}><td className="admin-log-check"><input type="checkbox" aria-label={'選取 '+(actionLabels[log.actionType]??log.actionType)} checked={selectedIds.includes(log.id)} onChange={()=>toggleLog(log.id)}/></td><td><time>{new Date(log.createdAt+'Z').toLocaleString('zh-TW')}</time></td><td><strong>{log.actorLabel}</strong><code>{log.actorDetail}</code></td><td><strong>{log.campaignName??'系統'}</strong>{log.campaignId&&<code>{log.campaignId}</code>}</td><td>{actionLabels[log.actionType]??log.actionType}</td><td>{log.entityId??log.entityType}</td><td>{log.actionType==='RESET_CAMPAIGN_PASSWORD'?<span>密碼內容不記錄</span>:<details><summary>查看</summary><pre>{JSON.stringify({before:log.before,after:log.after},null,2)}</pre></details>}</td></tr>)}
+        {filteredLogs.map(log => {
+          const diffs = formatActivityDiff(
+            log.before,
+            log.after,
+            {},
+            activityFieldAliases[log.actionType],
+          );
+          return (
+            <tr key={log.category + '-' + log.id}>
+              <td className="admin-log-check">
+                <input
+                  type="checkbox"
+                  aria-label={'選取 ' + (actionLabels[log.actionType] ?? log.actionType)}
+                  checked={selectedIds.includes(log.id)}
+                  onChange={() => toggleLog(log.id)}
+                />
+              </td>
+              <td><time>{new Date(log.createdAt + 'Z').toLocaleString('zh-TW')}</time></td>
+              <td><strong>{log.actorLabel}</strong><code>{log.actorDetail}</code></td>
+              <td><strong>{log.campaignName ?? '系統'}</strong>{log.campaignId && <code>{log.campaignId}</code>}</td>
+              <td>{actionLabels[log.actionType] ?? log.actionType}</td>
+              <td>{log.entityId ?? log.entityType}</td>
+              <td>
+                {log.actionType === 'RESET_CAMPAIGN_PASSWORD' ? (
+                  <span>密碼內容不記錄</span>
+                ) : diffs.length > 0 ? (
+                  <div className="admin-log-diff">
+                    <ul className="admin-diff-list">
+                      {diffs.map(d => (
+                        <li key={d.field}>
+                          <strong>{d.label}</strong>：
+                          <span className="diff-before">{d.displayBefore}</span>
+                          <span className="diff-arrow"> → </span>
+                          <span className="diff-after">{d.displayAfter}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <details>
+                      <summary>原始 JSON</summary>
+                      <pre>{JSON.stringify({ before: log.before, after: log.after }, null, 2)}</pre>
+                    </details>
+                  </div>
+                ) : (
+                  <details>
+                    <summary>查看 JSON</summary>
+                    <pre>{JSON.stringify({ before: log.before, after: log.after }, null, 2)}</pre>
+                  </details>
+                )}
+              </td>
+            </tr>
+          );
+        })}
         {!filteredLogs.length&&<tr><td className="admin-log-empty" colSpan={7}>{search?'找不到符合搜尋條件的操作紀錄。':campaignId?'此戰役在目前分類中沒有操作紀錄。':'此分類目前沒有操作紀錄。'}</td></tr>}
       </tbody></table></div>}
     </section>

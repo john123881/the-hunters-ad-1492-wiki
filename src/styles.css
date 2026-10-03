@@ -1857,6 +1857,13 @@ svg { flex-shrink: 0; }
 
 .admin-activity-list details summary { color:#d0b46f;cursor:pointer;font-size:10px; }
 .admin-activity-list pre { max-width:420px;max-height:220px;overflow:auto;margin:8px 0 0;padding:10px;background:#050b0c;color:#aebcba;font-size:10px;white-space:pre-wrap; }
+.admin-log-diff { display: grid; gap: 6px; }
+.admin-diff-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; font-size: 11px; }
+.admin-diff-list li { color: #d0dedd; }
+.admin-diff-list strong { color: #f2dec0; font-size: 11px; }
+.admin-diff-list .diff-before { color: #d68f84; text-decoration: line-through; opacity: 0.85; }
+.admin-diff-list .diff-arrow { color: #a4b5b4; margin: 0 4px; }
+.admin-diff-list .diff-after { color: #9fd88d; font-weight: 600; }
 .admin-password-dialog { width:min(520px,100%);padding:0;border:1px solid #806a38;background:#0a1416;box-shadow:0 22px 80px #000; }
 .admin-password-dialog > header { display:flex;justify-content:space-between;gap:18px;padding:20px;border-bottom:1px solid #39484a; }
 .admin-password-dialog h2 { margin:5px 0;color:#ead8ae;font:700 27px var(--serif); }
