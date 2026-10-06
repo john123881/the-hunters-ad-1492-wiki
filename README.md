@@ -1,8 +1,33 @@
 # The Hunters A.D. 1492 Wiki
 
-《The Hunters A.D. 1492》非官方繁體中文物品圖鑑。網站提供裝備列表、關鍵字搜尋、條件篩選與物品詳情，並支援桌面和手機版。
+以 React、TypeScript、Hono 與 Cloudflare D1 開發的《The Hunters A.D. 1492》非官方繁體中文物品圖鑑與多人戰役管理系統。
+
+本專案將分散於卡片與規則資料中的裝備、合成及戰役資訊數位化，提供條件搜尋、角色裝備、馬車倉庫、世界地圖與多人戰役狀態管理，協助玩家減少翻找卡片及人工記錄的時間，並支援桌面與手機版操作。
+
+- **線上展示**：[the-hunters-ad-1492.boardgame-wiki.workers.dev](https://the-hunters-ad-1492.boardgame-wiki.workers.dev/)
+- **測試帳號**：`demo-hunters`
+- **測試密碼**：`hunters1492`
+- **開發期間**：2026/09/23～2026/10/07
 
 > 本專案由玩家整理，不代表官方翻譯或規則。物品內容仍應以遊戲原始資料與規則書為準。
+
+## 專案畫面
+
+### 戰役世界地圖
+
+[![戰役世界地圖](docs/screenshots/campaign-map-review.png)](docs/screenshots/campaign-map-review.png)
+
+| 物品圖鑑與條件篩選 | 馬車與共用庫存管理 |
+| --- | --- |
+| [![物品圖鑑與條件篩選](docs/screenshots/item-catalog-review.png)](docs/screenshots/item-catalog-review.png) | [![馬車與共用庫存管理](docs/screenshots/wagon-management-review.png)](docs/screenshots/wagon-management-review.png) |
+
+| 角色裝備配置 | 裝備面板 |
+| --- | --- |
+| [![角色裝備配置](docs/screenshots/character-loadout-review.png)](docs/screenshots/character-loadout-review.png) | [![裝備面板](docs/screenshots/equipment-board-review.png)](docs/screenshots/equipment-board-review.png) |
+
+### 管理者後台
+
+[![管理者後台](docs/screenshots/admin-dashboard-review.png)](docs/screenshots/admin-dashboard-review.png)
 
 ## 功能
 
@@ -30,7 +55,84 @@
 
 > 目前資料來源包含裝備圖鑑資料集、工坊合成資料以及戰役地圖母版。物品內容仍以遊戲原始實體配件與規則書為準。
 
-## 技術架構
+## 專案目錄結構
+
+```text
+the-hunters-ad-1492/
+├─ src/                         # React 前端程式
+│  ├─ components/              # 共用 UI 與領域元件
+│  ├─ lib/                     # API client、共用 hooks 與樂觀更新邏輯
+│  ├─ pages/                   # 圖鑑、登入、戰役、地圖與管理頁面
+│  ├─ App.tsx                  # 前端路由與應用程式入口
+│  ├─ main.tsx                 # React 掛載入口
+│  └─ styles.css               # 全站樣式
+│
+├─ server/                      # Hono 後端 API
+│  ├─ db/
+│  │  ├─ schema/               # Drizzle 資料表定義
+│  │  ├─ batch.ts              # D1 批次操作
+│  │  └─ optimistic.ts         # 樂觀鎖與版本衝突處理
+│  ├─ http/                    # JSON 回應與衝突錯誤處理
+│  ├─ index.ts                 # Worker 入口與路由註冊
+│  ├─ auth.ts                  # 玩家登入、Session 與權限驗證
+│  ├─ catalog.ts               # 物品圖鑑與篩選查詢
+│  ├─ characters.ts            # 戰役角色資料
+│  ├─ characterLoadout.ts      # 角色裝備配置查詢
+│  ├─ map.ts                   # 戰役地圖與卡片狀態
+│  ├─ wagon.ts                 # 馬車、庫存及時間標記
+│  └─ admin.ts                 # 管理者登入與戰役管理
+│
+├─ shared/                      # 前後端共用型別、常數及資料模板
+├─ data/                        # 裝備、材料及合成來源資料
+├─ migrations/                  # Cloudflare D1 schema 增量遷移
+├─ seeds/                       # 初始資料與資料庫匯入 SQL
+├─ public/                      # 卡片、地圖與其他靜態資源
+├─ tests/
+│  ├─ fixtures/                # 測試資料
+│  └─ visual/                  # Playwright 視覺與行動版測試
+├─ docs/                        # 架構、資料庫與功能設計文件
+├─ scripts/                     # 資料轉換、匯入、圖片處理與部署腳本
+├─ wrangler.jsonc               # Cloudflare Workers／D1 設定
+├─ package.json                 # 專案指令與套件設定
+└─ README.md
+```
+
+## 系統架構
+
+```mermaid
+flowchart LR
+    U[使用者瀏覽器]
+
+    subgraph CF[Cloudflare Workers]
+        FE[React SPA<br/>TypeScript / Vite]
+        API[Hono RESTful API]
+        AUTH[Authentication<br/>Session / CSRF]
+        DOMAIN[Domain Modules<br/>Catalog / Campaign / Map / Wagon / Character]
+    end
+
+    DB[(Cloudflare D1)]
+    ASSETS[Cloudflare Assets<br/>卡片與地圖圖片]
+
+    U --> FE
+    FE -->|HTTP / JSON| API
+    FE --> ASSETS
+    API --> AUTH
+    API --> DOMAIN
+    AUTH --> DB
+    DOMAIN -->|Drizzle ORM| DB
+```
+
+### 架構說明
+
+- 前端採用 React 19、TypeScript 與 Vite 建立 SPA，負責物品查詢、戰役地圖、馬車倉庫及角色裝備等互動介面。
+- 前端統一透過 HTTP／JSON 呼叫 Hono RESTful API，不直接存取資料庫。
+- 後端依領域拆分物品目錄、戰役、地圖、馬車、角色及裝備等 API 模組。
+- 使用 Drizzle ORM 存取 Cloudflare D1，並透過 migrations 管理資料結構演進。
+- 使用 Session、CSRF 防護與戰役權限檢查保護資料異動操作。
+- 多人編輯採用版本檢查與 Optimistic Locking，避免不同玩家的更新互相覆蓋。
+- 前端、API 與靜態資源部署於 Cloudflare Workers／Assets。
+
+### 技術棧
 
 - React 19、TypeScript、Vite
 - Hono API（Worker 邊緣運行）
@@ -47,6 +149,29 @@ React (SPA) → /api → Hono Router → Drizzle ORM → Cloudflare D1 (hunters-
 ```
 
 詳細設計請參閱 [系統架構](docs/architecture.md) 與 [資料庫設計](docs/database-review.md)。
+
+## 主要模組
+
+| 模組 | 功能 |
+| --- | --- |
+| Item Catalog | 物品搜尋、條件篩選、詳細資料與合成需求 |
+| Campaign | 戰役建立、玩家登入及戰役狀態管理 |
+| Character | 角色資料、裝備配置與持有物品管理 |
+| Wagon | 共用庫存、工坊升級、經過天數及時間標記 |
+| World Map | 地圖拼接、隊伍位置、地圖卡片與翻面狀態 |
+| Authentication | 玩家 Session、CSRF 防護與存取控制 |
+| Data Pipeline | 來源資料驗證、JSON／SQL 產生與種子資料匯入 |
+
+## 開發流程
+
+本專案採用 **AI-assisted Spec-driven Development**：
+
+1. 先與 AI Agent 討論需求、使用情境與功能邊界。
+2. 將確認後的內容整理為 implementation plan。
+3. 依功能相依關係拆分為數個開發階段及可驗證的小任務。
+4. 每完成一段功能後執行 typecheck、build、測試與人工操作驗證。
+5. 確認結果符合預期後，再進入下一階段開發。
+6. AI 產生的程式碼由開發者負責審查、修改及最終驗證。
 
 ## 本機執行
 
@@ -79,26 +204,12 @@ npm run dev
 | `npm run test:visual` | 執行 Playwright 行動端視覺回歸測試 |
 | `npm run deploy:prod` | 一鍵完成型別檢查、打包、遠端遷移與部署至 Cloudflare |
 
-## 主要目錄
-
-| 路徑 | 用途 |
-| --- | --- |
-| `src/` | React 頁面（圖鑑、馬車、地圖、角色）、元件與 CSS 樣式 |
-| `server/` | Hono 路由模組（items, campaigns, wagon, map）與 D1 SQL 交易 |
-| `server/db/schema/` | Drizzle ORM 資料表定義與關聯模型 |
-| `shared/` | 前後端共用 TypeScript 資料契約與常數定義 |
-| `data/` | 裝備與材料來源資料 |
-| `migrations/` | Cloudflare D1 資料庫 schema 增量遷移檔案 |
-| `seeds/` | 資料庫匯入 SQL |
-| `public/` | 靜態資產（物品圖片、地圖板塊切圖、資源圖示、工坊圖示） |
-| `tests/visual/` | 行動端視覺回歸測試與快照 |
-| `docs/` | 架構、資料庫與合成系統設計文件 |
-
 ## 專案狀態
 
 本專案現已完成：
 1. **物品圖鑑與合成系統（MVP）**
 2. **馬車營地與天數推進系統**
 3. **M01~M20 大世界戰役地圖與卡片標記系統**
-4. **角色面板系統（Hero & Equipment Boards）規格規劃中（見 `plan_campaign_characters.md`）**
+4. **角色面板與裝備配置系統（Hero & Equipment Boards）**
+5. **管理者登入、戰役管理、備份與操作紀錄**
 
