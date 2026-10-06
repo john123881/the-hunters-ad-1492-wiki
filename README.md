@@ -13,21 +13,17 @@
 
 ## 專案畫面
 
-### 戰役世界地圖
-
-[![戰役世界地圖](docs/screenshots/campaign-map-review.png)](docs/screenshots/campaign-map-review.png)
-
-| 物品圖鑑與條件篩選 | 馬車與共用庫存管理 |
+| 管理者後台 | 物品圖鑑與條件篩選 |
 | --- | --- |
-| [![物品圖鑑與條件篩選](docs/screenshots/item-catalog-review.png)](docs/screenshots/item-catalog-review.png) | [![馬車與共用庫存管理](docs/screenshots/wagon-management-review.png)](docs/screenshots/wagon-management-review.png) |
+| [![管理者後台](docs/screenshots/admin-dashboard-review.png)](docs/screenshots/admin-dashboard-review.png) | [![物品圖鑑與條件篩選](docs/screenshots/item-catalog-review.png)](docs/screenshots/item-catalog-review.png) |
+
+| 馬車與共用庫存管理 | 戰役世界地圖 |
+| --- | --- |
+| [![馬車與共用庫存管理](docs/screenshots/wagon-management-review.png)](docs/screenshots/wagon-management-review.png) | [![戰役世界地圖](docs/screenshots/campaign-map-review.png)](docs/screenshots/campaign-map-review.png) |
 
 | 角色裝備配置 | 裝備面板 |
 | --- | --- |
 | [![角色裝備配置](docs/screenshots/character-loadout-review.png)](docs/screenshots/character-loadout-review.png) | [![裝備面板](docs/screenshots/equipment-board-review.png)](docs/screenshots/equipment-board-review.png) |
-
-### 管理者後台
-
-[![管理者後台](docs/screenshots/admin-dashboard-review.png)](docs/screenshots/admin-dashboard-review.png)
 
 ## 功能
 
