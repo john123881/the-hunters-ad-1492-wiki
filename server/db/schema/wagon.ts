@@ -2,6 +2,7 @@ import { sqliteTable, text, integer, unique, primaryKey, check, index, uniqueInd
 import { sql } from 'drizzle-orm';
 import { campaigns } from './campaigns';
 import { items } from './items';
+import { campaignCharacters } from './characters';
 
 export const craftingStations = sqliteTable('crafting_stations', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -109,7 +110,7 @@ export const campaignEquipmentInstances = sqliteTable('campaign_equipment_instan
   campaignId: text('campaign_id').notNull().references(() => campaignWagons.campaignId, { onDelete: 'cascade' }),
   itemId: integer('item_id').notNull().references(() => items.id),
   locationType: text('location_type').notNull().default('WAGON'),
-  characterId: integer('character_id'),
+  characterId: integer('character_id').references(() => campaignCharacters.id, { onDelete: 'cascade' }),
   damageMarkers: integer('damage_markers').notNull().default(0),
   notes: text('notes').notNull().default(''),
   createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
@@ -119,6 +120,19 @@ export const campaignEquipmentInstances = sqliteTable('campaign_equipment_instan
   check('chk_equip_damage', sql`${table.damageMarkers} >= 0`),
   check('chk_equip_char_link', sql`(${table.locationType} = 'WAGON' AND ${table.characterId} IS NULL) OR (${table.locationType} = 'CHARACTER' AND ${table.characterId} IS NOT NULL)`),
   index('idx_campaign_equipment_location').on(table.campaignId, table.locationType, table.characterId),
+]);
+
+export const campaignEquipmentAttachments = sqliteTable('campaign_equipment_attachments', {
+  equipmentInstanceId: integer('equipment_instance_id').notNull().references(() => campaignEquipmentInstances.id, { onDelete: 'cascade' }),
+  attachmentInstanceId: integer('attachment_instance_id').notNull().unique().references(() => campaignEquipmentInstances.id, { onDelete: 'restrict' }),
+  weaponSlotIndex: integer('weapon_slot_index').notNull().default(1),
+  socketIndex: integer('socket_index').notNull(),
+  attachedAt: text('attached_at').notNull().default(sql`(datetime('now'))`),
+}, (table) => [
+  primaryKey({ columns: [table.equipmentInstanceId, table.weaponSlotIndex, table.socketIndex] }),
+  check('chk_equipment_attachment_weapon_slot_index', sql`${table.weaponSlotIndex} >= 1`),
+  check('chk_equipment_attachment_socket_index', sql`${table.socketIndex} >= 1`),
+  check('chk_equipment_attachment_distinct_instances', sql`${table.equipmentInstanceId} <> ${table.attachmentInstanceId}`),
 ]);
 
 export const wagonActivityLogs = sqliteTable('wagon_activity_logs', {

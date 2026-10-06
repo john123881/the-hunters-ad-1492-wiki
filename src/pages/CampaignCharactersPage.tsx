@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BookOpen, FlaskConical, Image, Loader2, Minus, Plus, RefreshCw, Save, Shield, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { CharacterEquipmentBoard } from '../components/CharacterEquipmentBoard';
 import { useOptimisticSave } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignCharacter, CampaignCharactersResponse } from '../../shared/types';
 
@@ -123,11 +124,40 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
     setDraft(current => (current ? { ...current, [key]: value } : current));
   };
 
+  const syncLoadoutVersion = useCallback((version: number) => {
+    setDraft(current => current ? { ...current, version } : current);
+    setCharacters(current => current.map(entry =>
+      entry.playerNumber === selectedNumber ? { ...entry, version } : entry
+    ));
+  }, [selectedNumber]);
   async function save() {
     if (!draft || !session) return;
-    const result = await optimisticSave.save('/api/campaign/characters/' + selectedNumber, draft, {
+    let saveVersion = draft.version;
+    if (character && draft.heroSlug !== character.heroSlug) {
+      if (draft.version == null) return;
+      if (!window.confirm('更換角色會將目前裝備面板上的全部裝備與附件移入馬車，確定繼續？')) return;
+      try {
+        setMessage('正在更換角色…');
+        const wagonResponse = await fetch('/api/campaign/wagon', { credentials: 'same-origin' });
+        const wagonPayload = await wagonResponse.json() as { data?: { version: number }; error?: { message: string } };
+        if (!wagonResponse.ok || !wagonPayload.data) throw new Error(wagonPayload.error?.message ?? '無法讀取馬車版本。');
+        const switchResponse = await fetch('/api/campaign/characters/' + selectedNumber + '/switch-hero', {
+          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ heroSlug: draft.heroSlug, expectedCharacterVersion: draft.version, expectedWagonVersion: wagonPayload.data.version, confirmed: true }),
+        });
+        const switchPayload = await switchResponse.json() as { data?: { version: number }; error?: { message: string } };
+        if (!switchResponse.ok || !switchPayload.data) throw new Error(switchPayload.error?.message ?? '更換角色失敗。');
+        saveVersion = switchPayload.data.version;
+        setDraft(current => current ? { ...current, version: saveVersion } : current);
+      } catch (cause) {
+        setMessage(cause instanceof Error ? cause.message : '更換角色失敗。');
+        return;
+      }
+    }
+    const result = await optimisticSave.save('/api/campaign/characters/' + selectedNumber, { ...draft, version: saveVersion }, {
       method: 'PUT',
-      expectedVersion: draft.version,
+      expectedVersion: saveVersion,
+      customSuccessMessage: character && draft.heroSlug !== character.heroSlug ? '角色已更換，原裝備已移入馬車。' : undefined,
     });
     if (result.status === 'conflict') {
       const latestChars = result.conflict.latest;
@@ -180,13 +210,13 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
     {busyLoading ? <div className="character-loading">正在載入角色資料…</div>
       : !selectedPlayer ? <article className="character-preview-panel"><p className="eyebrow">EMPTY PLAYER SLOT</p><h2>玩家席位 {selectedNumber} 從缺</h2><p>此席位尚未加入戰役。</p></article>
       : (!draft || choosingHero) ? <article className="hero-picker">
-        <div className="hero-picker-heading"><div><p className="eyebrow">{choosingHero ? 'CHANGE HUNTER' : 'CHOOSE HUNTER'}</p><h2>{choosingHero ? '更換 ' + selectedPlayer.playerAlias + ' 的角色' : '為 ' + selectedPlayer.playerAlias + ' 選擇獵人'}</h2><p>{choosingHero ? '選擇後會重設面板數值；按下儲存才會正式套用。' : '同戰役玩家皆可協助選角。'}</p></div>{choosingHero && <button className="button secondary" type="button" onClick={() => setChoosingHero(false)}>取消</button>}</div>
+        <div className="hero-picker-heading"><div><p className="eyebrow">{choosingHero ? 'CHANGE HUNTER' : 'CHOOSE HUNTER'}</p><h2>{choosingHero ? '更換 ' + selectedPlayer.playerAlias + ' 的角色' : '為 ' + selectedPlayer.playerAlias + ' 選擇獵人'}</h2><p>{choosingHero ? '儲存後會清空裝備配置，並將目前裝備與附件全部移入馬車。' : '同戰役玩家皆可協助選角。'}</p></div>{choosingHero && <button className="button secondary" type="button" onClick={() => setChoosingHero(false)}>取消</button>}</div>
         <div className="hero-picker-grid">{heroDefinitions.map(option => {
           const used = usedHeroes.has(option.slug);
           const current = choosingHero && draft?.heroSlug === option.slug;
           return <button type="button" key={option.slug} disabled={used || current} onClick={() => {
-            const next = emptyDraft(option.slug);
-            setDraft({ ...next, version: draft?.version ?? null });
+            const next = draft ? { ...draft, heroSlug: option.slug } : emptyDraft(option.slug);
+            setDraft(next);
             setIsDirty(true);
             setChoosingHero(false);
             setBoardImageLoaded(false);
@@ -196,7 +226,8 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
           </button>;
         })}</div>
       </article>
-      : hero && <div className="character-workspace">
+      : hero && <>
+      <div className="character-workspace">
         <div className="character-board-stage">
           <img
             key={hero.boardImageUrl}
@@ -256,7 +287,9 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
           <label className="field"><span>角色備註</span><textarea disabled={!canEdit} maxLength={2000} value={draft.notes} onChange={event => update('notes', event.target.value)} /></label>
           {canEdit && <div className="character-save-bar"><button className="button" type="button" disabled={saving} onClick={save}><Save />{saving ? '儲存中…' : isDirty ? '儲存角色面板 *' : '儲存角色面板'}</button></div>}
         </aside>
-      </div>}
+      </div>
+      <CharacterEquipmentBoard playerNumber={selectedNumber} heroSlug={character?.heroSlug ?? draft.heroSlug} canEdit={canEdit} onVersionChange={syncLoadoutVersion} />
+    </>}
 
     {modal && hero && <div className="character-modal-backdrop" role="presentation" onMouseDown={event => event.target === event.currentTarget && setModal(null)}>
       <section className="character-modal" role="dialog" aria-modal="true" aria-labelledby="character-modal-title">

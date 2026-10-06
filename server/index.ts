@@ -8,6 +8,8 @@ import { createAdminCampaign, deleteAdminActivityLogs, exportAdminCampaignBackup
 import { getSession, loginCampaign, logout, requireCampaignSession } from './auth';
 import { getCampaignMap, removeMapCard, updateLocationCard, updateMapEventNotes, updateMapPosition, updateMapTile, upsertMapCard, updateCampaignCardProgress } from './map';
 import { getCampaignCharacters, saveCampaignCharacter } from './characters';
+import { getCompatibleCharacterCatalogCandidates, getCompatibleCharacterEquipmentCandidates, getCharacterLoadout, openCharacterSlot, restoreCharacterSlotCover, restoreInitialCharacterBoard } from './characterLoadout';
+import { createAndEquipCatalogItem, createAndInstallCatalogAttachment, equipCharacterItem, getAttachmentCandidates, getAttachmentCatalogCandidates, installCharacterAttachment, moveCharacterItem, removeAllCharacterItems, removeCharacterItem, removeRetainedAttachment, removeInstalledAttachment, reorderHandItems, replaceCharacterItem, returnCharacterItemToWagon, returnInstalledAttachmentToWagon, returnRetainedAttachmentToWagon, switchCharacterHero, updateCharacterItemDamage } from './characterLoadoutMutations';
 import { addWagonEquipment, createTimeToken, getWagon, removeTimeToken, removeWagonEquipment, updateCampaignName, updateWagonDay, updateSharedGold, updateWagonEquipment, updateWagonResource, updateWagonUpgrade, updateWagonNotes } from './wagon';
 import { getDb } from './db';
 import { items } from './db/schema/index';
@@ -48,6 +50,31 @@ app.get('/api/auth/session', getSession);
 app.post('/api/auth/logout', logout);
 app.get('/api/campaign/characters', getCampaignCharacters);
 app.put('/api/campaign/characters/:playerNumber', saveCampaignCharacter);
+app.get('/api/campaign/characters/:playerNumber/loadout', getCharacterLoadout);
+app.get('/api/campaign/characters/:playerNumber/equipment-candidates', getCompatibleCharacterEquipmentCandidates);
+app.get('/api/campaign/characters/:playerNumber/equipment-catalog-candidates', getCompatibleCharacterCatalogCandidates);
+app.post('/api/campaign/characters/:playerNumber/slots/:slotKey/open', openCharacterSlot);
+app.delete('/api/campaign/characters/:playerNumber/slots/:slotKey/open', restoreCharacterSlotCover);
+app.post('/api/campaign/characters/:playerNumber/slots/:slotKey/cover', restoreCharacterSlotCover);
+app.post('/api/campaign/characters/:playerNumber/loadout/restore-initial', restoreInitialCharacterBoard);
+app.put('/api/campaign/characters/:playerNumber/equipment/:instanceId', equipCharacterItem);
+app.post('/api/campaign/characters/:playerNumber/equipment-from-catalog', createAndEquipCatalogItem);
+app.patch('/api/campaign/characters/:playerNumber/equipment/:instanceId/position', moveCharacterItem);
+app.patch('/api/campaign/characters/:playerNumber/equipment/:instanceId/damage', updateCharacterItemDamage);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/unequip', returnCharacterItemToWagon);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/remove', removeCharacterItem);
+app.post('/api/campaign/characters/:playerNumber/attachments/:instanceId/remove', removeRetainedAttachment);
+app.post('/api/campaign/characters/:playerNumber/attachments/:instanceId/move-to-wagon', returnRetainedAttachmentToWagon);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/attachments/:attachmentId/remove', removeInstalledAttachment);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/attachments/:attachmentId/move-to-wagon', returnInstalledAttachmentToWagon);
+app.post('/api/campaign/characters/:playerNumber/equipment/remove-all', removeAllCharacterItems);
+app.get('/api/campaign/characters/:playerNumber/equipment/:instanceId/attachment-candidates', getAttachmentCandidates);
+app.get('/api/campaign/characters/:playerNumber/equipment/:instanceId/attachment-catalog-candidates', getAttachmentCatalogCandidates);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/attachments', installCharacterAttachment);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/attachments-from-catalog', createAndInstallCatalogAttachment);
+app.post('/api/campaign/characters/:playerNumber/equipment/:instanceId/replace', replaceCharacterItem);
+app.put('/api/campaign/characters/:playerNumber/loadout/hand-order', reorderHandItems);
+app.post('/api/campaign/characters/:playerNumber/switch-hero', switchCharacterHero);
 app.get('/api/campaign/map', getCampaignMap);
 app.patch('/api/campaign/map/tiles/:mapCode', updateMapTile);
 app.patch('/api/campaign/map/position', updateMapPosition);
@@ -82,6 +109,14 @@ app.get('/api/items/:slug', async c => {
 });
 app.notFound(c => c.json({ error: { code: 'NOT_FOUND', message: '找不到此 API 路徑。' } }, 404));
 app.onError((error, c) => {
+  if (String(error).includes('chk_char_log_actor')) {
+    return c.json({
+      error: {
+        code: 'EQUIPMENT_VERSION_CONFLICT',
+        message: '角色或馬車資料已被其他玩家更新，請重新載入最新資料後再試。',
+      },
+    }, 409);
+  }
   if (error instanceof InvalidQuery) return c.json({ error: { code: 'INVALID_QUERY', message: error.message } }, 400);
   if (error instanceof HTTPException) {
     return c.json({ error: { code: error.status === 403 ? 'FORBIDDEN' : 'HTTP_ERROR', message: error.status === 403 ? '請求來源驗證失敗。' : error.message } }, error.status);

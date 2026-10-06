@@ -3,7 +3,7 @@ import type { AdminSession } from '../shared/types';
 type JsonRow = Record<string, unknown>;
 
 const FORMAT = 'the-hunters-campaign-backup';
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 const tableColumns: Record<string, string[]> = {
   campaigns: ['id','campaign_name','password_hash','max_players','is_active','notes','created_at','updated_at','deleted_at'],
@@ -11,8 +11,12 @@ const tableColumns: Record<string, string[]> = {
   campaign_wagons: ['campaign_id','elapsed_days','location_code','shared_gold','version','updated_by_player','created_at','updated_at','notes'],
   campaign_wagon_upgrades: ['campaign_id','station_id','level','updated_at'],
   campaign_wagon_resources: ['campaign_id','resource_id','quantity','updated_at'],
+  campaign_characters: ['id','campaign_id','player_number','hero_slug','custom_name','morale_position','strength_level','knowledge_level','perception_level','agility_level','max_health_level','current_health','xp_tens','xp_ones','is_poisoned','notes','version','created_at','updated_at'],
   campaign_equipment_instances: ['id','campaign_id','item_id','location_type','character_id','damage_markers','notes','created_at','updated_at'],
-  campaign_equipment_attachments: ['equipment_instance_id','attachment_instance_id','socket_index','attached_at'],
+  campaign_equipment_attachments: ['equipment_instance_id','attachment_instance_id','weapon_slot_index','socket_index','attached_at'],
+  campaign_character_opened_slots: ['character_id','slot_key','opened_by_player','opened_at'],
+  campaign_character_equipment_slots: ['campaign_id','character_id','equipment_instance_id','slot_key','slot_index','created_at'],
+  campaign_character_retained_attachments: ['attachment_instance_id','campaign_id','character_id','anchor_slot_key','socket_index','retained_at'],
   campaign_cards_progress: ['id','campaign_id','card_code','card_type','status','updated_at'],
   campaign_card_time_tokens: ['id','campaign_id','story_card_progress_id','token_code','placed_at_day','unlock_at_day','status','removed_at','removed_by_player','created_at'],
   wagon_activity_logs: ['id','campaign_id','player_number','action_type','entity_type','entity_id','before_json','after_json','created_at'],
@@ -22,7 +26,6 @@ const tableColumns: Record<string, string[]> = {
   map_activity_logs: ['id','campaign_id','player_number','action_type','entity_type','entity_id','before_json','after_json','created_at'],
   campaign_location_cards: ['campaign_id','location_code','is_revealed','face','resource_notes','notes','updated_at'],
   campaign_card_statuses: ['campaign_id','card_code','is_resolved','resolved_at','updated_by_player','updated_at'],
-  campaign_characters: ['id','campaign_id','player_number','hero_slug','custom_name','morale_position','strength_level','knowledge_level','perception_level','agility_level','max_health_level','current_health','xp_tens','xp_ones','is_poisoned','notes','version','created_at','updated_at'],
   character_activity_logs: ['id','campaign_id','actor_player_number','target_player_number','action_type','entity_type','entity_id','before_json','after_json','created_at'],
 };
 
@@ -32,8 +35,12 @@ const exportQueries: Record<string, string> = {
   campaign_wagons: 'SELECT * FROM campaign_wagons WHERE campaign_id=?',
   campaign_wagon_upgrades: 'SELECT * FROM campaign_wagon_upgrades WHERE campaign_id=? ORDER BY station_id',
   campaign_wagon_resources: 'SELECT * FROM campaign_wagon_resources WHERE campaign_id=? ORDER BY resource_id',
+  campaign_characters: 'SELECT * FROM campaign_characters WHERE campaign_id=? ORDER BY player_number',
   campaign_equipment_instances: 'SELECT * FROM campaign_equipment_instances WHERE campaign_id=? ORDER BY id',
-  campaign_equipment_attachments: 'SELECT a.* FROM campaign_equipment_attachments a JOIN campaign_equipment_instances e ON e.id=a.equipment_instance_id WHERE e.campaign_id=? ORDER BY a.equipment_instance_id,a.socket_index',
+  campaign_equipment_attachments: 'SELECT a.* FROM campaign_equipment_attachments a JOIN campaign_equipment_instances e ON e.id=a.equipment_instance_id WHERE e.campaign_id=? ORDER BY a.equipment_instance_id,a.weapon_slot_index,a.socket_index',
+  campaign_character_opened_slots: 'SELECT s.* FROM campaign_character_opened_slots s JOIN campaign_characters c ON c.id=s.character_id WHERE c.campaign_id=? ORDER BY s.character_id,s.slot_key',
+  campaign_character_equipment_slots: 'SELECT * FROM campaign_character_equipment_slots WHERE campaign_id=? ORDER BY character_id,equipment_instance_id,slot_index',
+  campaign_character_retained_attachments: 'SELECT * FROM campaign_character_retained_attachments WHERE campaign_id=? ORDER BY character_id,anchor_slot_key,socket_index',
   campaign_cards_progress: 'SELECT * FROM campaign_cards_progress WHERE campaign_id=? ORDER BY id',
   campaign_card_time_tokens: 'SELECT * FROM campaign_card_time_tokens WHERE campaign_id=? ORDER BY id',
   wagon_activity_logs: 'SELECT * FROM wagon_activity_logs WHERE campaign_id=? ORDER BY id',
@@ -43,7 +50,6 @@ const exportQueries: Record<string, string> = {
   map_activity_logs: 'SELECT * FROM map_activity_logs WHERE campaign_id=? ORDER BY id',
   campaign_location_cards: 'SELECT * FROM campaign_location_cards WHERE campaign_id=? ORDER BY location_code',
   campaign_card_statuses: 'SELECT * FROM campaign_card_statuses WHERE campaign_id=? ORDER BY card_code',
-  campaign_characters: 'SELECT * FROM campaign_characters WHERE campaign_id=? ORDER BY player_number',
   character_activity_logs: 'SELECT * FROM character_activity_logs WHERE campaign_id=? ORDER BY id',
 };
 
@@ -76,7 +82,30 @@ function isRow(value: unknown): value is JsonRow {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
-function validateBackup(value: unknown, campaignId: string): CampaignBackup {
+function normalizeBackup(value: unknown): unknown {
+  if (!isRow(value) || value.format !== FORMAT || !isRow(value.tables)) return value;
+  if (value.schemaVersion !== 1) return value;
+  const tables = { ...value.tables };
+  const attachments = Array.isArray(tables.campaign_equipment_attachments)
+    ? tables.campaign_equipment_attachments.map(row => isRow(row)
+      ? { ...row, weapon_slot_index: row.weapon_slot_index ?? 1 }
+      : row)
+    : [];
+  return {
+    ...value,
+    schemaVersion: SCHEMA_VERSION,
+    tables: {
+      ...tables,
+      campaign_equipment_attachments: attachments,
+      campaign_character_opened_slots: [],
+      campaign_character_equipment_slots: [],
+      campaign_character_retained_attachments: [],
+    },
+  };
+}
+
+function validateBackup(input: unknown, campaignId: string): CampaignBackup {
+  const value = normalizeBackup(input);
   if (!isRow(value) || value.format !== FORMAT || value.schemaVersion !== SCHEMA_VERSION) {
     throw new Error('備份格式或版本不支援。');
   }

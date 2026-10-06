@@ -115,6 +115,15 @@ export async function saveCampaignCharacter(c: Ctx) {
     }, 409);
   }
 
+  if (before && before.heroSlug !== heroSlug) {
+    return error(
+      c,
+      409,
+      'HERO_CHANGE_REQUIRES_SWITCH',
+      '更換角色必須使用換角流程，系統會先將目前面板上的裝備全部移入馬車。',
+    );
+  }
+
   const isPoisoned = input.isPoisoned === true;
 
   try {

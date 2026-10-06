@@ -455,3 +455,16 @@ SQLite 的 `CHECK` 與外鍵只能處理部分跨表規則，下列條件必須�
 - 可以依分類、格數、攻擊類型、判定屬性、效果和合成台篩選。
 - API 回傳原始效果文字，結構化資料只作為篩選與輔助顯示。
 
+
+## 11. 角色 Equipment Board 戰役狀態（Migration 0024）
+
+`0024_create_character_loadouts.sql` 將固定模板與戰役狀態分離：
+
+- 固定槽位拓撲、百分比熱點及各英雄的 `OPEN／LOCKED_10／BLOCKED` 初始分布保存在 `shared/equipmentBoardTemplates.ts`，不寫入 D1。
+- `campaign_character_opened_slots` 只記錄玩家已移除的原始 `10 XP` 蓋板，不自動扣除 XP。
+- `campaign_character_equipment_slots` 以逐格資料保存多格裝備占用，並對同一角色的 `slot_key` 建立唯一限制。
+- `campaign_character_retained_attachments` 保存主武器離開後仍留在實體 Equipment Board 原位的附件。
+- `campaign_equipment_attachments` 新增 `weapon_slot_index`，附件孔位以 `(equipment_instance_id, weapon_slot_index, socket_index)` 唯一識別。
+- `campaign_equipment_instances.character_id` 建立角色外鍵；額外 trigger 驗證角色、裝備實體、占格及留置附件屬於同一戰役。
+- 所有跨角色裝備流轉必須先回到馬車，再由另一名角色重新放置。
+- 戰役備份格式升為 schema v2；匯入 schema v1 時，舊附件的 `weapon_slot_index` 轉為 `1`，新增的三張角色面板狀態表使用空資料。
