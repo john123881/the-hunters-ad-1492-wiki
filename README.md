@@ -101,25 +101,14 @@ the-hunters-ad-1492/
 
 ```mermaid
 flowchart LR
-    U[使用者瀏覽器]
-
-    subgraph CF[Cloudflare Workers]
-        FE[React SPA<br/>TypeScript / Vite]
-        API[Hono RESTful API]
-        AUTH[Authentication<br/>Session / CSRF]
-        DOMAIN[Domain Modules<br/>Catalog / Campaign / Map / Wagon / Character]
-    end
-
-    DB[(Cloudflare D1)]
-    ASSETS[Cloudflare Assets<br/>卡片與地圖圖片]
-
-    U --> FE
-    FE -->|HTTP / JSON| API
-    FE --> ASSETS
-    API --> AUTH
-    API --> DOMAIN
-    AUTH --> DB
-    DOMAIN -->|Drizzle ORM| DB
+    Browser["使用者瀏覽器"] --> Frontend["React SPA - TypeScript + Vite"]
+    Frontend -->|HTTP JSON| API["Hono RESTful API"]
+    Frontend --> Assets["Cloudflare Assets"]
+    API --> Security["Session、CSRF、權限檢查"]
+    API --> Domain["Catalog、Campaign、Map、Wagon、Character"]
+    Security --> Database["Cloudflare D1"]
+    Domain --> ORM["Drizzle ORM"]
+    ORM --> Database
 ```
 
 ### 架構說明
