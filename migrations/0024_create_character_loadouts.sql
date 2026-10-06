@@ -47,22 +47,12 @@ CREATE INDEX idx_campaign_equipment_location
 CREATE TRIGGER trg_campaign_equipment_character_insert
 BEFORE INSERT ON campaign_equipment_instances
 WHEN NEW.location_type = 'CHARACTER'
-BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_characters c
-    WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id
-  ) THEN RAISE(ABORT, 'equipment character must belong to campaign') END;
-END;
+BEGIN SELECT RAISE(ABORT, 'equipment character must belong to campaign') WHERE NOT EXISTS (SELECT 1 FROM campaign_characters c WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id); END;
 
 CREATE TRIGGER trg_campaign_equipment_character_update
 BEFORE UPDATE OF campaign_id, location_type, character_id ON campaign_equipment_instances
 WHEN NEW.location_type = 'CHARACTER'
-BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_characters c
-    WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id
-  ) THEN RAISE(ABORT, 'equipment character must belong to campaign') END;
-END;
+BEGIN SELECT RAISE(ABORT, 'equipment character must belong to campaign') WHERE NOT EXISTS (SELECT 1 FROM campaign_characters c WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id); END;
 
 CREATE TABLE campaign_character_opened_slots (
   character_id INTEGER NOT NULL REFERENCES campaign_characters(id) ON DELETE CASCADE,
@@ -88,35 +78,11 @@ CREATE INDEX idx_character_equipment_slots_character
 
 CREATE TRIGGER trg_character_equipment_slot_insert
 BEFORE INSERT ON campaign_character_equipment_slots
-BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_characters c
-    WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id
-  ) THEN RAISE(ABORT, 'slot character must belong to campaign') END;
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_equipment_instances e
-    WHERE e.id = NEW.equipment_instance_id
-      AND e.campaign_id = NEW.campaign_id
-      AND e.character_id = NEW.character_id
-      AND e.location_type = 'CHARACTER'
-  ) THEN RAISE(ABORT, 'slot equipment must belong to character') END;
-END;
+BEGIN SELECT RAISE(ABORT, 'slot character must belong to campaign') WHERE NOT EXISTS (SELECT 1 FROM campaign_characters c WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id); SELECT RAISE(ABORT, 'slot equipment must belong to character') WHERE NOT EXISTS (SELECT 1 FROM campaign_equipment_instances e WHERE e.id = NEW.equipment_instance_id AND e.campaign_id = NEW.campaign_id AND e.character_id = NEW.character_id AND e.location_type = 'CHARACTER'); END;
 
 CREATE TRIGGER trg_character_equipment_slot_update
 BEFORE UPDATE OF campaign_id, character_id, equipment_instance_id ON campaign_character_equipment_slots
-BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_characters c
-    WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id
-  ) THEN RAISE(ABORT, 'slot character must belong to campaign') END;
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_equipment_instances e
-    WHERE e.id = NEW.equipment_instance_id
-      AND e.campaign_id = NEW.campaign_id
-      AND e.character_id = NEW.character_id
-      AND e.location_type = 'CHARACTER'
-  ) THEN RAISE(ABORT, 'slot equipment must belong to character') END;
-END;
+BEGIN SELECT RAISE(ABORT, 'slot character must belong to campaign') WHERE NOT EXISTS (SELECT 1 FROM campaign_characters c WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id); SELECT RAISE(ABORT, 'slot equipment must belong to character') WHERE NOT EXISTS (SELECT 1 FROM campaign_equipment_instances e WHERE e.id = NEW.equipment_instance_id AND e.campaign_id = NEW.campaign_id AND e.character_id = NEW.character_id AND e.location_type = 'CHARACTER'); END;
 
 CREATE TABLE campaign_character_retained_attachments (
   attachment_instance_id INTEGER PRIMARY KEY REFERENCES campaign_equipment_instances(id) ON DELETE CASCADE,
@@ -133,37 +99,11 @@ CREATE INDEX idx_character_retained_attachments_character
 
 CREATE TRIGGER trg_character_retained_attachment_insert
 BEFORE INSERT ON campaign_character_retained_attachments
-BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_characters c
-    WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id
-  ) THEN RAISE(ABORT, 'retained attachment character must belong to campaign') END;
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_equipment_instances e
-    JOIN attachment_specs a ON a.item_id = e.item_id
-    WHERE e.id = NEW.attachment_instance_id
-      AND e.campaign_id = NEW.campaign_id
-      AND e.character_id = NEW.character_id
-      AND e.location_type = 'CHARACTER'
-  ) THEN RAISE(ABORT, 'retained attachment must belong to character') END;
-END;
+BEGIN SELECT RAISE(ABORT, 'retained attachment character must belong to campaign') WHERE NOT EXISTS (SELECT 1 FROM campaign_characters c WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id); SELECT RAISE(ABORT, 'retained attachment must belong to character') WHERE NOT EXISTS (SELECT 1 FROM campaign_equipment_instances e JOIN attachment_specs a ON a.item_id = e.item_id WHERE e.id = NEW.attachment_instance_id AND e.campaign_id = NEW.campaign_id AND e.character_id = NEW.character_id AND e.location_type = 'CHARACTER'); END;
 
 CREATE TRIGGER trg_character_retained_attachment_update
 BEFORE UPDATE OF attachment_instance_id, campaign_id, character_id ON campaign_character_retained_attachments
-BEGIN
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_characters c
-    WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id
-  ) THEN RAISE(ABORT, 'retained attachment character must belong to campaign') END;
-  SELECT CASE WHEN NOT EXISTS (
-    SELECT 1 FROM campaign_equipment_instances e
-    JOIN attachment_specs a ON a.item_id = e.item_id
-    WHERE e.id = NEW.attachment_instance_id
-      AND e.campaign_id = NEW.campaign_id
-      AND e.character_id = NEW.character_id
-      AND e.location_type = 'CHARACTER'
-  ) THEN RAISE(ABORT, 'retained attachment must belong to character') END;
-END;
+BEGIN SELECT RAISE(ABORT, 'retained attachment character must belong to campaign') WHERE NOT EXISTS (SELECT 1 FROM campaign_characters c WHERE c.id = NEW.character_id AND c.campaign_id = NEW.campaign_id); SELECT RAISE(ABORT, 'retained attachment must belong to character') WHERE NOT EXISTS (SELECT 1 FROM campaign_equipment_instances e JOIN attachment_specs a ON a.item_id = e.item_id WHERE e.id = NEW.attachment_instance_id AND e.campaign_id = NEW.campaign_id AND e.character_id = NEW.character_id AND e.location_type = 'CHARACTER'); END;
 
 PRAGMA defer_foreign_keys = OFF;
 PRAGMA optimize;
