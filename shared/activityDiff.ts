@@ -51,6 +51,7 @@ const COMMON_FIELD_LABELS: Record<string, string> = {
   currentHealth: '當前生命值',
   xpTens: '經驗值十位',
   xpOnes: '經驗值個位',
+  accumulatedXp: '累積經驗值',
   isPoisoned: '中毒狀態',
 
   // 管理者與系統

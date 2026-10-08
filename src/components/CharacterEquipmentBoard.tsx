@@ -830,29 +830,33 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     </div>}
     <div className="equipment-board-canvas">
       <img src="/images/campaign/characters/equipment-board-gridless-v3.png" alt="角色裝備面板" />
-      {loadout.slots.map(slot => <button
-        key={slot.slotKey}
-        type="button"
-        className={'equipment-slot status-' + String(slot.status).toLowerCase() + (previewKeys.has(slot.slotKey) ? ' preview' : '')}
-        style={{
-          left: slot.boardRect.xPercent + '%', top: slot.boardRect.yPercent + '%',
-          width: slot.boardRect.widthPercent + '%', height: slot.boardRect.heightPercent + '%',
-        }}
-        disabled={!canEdit || busy || slot.status === 'BLOCKED'}
-        onClick={() => void chooseSlot(slot)}
-        aria-label={slot.slotKey + '，' + slot.status}
-      >
-        {slot.status === 'BLOCKED' && <img className="equipment-slot-cover" src="/images/campaign/characters/slot-cover-blocked-x-v1.png" alt="永久 X 蓋板" />}
-        {slot.status === 'LOCKED_10' && <img className="equipment-slot-cover" src="/images/campaign/characters/slot-cover-10xp-v1.png" alt="10 XP 蓋板" />}
-        {slot.status === 'OPEN' && <span className="equipment-slot-add">＋</span>}
-      </button>)}
+      {loadout.slots.map(slot => {
+        if (slot.status === 'OCCUPIED') return null;
+        return <button
+          key={slot.slotKey}
+          type="button"
+          className={'equipment-slot status-' + String(slot.status).toLowerCase() + (previewKeys.has(slot.slotKey) ? ' preview' : '')}
+          style={{
+            left: slot.boardRect.xPercent + '%', top: slot.boardRect.yPercent + '%',
+            width: slot.boardRect.widthPercent + '%', height: slot.boardRect.heightPercent + '%',
+          }}
+          disabled={!canEdit || busy || slot.status === 'BLOCKED'}
+          onClick={() => void chooseSlot(slot)}
+          aria-label={slot.slotKey + '，' + slot.status}
+        >
+          {slot.status === 'BLOCKED' && <img className="equipment-slot-cover" src="/images/campaign/characters/slot-cover-blocked-x-v1.png" alt="永久 X 蓋板" />}
+          {slot.status === 'LOCKED_10' && <img className="equipment-slot-cover" src="/images/campaign/characters/slot-cover-10xp-v1.png" alt="10 XP 蓋板" />}
+          {slot.status === 'OPEN' && <span className="equipment-slot-add">＋</span>}
+        </button>;
+      })}
       {loadout.equipment.map(item => {
         const first = loadout.slots.find(slot => slot.slotKey === item.slotKeys[0]);
         const last = loadout.slots.find(slot => slot.slotKey === item.slotKeys[item.slotKeys.length - 1]);
         if (!first || !last) return null;
-        const isWeapon = first.category === 'HAND' && item.categoryCode === 'weapon';
-        const overhang = isWeapon ? HAND_EQUIPMENT_VISUAL.socketOverhangPercent : 0;
-        return <button key={item.instanceId} type="button" className={'placed-equipment' + (isWeapon ? ' hand-weapon' : '')} style={{
+        const hasSockets = (item.sockets?.length ?? 0) > 0;
+        const isOverhangingWeapon = first.category === 'HAND' && item.categoryCode === 'weapon' && hasSockets;
+        const overhang = isOverhangingWeapon ? HAND_EQUIPMENT_VISUAL.socketOverhangPercent : 0;
+        return <button key={item.instanceId} type="button" className={'placed-equipment' + (isOverhangingWeapon ? ' hand-weapon' : '')} style={{
           left: (first.boardRect.xPercent - overhang) + '%', top: first.boardRect.yPercent + '%',
           width: (first.boardRect.widthPercent + overhang) + '%',
           height: (last.boardRect.yPercent + last.boardRect.heightPercent - first.boardRect.yPercent) + '%',

@@ -57,10 +57,9 @@ describe('Campaign Mutation Routes Conflict & Freeze Unit Tests', () => {
                   return [['MAP', 'M01', '', '', mapVersion]];
                 }
                 if (sqlString.includes('campaign_characters')) {
-                  // 如果是 select()（全欄位），第 2 欄為 campaignId
                   // 1: id, 2: campaignId, 3: playerNumber, 4: heroSlug, 5: customName,
                   // 6: morale, 7: strength, 8: knowledge, 9: perception, 10: agility,
-                  // 11: maxHealth, 12: currentHealth, 13: xpTens, 14: xpOnes, 15: isPoisoned, 16: notes, 17: version
+                  // 11: maxHealth, 12: currentHealth, 13: xpTens, 14: xpOnes, 15: accumulatedXp, 16: isPoisoned, 17: notes, 18: version
                   return [
                     [
                       1, // id
@@ -68,7 +67,7 @@ describe('Campaign Mutation Routes Conflict & Freeze Unit Tests', () => {
                       1, // player_number
                       'huntress', // hero_slug
                       'Hunter 1', // custom_name
-                      0, 1, 1, 1, 1, 5, 10, 0, 0, 0, '', characterVersion,
+                      0, 1, 1, 1, 1, 5, 10, 0, 0, 0, 0, '', characterVersion,
                     ],
                   ];
                 }

@@ -17,6 +17,7 @@ export const campaignCharacters = sqliteTable('campaign_characters', {
   currentHealth: integer('current_health').notNull().default(1),
   xpTens: integer('xp_tens').notNull().default(0),
   xpOnes: integer('xp_ones').notNull().default(0),
+  accumulatedXp: integer('accumulated_xp').notNull().default(0),
   isPoisoned: integer('is_poisoned', { mode: 'boolean' }).notNull().default(false),
   notes: text('notes').notNull().default(''),
   version: integer('version').notNull().default(1),
@@ -39,6 +40,7 @@ export const campaignCharacters = sqliteTable('campaign_characters', {
   check('chk_char_current_health', sql`${table.currentHealth} BETWEEN 0 AND 12`),
   check('chk_char_xp_tens', sql`${table.xpTens} BETWEEN 0 AND 90 AND ${table.xpTens} % 10 = 0`),
   check('chk_char_xp_ones', sql`${table.xpOnes} BETWEEN 0 AND 9`),
+  check('chk_char_accumulated_xp', sql`${table.accumulatedXp} BETWEEN 0 AND 999`),
   check('chk_char_poisoned', sql`${table.isPoisoned} IN (0, 1)`),
   check('chk_char_version', sql`${table.version} >= 1`),
 ]);

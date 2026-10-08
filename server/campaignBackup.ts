@@ -11,7 +11,7 @@ const tableColumns: Record<string, string[]> = {
   campaign_wagons: ['campaign_id','elapsed_days','location_code','shared_gold','version','updated_by_player','created_at','updated_at','notes'],
   campaign_wagon_upgrades: ['campaign_id','station_id','level','updated_at'],
   campaign_wagon_resources: ['campaign_id','resource_id','quantity','updated_at'],
-  campaign_characters: ['id','campaign_id','player_number','hero_slug','custom_name','morale_position','strength_level','knowledge_level','perception_level','agility_level','max_health_level','current_health','xp_tens','xp_ones','is_poisoned','notes','version','created_at','updated_at'],
+  campaign_characters: ['id','campaign_id','player_number','hero_slug','custom_name','morale_position','strength_level','knowledge_level','perception_level','agility_level','max_health_level','current_health','xp_tens','xp_ones','accumulated_xp','is_poisoned','notes','version','created_at','updated_at'],
   campaign_equipment_instances: ['id','campaign_id','item_id','location_type','character_id','damage_markers','notes','created_at','updated_at'],
   campaign_equipment_attachments: ['equipment_instance_id','attachment_instance_id','weapon_slot_index','socket_index','attached_at'],
   campaign_character_opened_slots: ['character_id','slot_key','opened_by_player','opened_at'],

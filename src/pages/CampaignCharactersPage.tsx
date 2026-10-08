@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BookOpen, FlaskConical, Image, Loader2, Minus, Plus, RefreshCw, Save, Shield, UserRound } from 'lucide-react';
+import { BookOpen, Image, Loader2, Minus, Plus, RefreshCw, Save, Shield, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
@@ -11,7 +11,8 @@ import type { ApiErrorResponse, AuthSession, CampaignCharacter, CampaignCharacte
 const characterFieldLabels: Record<string, string> = {
   heroSlug: '角色', customName: '角色名稱', moralePosition: '士氣位置', strengthLevel: '力量',
   knowledgeLevel: '知識', perceptionLevel: '洞察', agilityLevel: '敏捷', maxHealthLevel: '最大生命軌',
-  currentHealth: '當前生命', xpTens: '經驗值十位', xpOnes: '經驗值個位', isPoisoned: '中毒狀態', notes: '角色備註',
+  currentHealth: '當前生命', xpTens: '經驗值十位', xpOnes: '經驗值個位', accumulatedXp: '累積經驗值',
+  isPoisoned: '中毒狀態', notes: '角色備註',
 };
 
 function changedCharacterFields(before: CampaignCharacter | null, latest: CampaignCharacter) {
@@ -24,15 +25,24 @@ type Draft = Omit<CampaignCharacter, 'id' | 'playerNumber' | 'version'> & { vers
 const emptyDraft = (heroSlug: string): Draft => ({
   heroSlug, customName: '', moralePosition: 0, strengthLevel: 0, knowledgeLevel: 0,
   perceptionLevel: 0, agilityLevel: 0, maxHealthLevel: 0, currentHealth: 1,
-  xpTens: 0, xpOnes: 0, isPoisoned: false, notes: '', version: null,
+  xpTens: 0, xpOnes: 0, accumulatedXp: 0, isPoisoned: false, notes: '', version: null,
 });
-const toDraft = (character: CampaignCharacter): Draft => ({ ...character, version: character.version });
+const toDraft = (character: CampaignCharacter): Draft => ({
+  ...character,
+  accumulatedXp: typeof character.accumulatedXp === 'number' && !Number.isNaN(character.accumulatedXp)
+    ? character.accumulatedXp
+    : (Number(character.xpTens || 0) + Number(character.xpOnes || 0)),
+  version: character.version,
+});
 
-function Stepper({ label, value, min, max, step = 1, disabled, onChange }: {
-  label: string; value: number; min: number; max: number; step?: number; disabled: boolean; onChange: (value: number) => void;
+function Stepper({ label, iconUrl, value, min, max, step = 1, disabled, onChange }: {
+  label: string; iconUrl?: string; value: number; min: number; max: number; step?: number; disabled: boolean; onChange: (value: number) => void;
 }) {
   return <div className="character-stepper">
-    <span>{label}</span>
+    <span className="character-stepper-label">
+      {iconUrl && <img src={iconUrl} alt="" className="character-stepper-icon" />}
+      {label}
+    </span>
     <div><button type="button" disabled={disabled || value <= min} onClick={() => onChange(Math.max(min, value - step))} aria-label={label + '減少'}><Minus /></button>
       <strong>{value}</strong>
       <button type="button" disabled={disabled || value >= max} onClick={() => onChange(Math.min(max, value + step))} aria-label={label + '增加'}><Plus /></button></div>
@@ -271,24 +281,50 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
           </div>
           <label className="field"><span>角色名稱</span><input disabled={!canEdit} maxLength={40} value={draft.customName} placeholder={hero.displayNameZhTw} onChange={event => update('customName', event.target.value)} /></label>
           <section className="character-track-grid" aria-label="角色面板位置">
-            <Stepper label="士氣位置" value={draft.moralePosition} min={-2} max={4} disabled={!canEdit} onChange={value => update('moralePosition', value)} />
-            <Stepper label="經驗值 (XP)" value={draft.xpTens + draft.xpOnes} min={0} max={99} disabled={!canEdit} onChange={value => {
-              update('xpTens', Math.floor(value / 10) * 10);
-              update('xpOnes', value % 10);
+            <Stepper label="士氣位置" iconUrl="/images/icons/equipment/morale.png" value={draft.moralePosition} min={-2} max={4} disabled={!canEdit} onChange={value => update('moralePosition', value)} />
+            <label className="character-poison-toggle">
+              <input type="checkbox" disabled={!canEdit} checked={draft.isPoisoned} onChange={event => update('isPoisoned', event.target.checked)} />
+              <img src="/images/icons/equipment/poison.png" alt="" className="character-poison-icon" />
+              <span>中毒狀態</span>
+            </label>
+            <Stepper label="力量" iconUrl="/images/icons/equipment/strength.png" value={draft.strengthLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('strengthLevel', value)} />
+            <Stepper label="知識" iconUrl="/images/icons/equipment/wisdom.png" value={draft.knowledgeLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('knowledgeLevel', value)} />
+            <Stepper label="洞察" iconUrl="/images/icons/equipment/perception.png" value={draft.perceptionLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('perceptionLevel', value)} />
+            <Stepper label="敏捷" iconUrl="/images/icons/equipment/agility.png" value={draft.agilityLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('agilityLevel', value)} />
+            <Stepper label="最大生命軌" iconUrl="/images/icons/equipment/max_health.png" value={draft.maxHealthLevel} min={0} max={5} disabled={!canEdit} onChange={value => update('maxHealthLevel', value)} />
+            <Stepper label="當前生命" iconUrl="/images/icons/equipment/current_health.png" value={draft.currentHealth} min={0} max={12} disabled={!canEdit} onChange={value => update('currentHealth', value)} />
+            <Stepper label="累積經驗值" iconUrl="/images/icons/equipment/xp.png" value={draft.accumulatedXp ?? (draft.xpTens + draft.xpOnes)} min={0} max={999} disabled={!canEdit} onChange={value => {
+              const currentAccum = draft.accumulatedXp ?? (draft.xpTens + draft.xpOnes);
+              const diff = value - currentAccum;
+              const currentXp = draft.xpTens + draft.xpOnes;
+              const newCurrentXp = Math.min(99, Math.max(0, currentXp + (diff > 0 ? diff : 0)));
+              setDraft(current => (current ? {
+                ...current,
+                accumulatedXp: value,
+                xpTens: Math.floor(newCurrentXp / 10) * 10,
+                xpOnes: newCurrentXp % 10,
+              } : current));
+              setIsDirty(true);
             }} />
-            <Stepper label="力量" value={draft.strengthLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('strengthLevel', value)} />
-            <Stepper label="知識" value={draft.knowledgeLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('knowledgeLevel', value)} />
-            <Stepper label="洞察" value={draft.perceptionLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('perceptionLevel', value)} />
-            <Stepper label="敏捷" value={draft.agilityLevel} min={0} max={4} disabled={!canEdit} onChange={value => update('agilityLevel', value)} />
-            <Stepper label="最大生命軌" value={draft.maxHealthLevel} min={0} max={5} disabled={!canEdit} onChange={value => update('maxHealthLevel', value)} />
-            <Stepper label="當前生命" value={draft.currentHealth} min={0} max={12} disabled={!canEdit} onChange={value => update('currentHealth', value)} />
+            <Stepper label="當前經驗值" iconUrl="/images/icons/equipment/xp.png" value={draft.xpTens + draft.xpOnes} min={0} max={99} disabled={!canEdit} onChange={value => {
+              setDraft(current => (current ? {
+                ...current,
+                xpTens: Math.floor(value / 10) * 10,
+                xpOnes: value % 10,
+              } : current));
+              setIsDirty(true);
+            }} />
           </section>
-          <label className="character-poison"><input type="checkbox" disabled={!canEdit} checked={draft.isPoisoned} onChange={event => update('isPoisoned', event.target.checked)} /><FlaskConical />中毒狀態</label>
           <label className="field"><span>角色備註</span><textarea disabled={!canEdit} maxLength={2000} value={draft.notes} onChange={event => update('notes', event.target.value)} /></label>
           {canEdit && <div className="character-save-bar"><button className="button" type="button" disabled={saving} onClick={save}><Save />{saving ? '儲存中…' : isDirty ? '儲存角色面板 *' : '儲存角色面板'}</button></div>}
         </aside>
       </div>
-      <CharacterEquipmentBoard playerNumber={selectedNumber} heroSlug={character?.heroSlug ?? draft.heroSlug} canEdit={canEdit} onVersionChange={syncLoadoutVersion} />
+      {character && <CharacterEquipmentBoard
+        playerNumber={selectedNumber}
+        heroSlug={character.heroSlug}
+        canEdit={canEdit}
+        onVersionChange={syncLoadoutVersion}
+      />}
     </>}
 
     {modal && hero && <div className="character-modal-backdrop" role="presentation" onMouseDown={event => event.target === event.currentTarget && setModal(null)}>

@@ -202,6 +202,7 @@ export interface CampaignCharacter {
   currentHealth: number;
   xpTens: number;
   xpOnes: number;
+  accumulatedXp: number;
   isPoisoned: boolean;
   notes: string;
   version: number;

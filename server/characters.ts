@@ -41,6 +41,7 @@ async function loadCharacters(db: ReturnType<typeof getDb>, session: AuthSession
       currentHealth: campaignCharacters.currentHealth,
       xpTens: campaignCharacters.xpTens,
       xpOnes: campaignCharacters.xpOnes,
+      accumulatedXp: campaignCharacters.accumulatedXp,
       isPoisoned: campaignCharacters.isPoisoned,
       notes: campaignCharacters.notes,
       version: campaignCharacters.version,
@@ -81,6 +82,9 @@ export async function saveCampaignCharacter(c: Ctx) {
     currentHealth: integer(input.currentHealth, 0, 12),
     xpTens: integer(input.xpTens, 0, 90),
     xpOnes: integer(input.xpOnes, 0, 9),
+    accumulatedXp: input.accumulatedXp != null
+      ? integer(input.accumulatedXp, 0, 999)
+      : (integer(input.xpTens, 0, 90) != null && integer(input.xpOnes, 0, 9) != null ? Number(input.xpTens) + Number(input.xpOnes) : null),
   };
   if (Object.values(values).some(value => value === null) || Number(values.xpTens) % 10 !== 0) {
     return error(c, 400, 'INVALID_CHARACTER_STATE', '角色面板位置超出可用範圍。');
@@ -160,6 +164,7 @@ export async function saveCampaignCharacter(c: Ctx) {
           currentHealth: values.currentHealth!,
           xpTens: values.xpTens!,
           xpOnes: values.xpOnes!,
+          accumulatedXp: values.accumulatedXp!,
           isPoisoned,
           notes,
           version: sql`${campaignCharacters.version} + 1`,
@@ -226,6 +231,7 @@ export async function saveCampaignCharacter(c: Ctx) {
         currentHealth: values.currentHealth!,
         xpTens: values.xpTens!,
         xpOnes: values.xpOnes!,
+        accumulatedXp: values.accumulatedXp!,
         isPoisoned,
         notes,
         version: 1,
