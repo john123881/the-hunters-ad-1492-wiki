@@ -311,7 +311,7 @@ export async function getAdminCampaigns(c: Ctx) {
 }
 
 async function hashPassword(password: string) {
-  const rounds = 310000;
+  const rounds = 100000;
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
   const hash = new Uint8Array(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: rounds }, key, 256));

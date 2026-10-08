@@ -9,7 +9,7 @@ if (!/^[a-z0-9._-]{3,40}$/.test(username) || !displayName || displayName.length 
   process.exit(1);
 }
 const sqlText = value => "'" + value.replaceAll("'", "''") + "'";
-const rounds = 310000;
+const rounds = 100000;
 const salt = randomBytes(16);
 const hash = pbkdf2Sync(password, salt, rounds, 32, 'sha256');
 const passwordHash = `pbkdf2_sha256$${rounds}$${salt.toString('base64url')}$${hash.toString('base64url')}`;
