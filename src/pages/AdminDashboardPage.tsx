@@ -15,6 +15,7 @@ export function AdminDashboardPage(){
   const [busy,setBusy]=useState('');
   const [showCreate,setShowCreate]=useState(false);
   const [form,setForm]=useState({id:'',name:'',password:'',maxPlayers:4});
+  const [createConfirmPassword,setCreateConfirmPassword]=useState('');
   const [passwordTarget,setPasswordTarget]=useState<{id:string;name:string}|null>(null);
   const [newPassword,setNewPassword]=useState('');
   const [confirmPassword,setConfirmPassword]=useState('');
@@ -48,8 +49,9 @@ export function AdminDashboardPage(){
   }
   async function createCampaign(event:FormEvent){
     event.preventDefault();
+    if(form.password!==createConfirmPassword){setError('兩次輸入的戰役密碼不一致。');return;}
     const ok=await mutate('/api/admin/campaigns','POST',form,'戰役已建立。','create');
-    if(ok){setForm({id:'',name:'',password:'',maxPlayers:4});setShowCreate(false);}
+    if(ok){setForm({id:'',name:'',password:'',maxPlayers:4});setCreateConfirmPassword('');setShowCreate(false);}
   }
 
   async function resetPassword(event:FormEvent){
@@ -115,9 +117,10 @@ export function AdminDashboardPage(){
       <header><div><p className="eyebrow">NEW CAMPAIGN</p><h2>建立新戰役</h2></div><p>建立後，玩家即可使用戰役 ID、共用密碼與席位登入。</p></header>
       <label>戰役 ID<input value={form.id} onChange={event=>setForm({...form,id:event.target.value.toLowerCase()})} placeholder="hunters-party-2" required pattern="[a-z0-9][a-z0-9-]{2,39}"/></label>
       <label>戰役名稱<input value={form.name} onChange={event=>setForm({...form,name:event.target.value})} placeholder="週末獵人團" required maxLength={60}/></label>
-      <label>共用密碼<input type="password" value={form.password} onChange={event=>setForm({...form,password:event.target.value})} required minLength={8} maxLength={128}/></label>
+      <label>共用密碼<input type="password" autoComplete="new-password" value={form.password} onChange={event=>setForm({...form,password:event.target.value})} required minLength={8} maxLength={128}/></label>
+      <label>確認共用密碼<input type="password" autoComplete="new-password" value={createConfirmPassword} onChange={event=>setCreateConfirmPassword(event.target.value)} required minLength={8} maxLength={128} aria-invalid={Boolean(createConfirmPassword&&form.password!==createConfirmPassword)} aria-describedby="create-password-match-message"/><small id="create-password-match-message" className={'admin-create-password-match '+(createConfirmPassword&&form.password!==createConfirmPassword?'error':createConfirmPassword?'success':'')} aria-live="polite">{createConfirmPassword&&(form.password!==createConfirmPassword?'兩次密碼不一致。':'兩次密碼一致。')}</small></label>
       <label>玩家上限<select value={form.maxPlayers} onChange={event=>setForm({...form,maxPlayers:Number(event.target.value)})}>{[1,2,3,4].map(value=><option value={value} key={value}>{value} 人</option>)}</select></label>
-      <button className="button" disabled={busy==='create'} type="submit">{busy==='create'?'建立中…':'確認建立'}</button>
+      <button className="button" disabled={busy==='create'||form.password.length<8||form.password!==createConfirmPassword} type="submit">{busy==='create'?'建立中…':'確認建立'}</button>
     </form>}
     {error&&<div className="character-notice" role="alert">{error}</div>}
     {notice&&<div className="character-notice success" role="status">{notice}</div>}

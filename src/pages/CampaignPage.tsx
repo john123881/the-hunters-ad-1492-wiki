@@ -555,32 +555,72 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
   onToast: (message: string) => void;
   onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
 }) {
+  const [displayValue, setDisplayValue] = useState(value);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
-  async function update(next: number) {
+  const saveTimerRef = useRef<number | null>(null);
+  const versionRef = useRef(version);
+
+  useEffect(() => {
+    versionRef.current = version;
+  }, [version]);
+
+  useEffect(() => {
+    setDisplayValue(value);
+  }, [value]);
+
+  useEffect(() => () => {
+    if (saveTimerRef.current !== null) window.clearTimeout(saveTimerRef.current);
+  }, []);
+
+  async function update(sharedGold: number) {
     if (busyRef.current) return;
     busyRef.current = true;
     setBusy(true);
-    const sharedGold = Math.max(0, Math.min(99999, next));
     const response = await fetch('/api/campaign/wagon/gold', {
       method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sharedGold, expectedVersion: version }),
+      body: JSON.stringify({ sharedGold, expectedVersion: versionRef.current }),
     });
     if (!response.ok) {
       const problem = (await response.json()) as ApiErrorResponse;
       if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/gold',payload:{sharedGold},successMessage:'團隊共用金錢已更新為 '+sharedGold});
-      else onError(problem.error.message);
+      else {
+        setDisplayValue(value);
+        onError(problem.error.message);
+      }
     } else {
       const result = await response.json() as CampaignWagonResponse;
+      setDisplayValue(result.data.sharedGold);
       onChange(result.data);
-      onToast('團隊共用金錢已更新為 ' + sharedGold);
+      onToast('團隊共用金錢已更新為 ' + result.data.sharedGold);
     }
     busyRef.current = false;
     setBusy(false);
   }
+
+  function adjust(delta: number) {
+    if (busyRef.current) return;
+    setDisplayValue(current => {
+      const next = Math.max(0, Math.min(99999, current + delta));
+      if (next === current) return current;
+      if (saveTimerRef.current !== null) window.clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = window.setTimeout(() => {
+        saveTimerRef.current = null;
+        void update(next);
+      }, 300);
+      return next;
+    });
+  }
+
   return <div className="shared-gold">
-    <small>團隊共用金錢</small>
-    <div><button disabled={busy || value === 0} onClick={() => void update(value - 1)} aria-label="共用金錢減少 1">−</button><strong>{value}</strong><button disabled={busy} onClick={() => void update(value + 1)} aria-label="共用金錢增加 1">＋</button></div>
+    <small>團隊共用金錢{busy ? ' · 儲存中…' : ''}</small>
+    <div>
+      <button disabled={busy || displayValue === 0} onClick={() => adjust(-5)} aria-label="共用金錢減少 5">−5</button>
+      <button disabled={busy || displayValue === 0} onClick={() => adjust(-1)} aria-label="共用金錢減少 1">−1</button>
+      <strong aria-live="polite">{displayValue}</strong>
+      <button disabled={busy || displayValue === 99999} onClick={() => adjust(1)} aria-label="共用金錢增加 1">+1</button>
+      <button disabled={busy || displayValue === 99999} onClick={() => adjust(5)} aria-label="共用金錢增加 5">+5</button>
+    </div>
   </div>;
 }
 

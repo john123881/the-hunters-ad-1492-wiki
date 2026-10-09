@@ -69,6 +69,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const [draft, setDraft] = useState<CampaignMapTile | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedLocationCode, setSelectedLocationCode] = useState('L01');
+  const locationRecordsRef = useRef<HTMLDivElement>(null);
   const [locationDraft, setLocationDraft] = useState<CampaignLocationCard | null>(null);
   const [roadEventNotes, setRoadEventNotes] = useState('');
   const [townEventNotes, setTownEventNotes] = useState('');
@@ -80,6 +81,10 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const [progressTypeFilter, setProgressTypeFilter] = useState<'ALL' | 'STORY' | 'MISSION'>('ALL');
   const [progressStateFilter, setProgressStateFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
   const [progressQuery, setProgressQuery] = useState('');
+  const [progressDrawerOpen, setProgressDrawerOpen] = useState(false);
+  const [progressPage, setProgressPage] = useState(0);
+  const [progressReturnCardCode, setProgressReturnCardCode] = useState('');
+  const [isMobileProgress, setIsMobileProgress] = useState(() => window.matchMedia('(max-width: 620px)').matches);
   const [flippingCode, setFlippingCode] = useState('');
   const [loadingFlipCode, setLoadingFlipCode] = useState('');
   const [returnToProgress, setReturnToProgress] = useState(false);
@@ -93,6 +98,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const [editingCardNoteId, setEditingCardNoteId] = useState<number | null>(null);
   const [editingCardNote, setEditingCardNote] = useState('');
   const savedTimerRef = useRef<number | null>(null);
+  const progressDrawerRef = useRef<HTMLElement>(null);
 
   const loadMap = useCallback(async () => {
     if (!session) return;
@@ -134,6 +140,44 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   useEffect(() => () => {
     if (savedTimerRef.current !== null) window.clearTimeout(savedTimerRef.current);
   }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 620px)');
+    const update = () => setIsMobileProgress(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!progressDrawerOpen || !isMobileProgress) return;
+    const scrollY = window.scrollY;
+    const previous = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.position = previous.position;
+      document.body.style.top = previous.top;
+      document.body.style.width = previous.width;
+      document.body.style.overflow = previous.overflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [isMobileProgress, progressDrawerOpen]);
+
+  useEffect(() => {
+    if (!progressDrawerOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setProgressDrawerOpen(false);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [progressDrawerOpen]);
 
   useEffect(() => {
     if (!editorOpen || !window.matchMedia('(max-width: 720px), (max-height: 600px) and (pointer: coarse)').matches) return;
@@ -232,6 +276,15 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     if (editorOpen && mapDraftDirty && !window.confirm('這張地圖卡有尚未儲存的修改，確定要放棄並返回卡片清單嗎？')) return;
     setEditorOpen(false);
     setReturnToProgress(false);
+    if (isMobileProgress) {
+      const targetIndex = visibleCardProgress.findIndex(card => card.cardCode === progressReturnCardCode);
+      if (targetIndex >= 0) setProgressPage(Math.floor(targetIndex / 20));
+      setProgressDrawerOpen(true);
+      window.setTimeout(() => {
+        progressDrawerRef.current?.querySelector<HTMLElement>('[data-card-code="' + progressReturnCardCode + '"]')?.focus();
+      }, 0);
+      return;
+    }
     document.getElementById('campaign-card-progress-title')?.scrollIntoView({
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
       block: 'start',
@@ -242,6 +295,17 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     () => map?.cards.filter(card => card.locationType === 'MAP' && card.locationCode === selectedCode) ?? [],
     [map, selectedCode],
   );
+  function selectLocationCard(locationCode: string) {
+    setSelectedLocationCode(locationCode);
+    if (!window.matchMedia('(max-width: 900px)').matches) return;
+    window.requestAnimationFrame(() => {
+      locationRecordsRef.current?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      });
+    });
+  }
+
   const selectedLocationCards = useMemo(
     () => map?.cards.filter(card => card.locationType === 'LOCATION' && card.locationCode === selectedLocationCode) ?? [],
     [map, selectedLocationCode],
@@ -269,6 +333,25 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     const queryMatches = card.cardCode.includes(progressQuery.trim().toUpperCase());
     return typeMatches && stateMatches && queryMatches;
   }) ?? [], [map, progressQuery, progressStateFilter, progressTypeFilter]);
+  const progressPageSize = 20;
+  const progressPageCount = Math.max(1, Math.ceil(visibleCardProgress.length / progressPageSize));
+  const displayedCardProgress = isMobileProgress && !progressQuery.trim()
+    ? visibleCardProgress.slice(progressPage * progressPageSize, (progressPage + 1) * progressPageSize)
+    : visibleCardProgress;
+  const progressRanges = Array.from({ length: progressPageCount }, (_, page) => {
+    const cards = visibleCardProgress.slice(page * progressPageSize, (page + 1) * progressPageSize);
+    return { page, label: cards.length ? cards[0].cardCode + '–' + cards[cards.length - 1].cardCode : '無卡片' };
+  });
+
+  useEffect(() => {
+    setProgressPage(0);
+  }, [progressQuery, progressStateFilter, progressTypeFilter]);
+
+  useEffect(() => {
+    if (progressPage < progressPageCount) return;
+    setProgressPage(Math.max(0, progressPageCount - 1));
+  }, [progressPage, progressPageCount]);
+
   const resolvedCardCount = map?.cardProgress.filter(card => card.isResolved).length ?? 0;
   const usedTimeTokenCodes = useMemo(() => new Set([
     ...(map?.cardProgress.flatMap(card => card.timeToken ? [card.timeToken.tokenCode] : []) ?? []),
@@ -427,13 +510,22 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     }
   }
 
+  function openProgressCard(card: CampaignMapCard) {
+    setProgressReturnCardCode(card.cardCode);
+    setProgressQuery(card.cardCode);
+    setProgressTypeFilter('ALL');
+    setProgressStateFilter('ALL');
+    setProgressPage(0);
+    setProgressDrawerOpen(true);
+  }
+
   function renderPlacedCard(card: CampaignMapCard) {
     const typeLabel = card.cardType === 'STORY' ? '劇情卡' : card.cardType === 'MISSION' ? '任務卡' : '大劇情卡';
     const tokenLabel = card.timeToken
       ? card.timeToken.tokenCode + (card.timeToken.unlockAtDay === null ? '' : ' · 第 ' + card.timeToken.unlockAtDay + ' 天')
       : '';
     return <article key={card.id}>
-      <div><strong>{card.cardCode}</strong><small>{typeLabel}</small></div>
+      <div><button className="placed-card-progress-link" type="button" onClick={() => openProgressCard(card)}>{card.cardCode}</button><small>{typeLabel}</small></div>
       {card.timeToken && <span className="time-token-chip"><Clock3 aria-hidden="true" />{tokenLabel}</span>}
       <select aria-label={'移動 ' + card.cardCode} disabled={Boolean(busy) || card.status === 'RESOLVED'} value={card.locationType + ':' + card.locationCode} onChange={event => {
         const [locationType, locationCode] = event.target.value.split(':');
@@ -621,7 +713,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           return <button
             className={'location-card-button' + (!locationBatchMode && selectedLocationCode === location.locationCode ? ' is-selected' : '') + (selectedLocationCodes.includes(location.locationCode) ? ' is-batch-selected' : '') + (location.isRevealed ? ' is-revealed' : '')}
             key={location.locationCode}
-            onClick={() => locationBatchMode ? toggleBatchCode(location.locationCode, 'LOCATION') : setSelectedLocationCode(location.locationCode)}
+            onClick={() => locationBatchMode ? toggleBatchCode(location.locationCode, 'LOCATION') : selectLocationCard(location.locationCode)}
             type="button"
             aria-pressed={locationBatchMode ? selectedLocationCodes.includes(location.locationCode) : selectedLocationCode === location.locationCode}
           >
@@ -641,8 +733,8 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           <label className="map-field"><span>地點卡備註</span><textarea value={locationDraft.notes} onChange={event => setLocationDraft({ ...locationDraft, notes: event.target.value })} rows={3} /></label>
           <div className="map-editor-primary-actions"><button className="button" disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/locations/' + locationDraft.locationCode, 'PATCH', locationDraft, 'location')} type="button"><Save aria-hidden="true" />{busy === 'location' ? '儲存中…' : savedAction === 'location' ? '已儲存' : '儲存地點卡'}</button><button className="button secondary" disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/position', 'PATCH', { locationType: 'LOCATION', locationCode: locationDraft.locationCode }, 'position')} type="button"><MapPin aria-hidden="true" />設為獵人位置</button></div>
         </div>
-        <div className="location-card-records">
-          <div className="map-subheading"><div><p className="eyebrow">PLACED CARDS</p><h3>{locationDraft.locationCode} 上的卡片</h3></div><div className="map-subheading-actions">{returnToProgress && <button className="text-button" onClick={returnToCardProgress} type="button">返回卡片清單</button>}<span>{selectedLocationCards.length} 張</span></div></div>
+        <div className="location-card-records" ref={locationRecordsRef}>
+          <div className="map-subheading"><div><p className="eyebrow">PLACED CARDS</p><h3>{locationDraft.locationCode} 上的卡片</h3></div><div className="map-subheading-actions">{returnToProgress && <button className="text-button" onClick={returnToCardProgress} type="button">返回卡片清單</button>}<span>{selectedLocationCards.length} 張</span><button className={"mobile-location-flip " + (locationDraft.isRevealed ? "is-revealed" : "")} disabled={Boolean(busy)} onClick={() => void flipLocationCard()} type="button"><Check aria-hidden="true" />{busy === "location-flip" ? "翻轉中…" : locationDraft.isRevealed ? "正面" : "覆蓋面"}</button></div></div>
           <div className="map-card-form"><label><span>卡片編號</span><select aria-invalid={Boolean(placementBlockedMessage)} value={cardCode} onChange={event => setCardCode(event.target.value)}>
               <option value="">選擇卡片</option>
               <optgroup label="劇情卡 S">{availablePlacementCards.story.map(card => <option key={card.cardCode} value={card.cardCode}>{card.cardCode}</option>)}</optgroup>
@@ -657,13 +749,17 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
       </div>}
     </section>
 
-    <section className="campaign-card-progress-section" aria-labelledby="campaign-card-progress-title">
+    <section ref={progressDrawerRef} className={'campaign-card-progress-section' + (progressDrawerOpen ? ' is-mobile-open' : '')} aria-labelledby="campaign-card-progress-title" aria-modal={isMobileProgress && progressDrawerOpen ? 'true' : undefined} role={isMobileProgress && progressDrawerOpen ? 'dialog' : undefined}>
       <header className="campaign-module-heading compact">
         <div><p className="eyebrow">STORY / MISSION CARDS</p><h2 id="campaign-card-progress-title">劇情卡與任務卡清單</h2><p>未放置卡可標記完成；點選已放置卡會前往所在的地圖卡或地點卡。</p></div>
         <span>{resolvedCardCount} / {map.cardProgress.length} 已完成</span>
+        {isMobileProgress && progressDrawerOpen && <button className="card-progress-close" type="button" onClick={() => setProgressDrawerOpen(false)} aria-label="關閉卡片清單"><X aria-hidden="true" />關閉</button>}
       </header>
+      {isMobileProgress && !progressDrawerOpen && <div className="card-progress-mobile-summary"><strong>已完成 {resolvedCardCount} / {map.cardProgress.length}</strong><button className="button" type="button" onClick={() => setProgressDrawerOpen(true)}>開啟卡片清單</button></div>}
+      {(!isMobileProgress || progressDrawerOpen) && <>
       <div className="card-progress-toolbar">
         <label className="card-progress-search"><span>搜尋卡號</span><input value={progressQuery} onChange={event => setProgressQuery(event.target.value)} placeholder="例如 S083" /></label>
+        {isMobileProgress && !progressQuery.trim() && <label className="card-progress-range"><span>顯示範圍</span><select value={progressPage} onChange={event => setProgressPage(Number(event.target.value))}>{progressRanges.map(range => <option key={range.page} value={range.page}>{range.label}</option>)}</select></label>}
         <div role="group" aria-label="卡片類型">
           {(['ALL', 'STORY', 'MISSION'] as const).map(filter => <button className={progressTypeFilter === filter ? 'active' : ''} key={filter} onClick={() => setProgressTypeFilter(filter)} type="button">{filter === 'ALL' ? '全部' : filter === 'STORY' ? '劇情卡 S' : '任務卡 J'}</button>)}
         </div>
@@ -675,18 +771,27 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
       </div>
       <div className="campaign-card-progress-grid">
         {visibleCardProgress.length === 0 && <p className="card-progress-empty">找不到符合條件的卡片，請調整卡號或篩選條件。</p>}
-        {visibleCardProgress.map(card => {
+        {displayedCardProgress.map(card => {
           const state = card.isResolved ? 'resolved' : card.locationCode ? 'placed' : 'unplaced';
           const stateLabel = card.isResolved ? '已完成' : card.locationCode ? '已放置於 ' + card.locationCode : '未放置';
           const locateCard = () => {
             if (!card.locationCode) return;
+            setProgressReturnCardCode(card.cardCode);
             setReturnToProgress(true);
-            if (card.locationType === 'MAP') {
-              openMapEditor(card.locationCode);
-              document.getElementById('core-map-grid')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+            const navigateToCard = () => {
+              if (card.locationType === 'MAP') {
+                openMapEditor(card.locationCode!);
+                document.getElementById('core-map-grid')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+              } else {
+                setSelectedLocationCode(card.locationCode!);
+                document.getElementById('location-cards-title')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+              }
+            };
+            if (isMobileProgress) {
+              setProgressDrawerOpen(false);
+              window.setTimeout(navigateToCard, 0);
             } else {
-              setSelectedLocationCode(card.locationCode);
-              document.getElementById('location-cards-title')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+              navigateToCard();
             }
           };
           const changeStatus = () => {
@@ -694,7 +799,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
             if (!card.isResolved && !confirmResolutionWithTimeToken(card.cardCode, card.timeToken)) return;
             mutate('/api/campaign/map/card-progress/' + card.cardCode, 'PATCH', { isResolved: !card.isResolved }, 'card-progress');
           };
-          return <article className={'campaign-card-progress ' + state} key={card.cardCode}>
+          return <article className={'campaign-card-progress ' + state} data-card-code={card.cardCode} key={card.cardCode}>
             <button className="card-progress-code" disabled={Boolean(busy) || !card.locationCode} onClick={locateCard} title={card.locationCode ? '前往 ' + card.locationCode : '尚未放置'} type="button">
               <strong>{card.cardCode}</strong>
               {card.timeToken && <span className="card-progress-token" aria-label={'Token ' + card.timeToken.tokenCode}>{card.timeToken.tokenCode}</span>}
@@ -704,6 +809,12 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           </article>;
         })}
       </div>
+      {isMobileProgress && !progressQuery.trim() && visibleCardProgress.length > progressPageSize && <nav className="card-progress-pagination" aria-label="卡片清單分頁">
+        <button type="button" disabled={progressPage === 0} onClick={() => setProgressPage(page => Math.max(0, page - 1))}>上一組</button>
+        <span>{progressPage + 1} / {progressPageCount}</span>
+        <button type="button" disabled={progressPage >= progressPageCount - 1} onClick={() => setProgressPage(page => Math.min(progressPageCount - 1, page + 1))}>下一組</button>
+      </nav>}
+      </>}
     </section>
 
     <section className="event-notes-section" aria-labelledby="event-notes-title">

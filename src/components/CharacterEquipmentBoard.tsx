@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, LockKeyhole, MoreHorizontal, Move, PackageOpen, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
+import { ArrowDown, ArrowUp, Loader2, LockKeyhole, MoreHorizontal, Move, PackageOpen, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
 import { HAND_EQUIPMENT_VISUAL } from '../../shared/equipmentBoardTemplates';
 import type { ApiErrorResponse, CampaignWagonResponse } from '../../shared/types';
 
@@ -64,6 +64,23 @@ type AttachmentCandidateResponse = {
 type AttachmentTarget = { equipment: Equipment; socket: EquipmentSocket };
 type LoadoutResponse = { data: Loadout };
 
+const EQUIPMENT_BOARD_IMAGE_URL = '/images/campaign/characters/equipment-board-gridless-v3.png';
+const EQUIPMENT_COVER_IMAGE_URLS = [
+  '/images/campaign/characters/slot-cover-blocked-x-v1.png',
+  '/images/campaign/characters/slot-cover-10xp-v1.png',
+] as const;
+
+async function preloadEquipmentImage(url: string) {
+  const image = new Image();
+  const loaded = new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error('圖片載入失敗：' + url));
+  });
+  image.src = url;
+  if (!image.complete || image.naturalWidth === 0) await loaded;
+  if (typeof image.decode === 'function') await image.decode();
+}
+
 class EquipmentApiError extends Error {
   constructor(
     message: string,
@@ -97,6 +114,8 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
   const [loadout, setLoadout] = useState<Loadout | null>(null);
   const [wagonVersion, setWagonVersion] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [visualStatus, setVisualStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [visualRetry, setVisualRetry] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
@@ -144,6 +163,29 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
   }, [onVersionChange, playerNumber]);
 
   useEffect(() => { void refresh(); }, [refresh]);
+
+  const equipmentVisualUrls = useMemo(() => {
+    if (!loadout?.templateVerified) return [];
+    return [...new Set([
+      EQUIPMENT_BOARD_IMAGE_URL,
+      ...EQUIPMENT_COVER_IMAGE_URLS,
+      ...loadout.equipment.flatMap(item => [
+        item.imageUrl,
+        ...item.attachments.map(attachment => attachment.imageUrl),
+      ]),
+      ...loadout.retainedAttachments.map(item => item.imageUrl),
+    ].filter(Boolean))];
+  }, [loadout]);
+
+  useEffect(() => {
+    if (!equipmentVisualUrls.length) return;
+    let cancelled = false;
+    setVisualStatus('loading');
+    void Promise.all(equipmentVisualUrls.map(preloadEquipmentImage))
+      .then(() => { if (!cancelled) setVisualStatus('ready'); })
+      .catch(() => { if (!cancelled) setVisualStatus('error'); });
+    return () => { cancelled = true; };
+  }, [equipmentVisualUrls, visualRetry]);
 
   useEffect(() => {
     if (previousHeroSlug.current === heroSlug) return;
@@ -783,7 +825,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     );
   }, [attachmentCatalogCandidates, attachmentQuery]);
 
-  if (loading) return <section className="equipment-board-section"><p>正在載入裝備面板…</p></section>;
+  if (loading) return <section className="equipment-board-section"><div className="equipment-board-loading" role="status" aria-live="polite" aria-busy="true"><Loader2 className="spinning-icon" /><strong>載入裝備資料中…</strong></div></section>;
   if (!loadout) return <section className="equipment-board-section"><p className="character-notice">{message || '無法載入裝備面板。'}</p></section>;
   if (!loadout.templateVerified) return <section className="equipment-board-section"><p className="character-notice">這位英雄的裝備格配置尚未完成</p></section>;
 
@@ -828,8 +870,10 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         <button className="button" type="button" disabled={!moveStartSlot || busy} onClick={() => void confirmMove()}>確認位置</button>
       </div>
     </div>}
-    <div className="equipment-board-canvas">
-      <img src="/images/campaign/characters/equipment-board-gridless-v3.png" alt="角色裝備面板" />
+    <div className={'equipment-board-canvas' + (visualStatus === 'ready' ? ' equipment-board-ready' : '')} aria-busy={visualStatus === 'loading'}>
+      {visualStatus === 'loading' && <div className="equipment-board-visual-state" role="status" aria-live="polite"><Loader2 className="spinning-icon" /><strong>載入裝備面板圖片中…</strong><small>正在準備底板、蓋板與裝備卡</small></div>}
+      {visualStatus === 'error' && <div className="equipment-board-visual-state error" role="alert"><strong>裝備面板圖片載入失敗</strong><small>請檢查網路後重新嘗試</small><button className="button secondary" type="button" onClick={() => setVisualRetry(value => value + 1)}><RotateCcw />重試</button></div>}
+      <img src={EQUIPMENT_BOARD_IMAGE_URL} alt="角色裝備面板" />
       {loadout.slots.map(slot => {
         if (slot.status === 'OCCUPIED') return null;
         return <button
