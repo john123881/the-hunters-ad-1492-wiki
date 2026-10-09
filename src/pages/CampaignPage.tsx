@@ -1,9 +1,23 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Clock3, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
+import { Clock3, Loader2, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
+
+const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v2.png';
+const WAGON_VISUAL_URLS = [WAGON_BOARD_IMAGE_URL] as const;
+
+async function preloadImage(url: string) {
+  const image = new Image();
+  const loaded = new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error('圖片載入失敗：' + url));
+  });
+  image.src = url;
+  if (!image.complete || image.naturalWidth === 0) await loaded;
+  if (typeof image.decode === 'function') await image.decode();
+}
 
 const DAY_ROWS = [Array.from({ length: 10 }, (_, index) => index + 1), Array.from({ length: 10 }, (_, index) => index + 11), Array.from({ length: 10 }, (_, index) => index + 21)];
 const WORKSHOP_GEOMETRY: Record<string, { centers: [number, number][] }> = {
@@ -42,6 +56,9 @@ export function CampaignPage({ session, loading, onLogout }: {
 }) {
   const [wagon, setWagon] = useState<CampaignWagon | null>(null);
   const [wagonLoading, setWagonLoading] = useState(false);
+  const [wagonVisualStatus, setWagonVisualStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [wagonImagesLoaded, setWagonImagesLoaded] = useState(0);
+  const [wagonVisualAttempt, setWagonVisualAttempt] = useState(0);
   const [failure, setFailure] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
   const [pendingDay, setPendingDay] = useState<number | null>(null);
@@ -61,6 +78,20 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [retryingConflict,setRetryingConflict]=useState(false);
 
   useEffect(() => { document.title = '馬車面板｜THE HUNTERS A.D. 1492 WIKI'; }, []);
+
+  useEffect(() => {
+    let active = true;
+    setWagonVisualStatus('loading');
+    setWagonImagesLoaded(0);
+    Promise.all(WAGON_VISUAL_URLS.map(async url => {
+      await preloadImage(url);
+      if (active) setWagonImagesLoaded(count => count + 1);
+    }))
+      .then(() => { if (active) setWagonVisualStatus('ready'); })
+      .catch(() => { if (active) setWagonVisualStatus('error'); });
+    return () => { active = false; };
+  }, [wagonVisualAttempt]);
+
 
   async function loadWagon() {
     if (!session) return;
@@ -271,8 +302,17 @@ export function CampaignPage({ session, loading, onLogout }: {
       </header>
 
       <div className="wagon-canvas">
-        <svg className="wagon-board-svg" viewBox="0 0 1536 1024" role="group" aria-label="馬車面板：五種工坊升級軌與三列交錯時間軌">
-          <image href="/images/campaign/wagon-board-concept-v2.png" x="0" y="0" width="1536" height="1024" />
+        {wagonVisualStatus === 'loading' && <div className="wagon-visual-state" role="status" aria-live="polite" aria-busy="true">
+          <Loader2 className="spinning-icon" aria-hidden="true" />
+          <strong>正在載入馬車面板…</strong>
+          <small>{wagonImagesLoaded} / {WAGON_VISUAL_URLS.length}</small>
+        </div>}
+        {wagonVisualStatus === 'error' && <div className="wagon-visual-state error" role="alert">
+          <strong>馬車面板圖片載入失敗</strong>
+          <button className="button secondary" type="button" onClick={() => setWagonVisualAttempt(value => value + 1)}>重新載入</button>
+        </div>}
+        {wagonVisualStatus === 'ready' && <svg className="wagon-board-svg wagon-board-svg-ready" viewBox="0 0 1536 1024" role="group" aria-label="馬車面板：五種工坊升級軌與三列交錯時間軌">
+          <image href={WAGON_BOARD_IMAGE_URL} x="0" y="0" width="1536" height="1024" />
 
           {/* 五種工坊等級：純狀態顯示，不接受點擊，累加點亮 */}
           <g className="svg-workshop-slots" aria-label="五種工坊當前等級（純顯示）" pointerEvents="none">
@@ -361,7 +401,7 @@ export function CampaignPage({ session, loading, onLogout }: {
             />
             {hasPlusThirty && <text className="svg-hourglass-icon" x="203" y="865">⏳</text>}
           </g>
-        </svg>
+        </svg>}
       </div>
       {/* 總覽下方：分區放大互動切換（工坊控制 / 時間軌專注區） */}
       <nav className="wagon-focus-nav" aria-label="分區放大檢視切換">
