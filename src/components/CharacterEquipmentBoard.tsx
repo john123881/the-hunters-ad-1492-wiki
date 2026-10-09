@@ -64,10 +64,12 @@ type AttachmentCandidateResponse = {
 type AttachmentTarget = { equipment: Equipment; socket: EquipmentSocket };
 type LoadoutResponse = { data: Loadout };
 
-const EQUIPMENT_BOARD_IMAGE_URL = '/images/campaign/characters/equipment-board-gridless-v3.png';
+const EQUIPMENT_BOARD_IMAGE_URL = '/images/campaign/characters/equipment-board-gridless-v4.webp';
+const EQUIPMENT_BLOCKED_COVER_IMAGE_URL = '/images/campaign/characters/slot-cover-blocked-x-v2.webp';
+const EQUIPMENT_10_XP_COVER_IMAGE_URL = '/images/campaign/characters/slot-cover-10xp-v2.webp';
 const EQUIPMENT_COVER_IMAGE_URLS = [
-  '/images/campaign/characters/slot-cover-blocked-x-v1.png',
-  '/images/campaign/characters/slot-cover-10xp-v1.png',
+  EQUIPMENT_BLOCKED_COVER_IMAGE_URL,
+  EQUIPMENT_10_XP_COVER_IMAGE_URL,
 ] as const;
 
 async function preloadEquipmentImage(url: string) {
@@ -888,8 +890,8 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
           onClick={() => void chooseSlot(slot)}
           aria-label={slot.slotKey + '，' + slot.status}
         >
-          {slot.status === 'BLOCKED' && <img className="equipment-slot-cover" src="/images/campaign/characters/slot-cover-blocked-x-v1.png" alt="永久 X 蓋板" />}
-          {slot.status === 'LOCKED_10' && <img className="equipment-slot-cover" src="/images/campaign/characters/slot-cover-10xp-v1.png" alt="10 XP 蓋板" />}
+          {slot.status === 'BLOCKED' && <img className="equipment-slot-cover" src={EQUIPMENT_BLOCKED_COVER_IMAGE_URL} alt="永久 X 蓋板" />}
+          {slot.status === 'LOCKED_10' && <img className="equipment-slot-cover" src={EQUIPMENT_10_XP_COVER_IMAGE_URL} alt="10 XP 蓋板" />}
           {slot.status === 'OPEN' && <span className="equipment-slot-add">＋</span>}
         </button>;
       })}
