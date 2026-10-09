@@ -15,6 +15,7 @@ const actionLabels:Record<string,string>={
   CREATE_TIME_TOKEN:'放置時間指示物',REMOVE_TIME_TOKEN:'移除時間指示物',
   UPDATE_TILE:'更新地圖卡',UPDATE_POSITION:'更新獵人位置',UPSERT_CARD:'放置或更新卡片',
   REMOVE_CARD:'移除卡片',UPDATE_LOCATION:'更新地點卡',UPDATE_EVENT_NOTES:'更新事件紀錄',
+  BATCH_UPDATE_MAP_TILES:'批次更新地圖卡',BATCH_UPDATE_LOCATION_CARDS:'批次更新地點卡',
   UPDATE_CARD_PROGRESS:'更新卡片進度',CREATE_CHARACTER:'建立角色',UPDATE_CHARACTER:'更新角色',
 };
 

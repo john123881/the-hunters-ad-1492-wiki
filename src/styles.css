@@ -1266,6 +1266,66 @@ svg { flex-shrink: 0; }
  .location-editor-fields { border-right: 0; border-bottom: 1px solid rgba(151,177,180,.25); }
 }
 
+
+.map-batch-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+  padding: .75rem 1rem;
+  border: 1px solid rgba(151,177,180,.3);
+  border-bottom: 0;
+  background: rgba(10,20,23,.92);
+}
+.map-batch-toolbar strong {
+  margin-right: auto;
+  color: var(--ivory);
+  font-size: .78rem;
+  letter-spacing: .06em;
+}
+.map-batch-toolbar > button:not(.button) {
+  min-height: 36px;
+  padding: .5rem .75rem;
+  border: 1px solid rgba(201,174,114,.58);
+  color: #e8d29a;
+  background: #111d20;
+  cursor: pointer;
+}
+.map-batch-toolbar > button:not(.button):hover,
+.map-batch-toolbar > button:not(.button):focus-visible {
+  border-color: var(--gold);
+  background: rgba(201,174,114,.14);
+}
+.map-batch-toolbar button:disabled { opacity: .4; cursor: default; }
+.location-batch-toolbar { border-inline: 0; }
+.map-card-placeholder.is-batch-selected,
+.location-card-button.is-batch-selected {
+  z-index: 2;
+  box-shadow: inset 0 0 0 4px #f1ca68, inset 0 0 28px rgba(226,182,72,.3);
+}
+.map-card-placeholder.is-batch-selected::after,
+.location-card-button.is-batch-selected::after {
+  content: "✓";
+  position: absolute;
+  z-index: 7;
+  top: .55rem;
+  left: .55rem;
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  color: #101719;
+  background: #f1ca68;
+  font-weight: 800;
+  box-shadow: 0 2px 10px #0009;
+}
+@media (max-width: 620px) {
+  .map-batch-toolbar { position: sticky; left: 0; align-items: stretch; }
+  .map-batch-toolbar strong { flex-basis: 100%; margin: 0; }
+  .map-batch-toolbar > button { flex: 1 1 auto; }
+}
+
 /* Physical map layout: four cards across, five rows. */
 .map-workspace { grid-template-columns: minmax(0, 1fr); }
 .core-map-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; }

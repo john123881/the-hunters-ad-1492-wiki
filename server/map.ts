@@ -416,6 +416,94 @@ export async function updateMapTile(c: Ctx) {
   return c.json({ data: await loadMap(c.env.DB, session) });
 }
 
+
+async function batchUpdateRevealState(c: Ctx, target: 'MAP' | 'LOCATION') {
+  const session = await requireCampaignSession(c);
+  if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');
+  const parsedInput = await body(c);
+  if (!parsedInput.success) return parsedInput.response;
+  const input = parsedInput.data;
+  const expectedVersion = Number(input?.expectedVersion);
+  const maxCodes = target === 'MAP' ? 20 : 14;
+  const validCode = target === 'MAP' ? validMapCode : validLocationCode;
+  const targetLabel = target === 'MAP' ? '地圖卡' : '地點卡';
+  const requestedUpdates = Array.isArray(input?.updates)
+    ? input.updates.map((entry: unknown) => {
+      const value = entry as { code?: unknown; isRevealed?: unknown };
+      return { code: String(value?.code ?? '').trim().toUpperCase(), isRevealed: value?.isRevealed };
+    })
+    : null;
+  const updates = requestedUpdates ?? (
+    Array.isArray(input?.codes) && typeof input?.isRevealed === 'boolean'
+      ? [...new Set(input.codes.map((value: unknown) => String(value).trim().toUpperCase()))]
+        .map(code => ({ code, isRevealed: input.isRevealed as boolean }))
+      : []
+  );
+  const codes = updates.map(update => update.code);
+
+  if (
+    updates.length === 0
+    || updates.length > maxCodes
+    || new Set(codes).size !== codes.length
+    || updates.some(update => !validCode(update.code) || typeof update.isRevealed !== 'boolean')
+  ) {
+    return error(c, 400, 'INVALID_BATCH_CODES', '請選擇有效的' + targetLabel + '與翻牌狀態。');
+  }
+
+  await ensureMap(c.env.DB, session.campaignId);
+  const db = getDb(c.env.DB);
+
+  if (target === 'MAP') {
+    const before = await db
+      .select({ code: campaignMapTiles.mapCode, isRevealed: campaignMapTiles.isRevealed, face: campaignMapTiles.face })
+      .from(campaignMapTiles)
+      .where(and(eq(campaignMapTiles.campaignId, session.campaignId), sql`${campaignMapTiles.mapCode} IN (${sql.join(codes.map(code => sql`${code}`), sql`, `)})`));
+    if (before.length !== codes.length) return error(c, 404, 'MAP_TILE_NOT_FOUND', '部分地圖卡不存在，請重新載入。');
+
+    const statements = updates.map(update => {
+      const face = update.isRevealed ? 'FRONT' : 'BACK';
+      return db.run(sql`
+        UPDATE campaign_map_tiles
+        SET is_revealed = ${update.isRevealed ? 1 : 0}, face = ${face}, updated_at = datetime('now')
+        WHERE campaign_id = ${session.campaignId} AND map_code = ${update.code}
+          AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ${session.campaignId} AND version = ${expectedVersion})
+      `);
+    });
+    statements.push(guardedMapLog(db, session, expectedVersion, 'BATCH_UPDATE_MAP_TILES', 'MAP_TILE_BATCH', codes.join(','), before, { updates }));
+    const updated = await runMapBatch(c, session, expectedVersion, statements);
+    if (!updated) return mapConflict(c, session, expectedVersion);
+  } else {
+    const before = await db
+      .select({ code: campaignLocationCards.locationCode, isRevealed: campaignLocationCards.isRevealed, face: campaignLocationCards.face })
+      .from(campaignLocationCards)
+      .where(and(eq(campaignLocationCards.campaignId, session.campaignId), sql`${campaignLocationCards.locationCode} IN (${sql.join(codes.map(code => sql`${code}`), sql`, `)})`));
+    if (before.length !== codes.length) return error(c, 404, 'LOCATION_CARD_NOT_FOUND', '部分地點卡不存在，請重新載入。');
+
+    const statements = updates.map(update => {
+      const face = update.isRevealed ? 'FRONT' : 'BACK';
+      return db.run(sql`
+        UPDATE campaign_location_cards
+        SET is_revealed = ${update.isRevealed ? 1 : 0}, face = ${face}, updated_at = datetime('now')
+        WHERE campaign_id = ${session.campaignId} AND location_code = ${update.code}
+          AND EXISTS (SELECT 1 FROM campaign_maps WHERE campaign_id = ${session.campaignId} AND version = ${expectedVersion})
+      `);
+    });
+    statements.push(guardedMapLog(db, session, expectedVersion, 'BATCH_UPDATE_LOCATION_CARDS', 'LOCATION_CARD_BATCH', codes.join(','), before, { updates }));
+    const updated = await runMapBatch(c, session, expectedVersion, statements);
+    if (!updated) return mapConflict(c, session, expectedVersion);
+  }
+
+  return c.json({ data: await loadMap(c.env.DB, session) });
+}
+
+export function batchUpdateMapTiles(c: Ctx) {
+  return batchUpdateRevealState(c, 'MAP');
+}
+
+export function batchUpdateLocationCards(c: Ctx) {
+  return batchUpdateRevealState(c, 'LOCATION');
+}
+
 export async function updateMapPosition(c: Ctx) {
   const session = await requireCampaignSession(c);
   if (!session.isActive) return error(c, 409, 'CAMPAIGN_INACTIVE', '此戰役目前已凍結。');

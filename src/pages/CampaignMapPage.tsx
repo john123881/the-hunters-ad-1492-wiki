@@ -62,6 +62,10 @@ function preloadMapImage(url: string) {
 export function CampaignMapPage({ session, loading }: { session: AuthSession | null; loading: boolean }) {
   const [map, setMap] = useState<CampaignMap | null>(null);
   const [selectedCode, setSelectedCode] = useState('M01');
+  const [mapBatchMode, setMapBatchMode] = useState(false);
+  const [selectedMapCodes, setSelectedMapCodes] = useState<string[]>([]);
+  const [locationBatchMode, setLocationBatchMode] = useState(false);
+  const [selectedLocationCodes, setSelectedLocationCodes] = useState<string[]>([]);
   const [draft, setDraft] = useState<CampaignMapTile | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedLocationCode, setSelectedLocationCode] = useState('L01');
@@ -176,6 +180,52 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     if (mapDraftDirty && draft?.mapCode !== mapCode && !window.confirm('目前地圖卡有尚未儲存的修改，確定要放棄並切換嗎？')) return;
     setSelectedCode(mapCode);
     setEditorOpen(true);
+  }
+
+  function startMapBatchSelection() {
+    if (mapDraftDirty && !window.confirm('這張地圖卡有尚未儲存的修改，確定要放棄並開始批次選取嗎？')) return;
+    setEditorOpen(false);
+    setMapBatchMode(true);
+    setSelectedMapCodes([]);
+  }
+
+  function toggleBatchCode(code: string, kind: 'MAP' | 'LOCATION') {
+    const setter = kind === 'MAP' ? setSelectedMapCodes : setSelectedLocationCodes;
+    setter(current => current.includes(code) ? current.filter(item => item !== code) : [...current, code]);
+  }
+
+  async function applyBatchFlip(kind: 'MAP' | 'LOCATION') {
+    const codes = kind === 'MAP' ? selectedMapCodes : selectedLocationCodes;
+    if (!codes.length || busy || !map) return;
+    const records = kind === 'MAP' ? map.tiles : map.locations;
+    const updates = codes.map(code => {
+      const record = records.find(item => (kind === 'MAP' ? 'mapCode' in item && item.mapCode === code : 'locationCode' in item && item.locationCode === code));
+      return { code, isRevealed: !record?.isRevealed };
+    });
+    if (kind === 'MAP') {
+      try {
+        await Promise.all(updates.filter(update => update.isRevealed).map(update => preloadMapImage(mapImageUrl(update.code, true))));
+      } catch {
+        setMessageKind('error');
+        setMessage('部分地圖圖片載入失敗，請檢查網路後重試。');
+        return;
+      }
+    }
+    const succeeded = await mutate(
+      kind === 'MAP' ? '/api/campaign/map/tiles/batch' : '/api/campaign/map/locations/batch',
+      'PATCH',
+      { updates },
+      kind === 'MAP' ? 'map-batch' : 'location-batch',
+    );
+    if (!succeeded) return;
+    setMessage(kind === 'MAP' ? `已翻轉並儲存 ${codes.length} 張地圖卡。` : `已翻轉並儲存 ${codes.length} 張地點卡。`);
+    if (kind === 'MAP') {
+      setSelectedMapCodes([]);
+      setMapBatchMode(false);
+    } else {
+      setSelectedLocationCodes([]);
+      setLocationBatchMode(false);
+    }
   }
 
   function returnToCardProgress() {
@@ -454,15 +504,26 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     {message && <div className={'toast map-toast ' + messageKind} role={messageKind === 'error' ? 'alert' : 'status'}><span>{message}</span><div className="map-toast-actions">{failedMutation && <button onClick={() => void mutate(failedMutation.path, failedMutation.method, failedMutation.payload, failedMutation.action)} type="button">重新嘗試</button>}{reauthRequired && <button onClick={() => window.location.assign('/login')} type="button">重新登入</button>}<button aria-label="關閉通知" onClick={() => setMessage('')} type="button"><X aria-hidden="true" /></button></div></div>}
 
     <div className="map-workspace">
+      <div className="map-batch-toolbar" aria-label="地圖卡批次操作">
+        {!mapBatchMode
+          ? <button className="button secondary" disabled={Boolean(busy)} onClick={startMapBatchSelection} type="button">批次選取地圖卡</button>
+          : <>
+            <strong>已選擇 {selectedMapCodes.length} 張地圖卡</strong>
+            <button type="button" disabled={Boolean(busy)} onClick={() => setSelectedMapCodes(map.tiles.map(tile => tile.mapCode))}>全選</button>
+            <button type="button" disabled={Boolean(busy) || !selectedMapCodes.length} onClick={() => setSelectedMapCodes([])}>清除</button>
+            <button type="button" disabled={Boolean(busy) || !selectedMapCodes.length} onClick={() => void applyBatchFlip('MAP')}>{busy === 'map-batch' ? '儲存中…' : '翻轉並儲存'}</button>
+            <button type="button" disabled={Boolean(busy)} onClick={() => { setMapBatchMode(false); setSelectedMapCodes([]); }}>取消</button>
+          </>}
+      </div>
       <div className="core-map-grid" id="core-map-grid" aria-label="核心地圖 M01 到 M20">
         {map.tiles.map(tile => {
           const cards = map.cards.filter(card => card.locationType === 'MAP' && card.locationCode === tile.mapCode);
           const occupied = map.currentMapCode === tile.mapCode;
           const displayRevealed = editorOpen && draft?.mapCode === tile.mapCode ? draft.isRevealed : tile.isRevealed;
           return <button
-            className={'map-card-placeholder' + (displayRevealed ? ' is-revealed' : '') + (selectedCode === tile.mapCode ? ' is-selected' : '') + (flippingCode === tile.mapCode ? ' is-flipping' : '')}
-            key={tile.mapCode} onClick={() => { if (flippingCode || loadingFlipCode) return; openMapEditor(tile.mapCode); }} type="button"
-            aria-pressed={selectedCode === tile.mapCode}
+            className={'map-card-placeholder' + (displayRevealed ? ' is-revealed' : '') + (!mapBatchMode && selectedCode === tile.mapCode ? ' is-selected' : '') + (selectedMapCodes.includes(tile.mapCode) ? ' is-batch-selected' : '') + (flippingCode === tile.mapCode ? ' is-flipping' : '')}
+            key={tile.mapCode} onClick={() => { if (flippingCode || loadingFlipCode) return; if (mapBatchMode) toggleBatchCode(tile.mapCode, 'MAP'); else openMapEditor(tile.mapCode); }} type="button"
+            aria-pressed={mapBatchMode ? selectedMapCodes.includes(tile.mapCode) : selectedCode === tile.mapCode}
           >
             <img
               alt={tile.mapCode + (displayRevealed ? ' 正面' : ' 背面')}
@@ -542,11 +603,28 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         <div><p className="eyebrow">LOCATION CARDS</p><h2 id="location-cards-title">地點卡</h2><p>核心 L01～L11 · 擴充 L12～L14</p></div>
         <span>{map.locations.length} 張</span>
       </header>
+      <div className="map-batch-toolbar location-batch-toolbar" aria-label="地點卡批次操作">
+        {!locationBatchMode
+          ? <button className="button secondary" disabled={Boolean(busy)} onClick={() => { setLocationBatchMode(true); setSelectedLocationCodes([]); }} type="button">批次選取地點卡</button>
+          : <>
+            <strong>已選擇 {selectedLocationCodes.length} 張地點卡</strong>
+            <button type="button" disabled={Boolean(busy)} onClick={() => setSelectedLocationCodes(map.locations.map(location => location.locationCode))}>全選</button>
+            <button type="button" disabled={Boolean(busy) || !selectedLocationCodes.length} onClick={() => setSelectedLocationCodes([])}>清除</button>
+            <button type="button" disabled={Boolean(busy) || !selectedLocationCodes.length} onClick={() => void applyBatchFlip('LOCATION')}>{busy === 'location-batch' ? '儲存中…' : '翻轉並儲存'}</button>
+            <button type="button" disabled={Boolean(busy)} onClick={() => { setLocationBatchMode(false); setSelectedLocationCodes([]); }}>取消</button>
+          </>}
+      </div>
       <div className="location-card-grid">
         {map.locations.map(location => {
           const occupied = map.currentLocationType === 'LOCATION' && map.currentLocationCode === location.locationCode;
           const count = map.cards.filter(card => card.locationType === 'LOCATION' && card.locationCode === location.locationCode).length;
-          return <button className={'location-card-button' + (selectedLocationCode === location.locationCode ? ' is-selected' : '') + (location.isRevealed ? ' is-revealed' : '')} key={location.locationCode} onClick={() => setSelectedLocationCode(location.locationCode)} type="button">
+          return <button
+            className={'location-card-button' + (!locationBatchMode && selectedLocationCode === location.locationCode ? ' is-selected' : '') + (selectedLocationCodes.includes(location.locationCode) ? ' is-batch-selected' : '') + (location.isRevealed ? ' is-revealed' : '')}
+            key={location.locationCode}
+            onClick={() => locationBatchMode ? toggleBatchCode(location.locationCode, 'LOCATION') : setSelectedLocationCode(location.locationCode)}
+            type="button"
+            aria-pressed={locationBatchMode ? selectedLocationCodes.includes(location.locationCode) : selectedLocationCode === location.locationCode}
+          >
             <strong>{location.locationCode}</strong><small>{location.isRevealed ? (location.face === 'FRONT' ? '正面' : '背面') : '尚未揭示'}</small>
             {occupied && <MapPin aria-hidden="true" />}
             {count > 0 && <span>{count}</span>}
@@ -554,7 +632,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         })}
       </div>
 
-      {locationDraft && <div className="location-editor">
+      {locationDraft && !locationBatchMode && <div className="location-editor">
         <div className="location-editor-fields">
           <div className="map-editor-actions">
             <button className={'reveal-toggle ' + (locationDraft.isRevealed ? 'is-revealed' : '')} disabled={Boolean(busy)} onClick={() => void flipLocationCard()} type="button"><Check aria-hidden="true" />{busy === 'location-flip' ? '翻轉儲存中…' : '翻轉並儲存'}<small>{locationDraft.isRevealed ? '目前：正面' : '目前：覆蓋面'}</small></button>
