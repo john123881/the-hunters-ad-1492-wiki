@@ -46,6 +46,7 @@ export function App() {
           <span className="brand-type">THE HUNTERS<small>A.D. 1492 WIKI</small></span>
         </Link>
         <nav className="main-nav" aria-label="主要導覽">
+          <NavLink to="/about">關於本站</NavLink>
           <NavLink to="/items">物品圖鑑</NavLink>
           <NavLink to="/campaigns">戰役紀錄</NavLink>
         </nav>
@@ -101,9 +102,9 @@ export function App() {
     </main>
     <footer className="site-footer">
       <div className="footer-inner">
-        <div className="footer-brand"><span>THE HUNTERS <small>A.D. 1492 WIKI</small></span></div>
+        <div className="footer-brand"><span>THE HUNTERS A.D. 1492 <small>WIKI</small></span></div>
         <p>UNOFFICIAL COMMUNITY ARCHIVE</p>
-        <Link to="/about">資料與版本說明 <ArrowUpRight size={13} /></Link>
+        <Link to="/about">關於本站 <ArrowUpRight size={13} /></Link>
       </div>
     </footer>
   </>;

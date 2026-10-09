@@ -2115,3 +2115,80 @@ svg { flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) {
   .equipment-slot, .placed-equipment { scroll-behavior: auto; transition: none; }
 }
+
+/* About：目前功能、資料原則與戰役入口。 */
+.about-page { max-width: 1120px; padding: 32px 0 76px; margin: auto; }
+.about-hero { position: relative; display: grid; grid-template-columns: 290px minmax(0,1fr); gap: 70px; align-items: center; min-height: 430px; margin-top: 14px; padding: 48px 58px; overflow: hidden; border: 1px solid #4a5756; background: radial-gradient(circle at 18% 50%,#33424880,transparent 34%),linear-gradient(120deg,#111d21,#0a1215 72%); }
+.about-hero::before { content: ''; position: absolute; inset: 16px; pointer-events: none; border: 1px solid #a9905a35; }
+.about-hero-mark { position: relative; display: grid; place-items: center; width: 250px; height: 250px; color: var(--gold); }
+.about-orbit { position: absolute; inset: 11px; border: 1px solid #b59a6155; border-radius: 50%; outline: 1px dashed #b59a6138; outline-offset: -22px; }
+.about-orbit::before,.about-orbit::after { content: ''; position: absolute; background: #b59a6138; }
+.about-orbit::before { width: 120%; height: 1px; left: -10%; top: 50%; }
+.about-orbit::after { height: 120%; width: 1px; top: -10%; left: 50%; }
+.about-page .about-emblem { position: relative; display: block; width: 88px; height: 112px; margin: 0; filter: drop-shadow(0 0 24px #d0af7245); }
+.about-hero-copy { position: relative; z-index: 1; }
+.about-hero-copy h1 { margin: 15px 0 20px; color: #ebdebd; font-size: clamp(38px,4.4vw,56px); letter-spacing: .08em; line-height: 1.35; }
+.about-page .about-intro { max-width: 650px; margin: 0 0 28px; color: #b8c3c0; font-family: var(--serif); font-size: 16px; line-height: 2.05; text-align: left; }
+.about-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 25px; }
+.about-text-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: #cbb687; font-size: 12px; letter-spacing: .08em; }
+.about-text-link:hover { color: #f0d798; }
+.about-page .about-section { margin-top: 66px; padding: 0; border: 0; }
+.about-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 40px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.about-section-heading .eyebrow { margin-bottom: 8px; }
+.about-page .about-section-heading h2 { margin: 0; color: #dfcfad; font-size: 27px; letter-spacing: .08em; }
+.about-page .about-section-heading > p { max-width: 370px; margin: 0; color: #8fa0a1; font-size: 11px; text-align: right; line-height: 1.9; }
+.about-feature-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border: 1px solid #435153; border-top: 0; }
+.about-feature-card { min-width: 0; padding: 27px 24px 30px; border-right: 1px solid #435153; background: linear-gradient(155deg,#172429b8,#10191d99); }
+.about-feature-card:last-child { border-right: 0; }
+.about-feature-icon { display: grid; place-items: center; width: 43px; height: 43px; margin-bottom: 28px; border: 1px solid #8f7950; color: #ddbd77; background: #b08d4110; transform: rotate(45deg); }
+.about-feature-icon svg { width: 21px; transform: rotate(-45deg); }
+.about-page .about-feature-card > p { margin-bottom: 8px; color: #b49a66; font: 8px Georgia,serif; letter-spacing: .17em; line-height: 1.5; }
+.about-feature-card h3 { margin-bottom: 13px; color: #e3d5b7; font-size: 18px; letter-spacing: .04em; }
+.about-feature-card > span { display: block; color: #9eaeac; font-size: 11px; line-height: 1.9; }
+.about-principle-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 20px; }
+.about-principle-grid article { display: flex; gap: 17px; padding: 22px; border: 1px solid #39494c; background: #101a1e99; }
+.about-principle-grid article > svg { width: 21px; color: #c2a66e; }
+.about-principle-grid h3 { margin-bottom: 8px; color: #d5c5a4; font-size: 15px; }
+.about-page .about-principle-grid p { margin: 0; color: #95a5a5; font-size: 11px; line-height: 1.9; }
+.about-callout { display: flex; align-items: center; justify-content: space-between; gap: 35px; margin-top: 66px; padding: 31px 36px; border: 1px solid #806d47; background: linear-gradient(100deg,#3a302124,#111a1d); }
+.about-callout .eyebrow { margin-bottom: 7px; }
+.about-callout h2 { margin-bottom: 8px; color: #dfcfad; font-size: 23px; }
+.about-callout p:not(.eyebrow) { margin: 0; color: #96a6a5; font-size: 11px; }
+
+@media (max-width: 900px) {
+  .about-hero { grid-template-columns: 190px minmax(0,1fr); gap: 36px; padding: 42px 38px; }
+  .about-hero-mark { width: 180px; height: 180px; }
+  .about-feature-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .about-feature-card:nth-child(2) { border-right: 0; }
+  .about-feature-card:nth-child(-n+2) { border-bottom: 1px solid #435153; }
+  .about-principle-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .about-page { padding-top: 20px; padding-bottom: 48px; }
+  .about-hero { display: block; min-height: 0; padding: 42px 25px 37px; text-align: center; }
+  .about-hero-mark { width: 150px; height: 150px; margin: 0 auto 24px; }
+  .about-page .about-emblem { width: 58px; height: 76px; }
+  .about-hero-copy h1 { font-size: 34px; }
+  .about-page .about-intro { font-size: 13px; text-align: center; }
+  .about-actions { justify-content: center; }
+  .about-section { margin-top: 48px; }
+  .about-section-heading { display: block; }
+  .about-page .about-section-heading > p { margin-top: 12px; text-align: left; }
+  .about-feature-grid { grid-template-columns: 1fr; border-top: 1px solid #435153; }
+  .about-feature-card,.about-feature-card:nth-child(2) { border-right: 0; border-bottom: 1px solid #435153; }
+  .about-feature-card:last-child { border-bottom: 0; }
+  .about-callout { display: block; padding: 26px 23px; }
+  .about-callout .button { width: 100%; margin-top: 22px; }
+}
+
+/* 首頁桌面主視覺依原圖比例展開，避免矮視窗用 cover 裁掉人物頭部。 */
+@media (min-width: 761px) {
+  .home-hero {
+    min-height: 0;
+    aspect-ratio: 1200 / 865;
+  }
+  .home-hero .hero-keyart {
+    object-fit: contain;
+    object-position: center;
+  }
+}
