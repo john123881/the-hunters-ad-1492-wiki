@@ -6,7 +6,7 @@ import { EventRecordsSection } from '../components/EventRecordsSection';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
-const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v2.png';
+const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v3.webp';
 const WAGON_VISUAL_URLS = [WAGON_BOARD_IMAGE_URL] as const;
 
 async function preloadImage(url: string) {
@@ -114,20 +114,21 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [roadEventNotes, setRoadEventNotes] = useState('');
   const [townEventNotes, setTownEventNotes] = useState('');
   const [mapVersion, setMapVersion] = useState<number | undefined>(undefined);
+  const [mapNotesStatus, setMapNotesStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   async function loadMapEventNotes() {
     if (!session) return;
+    setMapNotesStatus('loading');
     try {
       const response = await fetch('/api/campaign/map', { credentials: 'same-origin' });
-      if (!response.ok) return;
+      if (!response.ok) throw new Error(await readError(response));
       const result = await response.json() as CampaignMapResponse;
-      if (result?.data) {
-        setRoadEventNotes(result.data.roadEventNotes ?? '');
-        setTownEventNotes(result.data.townEventNotes ?? '');
-        setMapVersion(result.data.version);
-      }
+      setRoadEventNotes(result.data.roadEventNotes ?? '');
+      setTownEventNotes(result.data.townEventNotes ?? '');
+      setMapVersion(result.data.version);
+      setMapNotesStatus('ready');
     } catch {
-      // Map notes loading failure shouldn't break the wagon page
+      setMapNotesStatus('error');
     }
   }
 
@@ -509,7 +510,7 @@ export function CampaignPage({ session, loading, onLogout }: {
         <header><div><p className="eyebrow">FIVE WORKSHOPS</p><h2><Wrench size={20} />五種工坊</h2></div><small>直接點選等級（0–3 級）</small></header>
         <div className="workshop-list">
           {wagon.upgrades.map(upgrade => <div className="workshop-row" key={upgrade.code}>
-            <div>{upgrade.imageUrl && <img src={upgrade.imageUrl.replace(/\.webp$/, '.png')} alt="" />}<span><strong>{upgrade.name}</strong><small>{upgrade.originalName}</small></span></div>
+            <div>{upgrade.imageUrl && <img src={upgrade.imageUrl} alt="" loading="lazy" decoding="async" />}<span><strong>{upgrade.name}</strong><small>{upgrade.originalName}</small></span></div>
             <div className="level-selector" aria-label={`${upgrade.name}等級`}>
               {[0, 1, 2, 3].map(level => <button key={level} disabled={Boolean(savingUpgradeCode)} className={level === upgrade.level ? 'selected' : ''} onClick={() => void setUpgrade(upgrade.code, level)} aria-pressed={level === upgrade.level}>{level}</button>)}
             </div>
@@ -551,19 +552,30 @@ export function CampaignPage({ session, loading, onLogout }: {
       <ResourceInventory resources={wagon.resources} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
       <EquipmentInventory equipment={wagon.equipment} onChange={setWagon} onError={setFailure} onToast={setToast} />
       <WagonNotes notes={wagon.notes} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
-      <EventRecordsSection
-        initialRoadNotes={roadEventNotes}
-        initialTownNotes={townEventNotes}
-        expectedVersion={mapVersion}
-        onSaved={(newRoad, newTown) => {
-          setRoadEventNotes(newRoad);
-          setTownEventNotes(newTown);
-          setMapVersion(v => typeof v === 'number' ? v + 1 : v);
-        }}
-        onToast={setToast}
-        onError={setFailure}
-        variant="wagon"
-      />
+      {mapNotesStatus === 'ready' && typeof mapVersion === 'number'
+        ? <EventRecordsSection
+            initialRoadNotes={roadEventNotes}
+            initialTownNotes={townEventNotes}
+            expectedVersion={mapVersion}
+            onSaved={updatedMap => {
+              setRoadEventNotes(updatedMap.roadEventNotes);
+              setTownEventNotes(updatedMap.townEventNotes);
+              setMapVersion(updatedMap.version);
+            }}
+            onAdoptLatest={latestMap => {
+              setRoadEventNotes(latestMap.roadEventNotes);
+              setTownEventNotes(latestMap.townEventNotes);
+              setMapVersion(latestMap.version);
+            }}
+            onToast={setToast}
+            onError={setFailure}
+            variant="wagon"
+          />
+        : <section className="wagon-panel event-records-wagon-panel event-records-load-state" aria-live="polite">
+            {mapNotesStatus === 'loading'
+              ? <><Loader2 className="spin" aria-hidden="true" /><p>正在載入事件紀錄…</p></>
+              : <><p role="alert">目前無法載入事件紀錄，為避免覆寫其他玩家的資料，編輯功能暫時停用。</p><button className="button secondary" onClick={() => void loadMapEventNotes()} type="button">重新載入</button></>}
+          </section>}
     </section>
 
     {pendingDay !== null && <div className="confirm-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPendingDay(null); }}>
@@ -694,7 +706,7 @@ function ResourceInventory({ resources, version, onChange, onError, onToast, onC
     <header><div><p className="eyebrow">CRAFTING RESOURCES</p><h2><PackageOpen size={20} />素材庫存</h2></div><small>素材以數量保存</small></header>
     <div className="resource-grid">
       {resources.map(resource => <div className={resource.quantity > 0 ? 'resource-counter owned' : 'resource-counter'} key={resource.code}>
-        {resource.imageUrl ? <img src={resource.imageUrl} alt="" /> : <span className="resource-fallback" />}
+        {resource.imageUrl ? <img src={resource.imageUrl} alt="" loading="lazy" decoding="async" /> : <span className="resource-fallback" />}
         <span><strong>{resource.name}</strong><small>{resource.code.replace(/^(material|plant|trophy)_/, '')}</small></span>
         <div>
           <button aria-label={resource.name + '減少 5'} disabled={Boolean(busyCode) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 5)}>−5</button>
@@ -860,7 +872,7 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
     <div className="equipment-list">
       {equipment.length === 0 && <p className="muted">馬車目前沒有裝備。搜尋圖鑑後可逐件加入。</p>}
       {equipment.map(item => <article key={item.id}>
-        <div className="equipment-thumb">{item.imageUrl ? <img src={item.imageUrl} alt="" /> : <PackageOpen />}</div>
+        <div className="equipment-thumb">{item.imageUrl ? <img src={item.imageUrl} alt="" loading="lazy" decoding="async" /> : <PackageOpen />}</div>
         <div className="equipment-name"><small>{item.cardNumber ?? item.code} · 實體 #{item.id}</small><strong>{item.name}</strong><span>{item.categoryName}</span></div>
         {item.damageable
           ? <button className={'damage-toggle ' + (item.damageMarkers === 1 ? 'damaged' : '')} disabled={busyId === item.id} aria-pressed={item.damageMarkers === 1} onClick={() => void updateDamage(item, item.damageMarkers === 1 ? 0 : 1)}>

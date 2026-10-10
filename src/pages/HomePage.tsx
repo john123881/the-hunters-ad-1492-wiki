@@ -13,7 +13,7 @@ export function HomePage() {
       />
       <img
         className="hero-keyart"
-        src="/images/hero-keyart.png"
+        src="/images/hero-keyart.webp"
         alt="The Hunters A.D. 1492 主視覺"
         width="1200"
         height="865"

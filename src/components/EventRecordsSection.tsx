@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { Save } from 'lucide-react';
+import { VersionConflictPanel } from './VersionConflictPanel';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
-import type { ApiErrorResponse, CampaignMapResponse } from '../../shared/types';
+import type { ApiErrorResponse, CampaignMap, CampaignMapResponse } from '../../shared/types';
 
 interface EventRecordsSectionProps {
   initialRoadNotes: string;
   initialTownNotes: string;
   expectedVersion?: number;
-  onSaved?: (roadNotes: string, townNotes: string) => void;
+  onSaved?: (map: CampaignMap) => void;
+  onAdoptLatest?: (map: CampaignMap) => void;
   onToast?: (message: string) => void;
   onError?: (message: string) => void;
+  disabled?: boolean;
+  onSavingChange?: (saving: boolean) => void;
   variant?: 'map' | 'wagon';
 }
 
@@ -18,14 +22,18 @@ export function EventRecordsSection({
   initialTownNotes,
   expectedVersion,
   onSaved,
+  onAdoptLatest,
   onToast,
   onError,
+  disabled = false,
+  onSavingChange,
   variant = 'map',
 }: EventRecordsSectionProps) {
   const [roadNotes, setRoadNotes] = useState(initialRoadNotes);
   const [townNotes, setTownNotes] = useState(initialTownNotes);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [conflict, setConflict] = useState<{ latest: CampaignMap; expectedVersion: number | null } | null>(null);
   const savedTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -43,17 +51,19 @@ export function EventRecordsSection({
   const isDirty = roadNotes !== initialRoadNotes || townNotes !== initialTownNotes;
   useUnsavedChangesWarning(isDirty);
 
-  async function saveNotes() {
-    if (busy) return;
+  async function saveNotes(versionOverride?: number) {
+    if (busy || disabled) return;
     setBusy(true);
+    onSavingChange?.(true);
     setSaved(false);
     try {
       const payload: Record<string, unknown> = {
         roadEventNotes: roadNotes,
         townEventNotes: townNotes,
       };
-      if (typeof expectedVersion === 'number') {
-        payload.expectedVersion = expectedVersion;
+      const version = versionOverride ?? expectedVersion;
+      if (typeof version === 'number') {
+        payload.expectedVersion = version;
       }
       const response = await fetch('/api/campaign/map/event-notes', {
         method: 'PATCH',
@@ -65,11 +75,12 @@ export function EventRecordsSection({
       const result = await response.json().catch(() => null) as CampaignMapResponse | ApiErrorResponse | null;
       if (!response.ok || !result || !('data' in result)) {
         if (response.status === 409 && result && 'error' in result && result.error.code === 'MAP_VERSION_CONFLICT') {
-          const latestMap = result.error.conflict?.latest as { roadEventNotes?: string; townEventNotes?: string; version?: number } | undefined;
-          if (latestMap) {
-            onSaved?.(latestMap.roadEventNotes ?? '', latestMap.townEventNotes ?? '');
+          const details = result.error.conflict;
+          if (details?.scope === 'MAP') {
+            setConflict({ latest: details.latest as CampaignMap, expectedVersion: details.expectedVersion });
+          } else {
+            onError?.(result.error.message);
           }
-          onError?.('事件紀錄已被更新，已為您載入最新紀錄，請重新編輯後儲存。');
           return;
         }
         const errorMsg = (result as ApiErrorResponse | null)?.error?.message ?? '無法儲存事件紀錄，請稍後重試。';
@@ -78,15 +89,17 @@ export function EventRecordsSection({
       }
 
       setSaved(true);
+      setConflict(null);
       if (savedTimerRef.current !== null) window.clearTimeout(savedTimerRef.current);
       savedTimerRef.current = window.setTimeout(() => setSaved(false), 2000);
 
-      onSaved?.(result.data.roadEventNotes, result.data.townEventNotes);
+      onSaved?.(result.data);
       onToast?.('事件人工紀錄已儲存');
     } catch {
       onError?.('無法連線到伺服器，請檢查網路連線。');
     } finally {
       setBusy(false);
+      onSavingChange?.(false);
     }
   }
 
@@ -96,6 +109,20 @@ export function EventRecordsSection({
 
   return (
     <section className={containerClass} aria-labelledby="event-notes-title">
+      {conflict && <VersionConflictPanel
+        title="事件紀錄已被其他玩家更新"
+        changedFields={['道路事件卡或城鎮事件卡紀錄']}
+        expectedVersion={conflict.expectedVersion}
+        currentVersion={conflict.latest.version}
+        busy={busy}
+        onReload={() => {
+          setRoadNotes(conflict.latest.roadEventNotes);
+          setTownNotes(conflict.latest.townEventNotes);
+          onAdoptLatest?.(conflict.latest);
+          setConflict(null);
+        }}
+        onReapply={() => void saveNotes(conflict.latest.version)}
+      />}
       <header className="campaign-module-heading compact">
         <div>
           <p className="eyebrow">EVENT RECORDS</p>
@@ -110,6 +137,7 @@ export function EventRecordsSection({
           <textarea
             value={roadNotes}
             onChange={event => setRoadNotes(event.target.value)}
+            disabled={busy || disabled}
             rows={6}
             placeholder="每行記錄一張已觸發的道路事件卡"
           />
@@ -119,6 +147,7 @@ export function EventRecordsSection({
           <textarea
             value={townNotes}
             onChange={event => setTownNotes(event.target.value)}
+            disabled={busy || disabled}
             rows={6}
             placeholder="每行記錄一張已觸發的城鎮事件卡"
           />
@@ -127,7 +156,7 @@ export function EventRecordsSection({
       <div className="map-editor-primary-actions">
         <button
           className="button"
-          disabled={busy || !isDirty}
+          disabled={busy || disabled || !isDirty}
           onClick={() => void saveNotes()}
           type="button"
         >

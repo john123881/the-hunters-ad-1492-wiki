@@ -232,7 +232,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
             setBoardImageLoaded(false);
             setMessage('已選擇新角色，尚未儲存。');
           }}>
-            <img src={option.boardImageUrl} alt="" /><span><strong>{option.displayNameZhTw}</strong><small>{option.roleNameZhTw}{used ? ' · 已被選擇' : current ? ' · 目前角色' : ''}</small></span>
+            <img src={option.boardImageUrl} alt="" loading="lazy" decoding="async" /><span><strong>{option.displayNameZhTw}</strong><small>{option.roleNameZhTw}{used ? ' · 已被選擇' : current ? ' · 目前角色' : ''}</small></span>
           </button>;
         })}</div>
       </article>
@@ -248,6 +248,8 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
             }}
             src={hero.boardImageUrl}
             alt={hero.displayNameZhTw + '角色面板'}
+            decoding="async"
+            fetchPriority="high"
             onLoad={() => setBoardImageLoaded(true)}
             onError={() => setBoardImageLoaded(true)}
           />
@@ -331,7 +333,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
     {modal && hero && <div className="character-modal-backdrop" role="presentation" onMouseDown={event => event.target === event.currentTarget && setModal(null)}>
       <section className="character-modal" role="dialog" aria-modal="true" aria-labelledby="character-modal-title">
         <header><div><p className="eyebrow">{modal === 'story' ? 'CHARACTER STORY' : 'INITIAL LAYOUT'}</p><h2 id="character-modal-title">{hero.displayNameZhTw}</h2></div><button type="button" onClick={() => setModal(null)} aria-label="關閉">×</button></header>
-        {modal === 'story' ? <p className="character-story">{hero.storyZhTw}</p> : <img src={hero.initialLayoutImageUrl} alt={hero.displayNameZhTw + '初始面板配置'} />}
+        {modal === 'story' ? <p className="character-story">{hero.storyZhTw}</p> : <img src={hero.initialLayoutImageUrl} alt={hero.displayNameZhTw + '初始面板配置'} decoding="async" />}
       </section>
     </div>}
   </section>;
