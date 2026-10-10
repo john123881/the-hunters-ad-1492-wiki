@@ -110,7 +110,18 @@ async function installApi(
         map = { ...map, version: map.version + 1 };
         return route.fulfill({
           status: 409,
-          json: { error: { code: 'MAP_VERSION_CONFLICT', message: '版本衝突' } },
+          json: {
+            error: {
+              code: 'MAP_VERSION_CONFLICT',
+              message: '版本衝突',
+              conflict: {
+                scope: 'MAP',
+                expectedVersion: map.version - 1,
+                currentVersion: map.version,
+                latest: map,
+              },
+            },
+          },
         });
       }
       await new Promise(resolve => setTimeout(resolve, 180));
@@ -165,8 +176,8 @@ test('version conflict explains the problem and supports retry', async ({ page }
   await page.locator('.map-card-placeholder').first().click();
   await page.locator('.map-editor-drawer textarea').first().fill('線索 1');
   await page.locator('.map-editor-save-bar').getByRole('button', { name: '儲存卡片紀錄' }).click();
-  await expect(page.getByText('資料已被其他玩家更新')).toBeVisible();
-  await page.getByRole('button', { name: '重新嘗試' }).click();
+  await expect(page.getByText('地圖資料已被其他玩家更新')).toBeVisible();
+  await page.getByRole('button', { name: '保留我的修改並重新套用' }).click();
   await expect(page.locator('.map-editor-save-bar').getByRole('button', { name: '已儲存' })).toBeVisible();
 });
 
