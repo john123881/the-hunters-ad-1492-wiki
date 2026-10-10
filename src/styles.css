@@ -821,6 +821,7 @@ svg { flex-shrink: 0; }
   width: 42px;
   height: 42px;
   color: #d6b55f;
+  animation: board-spin 1.2s linear infinite;
 }
 .wagon-visual-state strong {
   position: relative;
@@ -2328,6 +2329,7 @@ svg { flex-shrink: 0; }
 .equipment-board-visual-state .spinning-icon {
   width: 40px;
   height: 40px;
+  animation: board-spin 1.2s linear infinite;
 }
 .equipment-board-loading strong,
 .equipment-board-visual-state strong {
