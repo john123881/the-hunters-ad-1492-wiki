@@ -3,7 +3,7 @@ from shutil import copy2
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT=Path(__file__).resolve().parents[1]
-MAPS=ROOT/"public/images/campaign/maps"
+MAPS=ROOT/"source-assets/campaign/maps"
 BASE=MAPS/"red-frame-uniform-base"
 BLANKS=MAPS/"uniform-name-blanks"
 OUTPUT=MAPS/"red-frame-uniform-preview"

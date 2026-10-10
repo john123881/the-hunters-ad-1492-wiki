@@ -2,7 +2,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[1]
-MAPS=ROOT/"public/images/campaign/maps"
+MAPS=ROOT/"source-assets/campaign/maps"
 SOURCE=Image.open(MAPS/"clear-back-sheet.png").convert("RGB")
 OUT=MAPS/"red-frame-uniform-back-preview"
 OUT.mkdir(parents=True,exist_ok=True)
