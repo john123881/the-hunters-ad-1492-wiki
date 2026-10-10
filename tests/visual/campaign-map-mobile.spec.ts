@@ -231,3 +231,28 @@ test('a location position also marks its parent map card', async ({ page }) => {
   await expect(parentMap.locator('.hunter-marker')).toHaveAttribute('title', '獵人目前位於 L08');
   await expect(location.locator('svg')).toBeVisible();
 });
+
+test('map and location cards share the complete batch selection workflow', async ({ page }) => {
+  await installApi(page);
+  await page.goto('/campaigns/map');
+
+  await page.getByRole('button', { name: '批次選取地圖卡' }).click();
+  const mapCards = page.locator('.map-card-placeholder');
+  await mapCards.nth(0).click();
+  await mapCards.nth(1).click();
+  await expect(page.getByText('已選擇 2 張地圖卡')).toBeVisible();
+  await page.getByRole('button', { name: '清除' }).first().click();
+  await expect(page.getByText('已選擇 0 張地圖卡')).toBeVisible();
+  await page.getByRole('button', { name: '全選' }).first().click();
+  await expect(page.getByText('已選擇 20 張地圖卡')).toBeVisible();
+  await page.getByRole('button', { name: '取消' }).first().click();
+  await expect(page.getByRole('button', { name: '批次選取地圖卡' })).toBeVisible();
+
+  await page.getByRole('button', { name: '批次選取地點卡' }).click();
+  const locationCards = page.locator('.location-card-button');
+  await locationCards.nth(0).click();
+  await locationCards.nth(1).click();
+  await expect(page.getByText('已選擇 2 張地點卡')).toBeVisible();
+  await page.locator('.location-batch-toolbar').getByRole('button', { name: '翻轉並儲存' }).click();
+  await expect(page.getByRole('button', { name: '批次選取地點卡' })).toBeVisible();
+});

@@ -6,7 +6,8 @@ import { EventRecordsSection } from '../components/EventRecordsSection';
 import { Toast } from '../components/common/Toast';
 import { getApiErrorMessage, readApiJson } from '../lib/apiClient';
 import { preloadImage, preloadImages } from '../lib/imagePreload';
-import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
+import { useBatchSelection } from '../lib/useBatchSelection';
+import { executeOptimisticMutation, useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignLocationCard, CampaignMap, CampaignMapCard, CampaignMapResponse, CampaignMapTile, CampaignWagonResponse } from '../../shared/types';
 
 
@@ -36,10 +37,10 @@ function mapImageUrl(mapCode: string, revealed: boolean) {
 export function CampaignMapPage({ session, loading }: { session: AuthSession | null; loading: boolean }) {
   const [map, setMap] = useState<CampaignMap | null>(null);
   const [selectedCode, setSelectedCode] = useState('M01');
-  const [mapBatchMode, setMapBatchMode] = useState(false);
-  const [selectedMapCodes, setSelectedMapCodes] = useState<string[]>([]);
-  const [locationBatchMode, setLocationBatchMode] = useState(false);
-  const [selectedLocationCodes, setSelectedLocationCodes] = useState<string[]>([]);
+  const availableMapCodes = useMemo(() => map?.tiles.map(tile => tile.mapCode) ?? [], [map?.tiles]);
+  const availableLocationCodes = useMemo(() => map?.locations.map(location => location.locationCode) ?? [], [map?.locations]);
+  const mapSelection = useBatchSelection(availableMapCodes);
+  const locationSelection = useBatchSelection(availableLocationCodes);
   const [draft, setDraft] = useState<CampaignMapTile | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [selectedLocationCode, setSelectedLocationCode] = useState('L01');
@@ -202,17 +203,12 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   function startMapBatchSelection() {
     if (mapDraftDirty && !window.confirm('這張地圖卡有尚未儲存的修改，確定要放棄並開始批次選取嗎？')) return;
     setEditorOpen(false);
-    setMapBatchMode(true);
-    setSelectedMapCodes([]);
-  }
-
-  function toggleBatchCode(code: string, kind: 'MAP' | 'LOCATION') {
-    const setter = kind === 'MAP' ? setSelectedMapCodes : setSelectedLocationCodes;
-    setter(current => current.includes(code) ? current.filter(item => item !== code) : [...current, code]);
+    mapSelection.start();
   }
 
   async function applyBatchFlip(kind: 'MAP' | 'LOCATION') {
-    const codes = kind === 'MAP' ? selectedMapCodes : selectedLocationCodes;
+    const selection = kind === 'MAP' ? mapSelection : locationSelection;
+    const codes = selection.selected;
     if (!codes.length || busy || !map) return;
     const records = kind === 'MAP' ? map.tiles : map.locations;
     const updates = codes.map(code => {
@@ -236,13 +232,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     );
     if (!succeeded) return;
     setMessage(kind === 'MAP' ? `已翻轉並儲存 ${codes.length} 張地圖卡。` : `已翻轉並儲存 ${codes.length} 張地點卡。`);
-    if (kind === 'MAP') {
-      setSelectedMapCodes([]);
-      setMapBatchMode(false);
-    } else {
-      setSelectedLocationCodes([]);
-      setLocationBatchMode(false);
-    }
+    selection.cancel();
   }
 
   function returnToCardProgress() {
@@ -437,46 +427,54 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     setMessage('');
     setMessageKind('success');
     try {
-      const response = await fetch(path, {
-        method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...payload, expectedVersion: map.version }),
+      const result = await executeOptimisticMutation<CampaignMap, object, CampaignMap>({
+        url: path,
+        method,
+        payload,
+        expectedVersion: map.version,
+        fallbackMessage: '資料格式不正確，請檢查輸入內容。',
+        computeChangedFields: latest => changedMapFields(map, latest),
       });
-      const result = await response.json().catch(() => null) as CampaignMapResponse | ApiErrorResponse | null;
-      if (!response.ok || !result || !('data' in result)) {
+
+      if (result.status === 'conflict') {
+        setMap(result.conflict.latest);
+        setFailedMutation(request);
+        setVersionConflict({
+          fields: result.conflict.changedFields,
+          expectedVersion: map.version,
+          currentVersion: result.conflict.currentVersion,
+        });
         setMessageKind('error');
-        if (response.status === 401) {
+        setMessage('');
+        return false;
+      }
+      if (result.status === 'error') {
+        setMessageKind('error');
+        if (result.error.status === 401) {
           setReauthRequired(true);
           setMessage('登入已失效，請重新登入後再操作。');
-        } else if(response.status===409&&result&&'error' in result&&result.error.code==='MAP_VERSION_CONFLICT'&&result.error.conflict?.scope==='MAP'){
-          const latest=result.error.conflict.latest as CampaignMap;
-          const fields=changedMapFields(map,latest);
-          setMap(latest);
+        } else if (result.error.status === 409) {
+          setMessage(result.error.message || '資料發生衝突，請檢查後再試。');
+        } else if (result.error.status >= 500 || result.error.status === 0) {
           setFailedMutation(request);
-          setVersionConflict({fields,expectedVersion:map.version,currentVersion:latest.version});
-          setMessage('');
-        } else if (response.status === 409) {
-          setMessage(getApiErrorMessage(result,'資料發生衝突，請檢查後再試。'));
-        } else if (response.status >= 500) {
-          setFailedMutation(request);
-          setMessage('伺服器暫時無法完成儲存，請稍後重試。');
+          setMessage(result.error.status === 0
+            ? '無法連線到伺服器，請檢查網路後重試。'
+            : '伺服器暫時無法完成儲存，請稍後重試。');
         } else {
-          setMessage(getApiErrorMessage(result, '資料格式不正確，請檢查輸入內容。'));
+          setMessage(result.error.message);
         }
         return false;
       }
+      if (result.status === 'busy') return false;
+
       setMap(result.data);
       setVersionConflict(null);
       setMessageKind('success');
-      setMessage(response.status === 201 ? '已新增卡片紀錄。' : '地圖紀錄已更新。');
+      setMessage(result.responseStatus === 201 ? '已新增卡片紀錄。' : '地圖紀錄已更新。');
       setSavedAction(action);
       if (savedTimerRef.current !== null) window.clearTimeout(savedTimerRef.current);
       savedTimerRef.current = window.setTimeout(() => setSavedAction(''), 1800);
       return true;
-    } catch {
-      setMessageKind('error');
-      setFailedMutation(request);
-      setMessage('無法連線到伺服器，請檢查網路後重試。');
-      return false;
     } finally {
       setBusy('');
     }
@@ -592,14 +590,14 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
 
     <div className="map-workspace">
       <div className="map-batch-toolbar" aria-label="地圖卡批次操作">
-        {!mapBatchMode
+        {!mapSelection.active
           ? <button className="button secondary" disabled={Boolean(busy)} onClick={startMapBatchSelection} type="button">批次選取地圖卡</button>
           : <>
-            <strong>已選擇 {selectedMapCodes.length} 張地圖卡</strong>
-            <button type="button" disabled={Boolean(busy)} onClick={() => setSelectedMapCodes(map.tiles.map(tile => tile.mapCode))}>全選</button>
-            <button type="button" disabled={Boolean(busy) || !selectedMapCodes.length} onClick={() => setSelectedMapCodes([])}>清除</button>
-            <button type="button" disabled={Boolean(busy) || !selectedMapCodes.length} onClick={() => void applyBatchFlip('MAP')}>{busy === 'map-batch' ? '儲存中…' : '翻轉並儲存'}</button>
-            <button type="button" disabled={Boolean(busy)} onClick={() => { setMapBatchMode(false); setSelectedMapCodes([]); }}>取消</button>
+            <strong>已選擇 {mapSelection.selectedCount} 張地圖卡</strong>
+            <button type="button" disabled={Boolean(busy)} onClick={mapSelection.selectAll}>全選</button>
+            <button type="button" disabled={Boolean(busy) || !mapSelection.selectedCount} onClick={mapSelection.clear}>清除</button>
+            <button type="button" disabled={Boolean(busy) || !mapSelection.selectedCount} onClick={() => void applyBatchFlip('MAP')}>{busy === 'map-batch' ? '儲存中…' : '翻轉並儲存'}</button>
+            <button type="button" disabled={Boolean(busy)} onClick={mapSelection.cancel}>取消</button>
           </>}
       </div>
       <div className="core-map-grid" id="core-map-grid" aria-label="核心地圖 M01 到 M20">
@@ -608,9 +606,9 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           const occupied = map.currentMapCode === tile.mapCode;
           const displayRevealed = editorOpen && draft?.mapCode === tile.mapCode ? draft.isRevealed : tile.isRevealed;
           return <button
-            className={'map-card-placeholder' + (displayRevealed ? ' is-revealed' : '') + (!mapBatchMode && selectedCode === tile.mapCode ? ' is-selected' : '') + (selectedMapCodes.includes(tile.mapCode) ? ' is-batch-selected' : '') + (flippingCode === tile.mapCode ? ' is-flipping' : '')}
-            key={tile.mapCode} onClick={() => { if (flippingCode || loadingFlipCode) return; if (mapBatchMode) toggleBatchCode(tile.mapCode, 'MAP'); else openMapEditor(tile.mapCode); }} type="button"
-            aria-pressed={mapBatchMode ? selectedMapCodes.includes(tile.mapCode) : selectedCode === tile.mapCode}
+            className={'map-card-placeholder' + (displayRevealed ? ' is-revealed' : '') + (!mapSelection.active && selectedCode === tile.mapCode ? ' is-selected' : '') + (mapSelection.isSelected(tile.mapCode) ? ' is-batch-selected' : '') + (flippingCode === tile.mapCode ? ' is-flipping' : '')}
+            key={tile.mapCode} onClick={() => { if (flippingCode || loadingFlipCode) return; if (mapSelection.active) mapSelection.toggle(tile.mapCode); else openMapEditor(tile.mapCode); }} type="button"
+            aria-pressed={mapSelection.active ? mapSelection.isSelected(tile.mapCode) : selectedCode === tile.mapCode}
           >
             <img
               alt={tile.mapCode + (displayRevealed ? ' 正面' : ' 背面')}
@@ -695,14 +693,14 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         <span>{map.locations.length} 張</span>
       </header>
       <div className="map-batch-toolbar location-batch-toolbar" aria-label="地點卡批次操作">
-        {!locationBatchMode
-          ? <button className="button secondary" disabled={Boolean(busy)} onClick={() => { setLocationBatchMode(true); setSelectedLocationCodes([]); }} type="button">批次選取地點卡</button>
+        {!locationSelection.active
+          ? <button className="button secondary" disabled={Boolean(busy)} onClick={locationSelection.start} type="button">批次選取地點卡</button>
           : <>
-            <strong>已選擇 {selectedLocationCodes.length} 張地點卡</strong>
-            <button type="button" disabled={Boolean(busy)} onClick={() => setSelectedLocationCodes(map.locations.map(location => location.locationCode))}>全選</button>
-            <button type="button" disabled={Boolean(busy) || !selectedLocationCodes.length} onClick={() => setSelectedLocationCodes([])}>清除</button>
-            <button type="button" disabled={Boolean(busy) || !selectedLocationCodes.length} onClick={() => void applyBatchFlip('LOCATION')}>{busy === 'location-batch' ? '儲存中…' : '翻轉並儲存'}</button>
-            <button type="button" disabled={Boolean(busy)} onClick={() => { setLocationBatchMode(false); setSelectedLocationCodes([]); }}>取消</button>
+            <strong>已選擇 {locationSelection.selectedCount} 張地點卡</strong>
+            <button type="button" disabled={Boolean(busy)} onClick={locationSelection.selectAll}>全選</button>
+            <button type="button" disabled={Boolean(busy) || !locationSelection.selectedCount} onClick={locationSelection.clear}>清除</button>
+            <button type="button" disabled={Boolean(busy) || !locationSelection.selectedCount} onClick={() => void applyBatchFlip('LOCATION')}>{busy === 'location-batch' ? '儲存中…' : '翻轉並儲存'}</button>
+            <button type="button" disabled={Boolean(busy)} onClick={locationSelection.cancel}>取消</button>
           </>}
       </div>
       <div className="location-card-grid">
@@ -710,11 +708,11 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           const occupied = map.currentLocationType === 'LOCATION' && map.currentLocationCode === location.locationCode;
           const count = map.cards.filter(card => card.locationType === 'LOCATION' && card.locationCode === location.locationCode).length;
           return <button
-            className={'location-card-button' + (!locationBatchMode && selectedLocationCode === location.locationCode ? ' is-selected' : '') + (selectedLocationCodes.includes(location.locationCode) ? ' is-batch-selected' : '') + (location.isRevealed ? ' is-revealed' : '')}
+            className={'location-card-button' + (!locationSelection.active && selectedLocationCode === location.locationCode ? ' is-selected' : '') + (locationSelection.isSelected(location.locationCode) ? ' is-batch-selected' : '') + (location.isRevealed ? ' is-revealed' : '')}
             key={location.locationCode}
-            onClick={() => locationBatchMode ? toggleBatchCode(location.locationCode, 'LOCATION') : selectLocationCard(location.locationCode)}
+            onClick={() => locationSelection.active ? locationSelection.toggle(location.locationCode) : selectLocationCard(location.locationCode)}
             type="button"
-            aria-pressed={locationBatchMode ? selectedLocationCodes.includes(location.locationCode) : selectedLocationCode === location.locationCode}
+            aria-pressed={locationSelection.active ? locationSelection.isSelected(location.locationCode) : selectedLocationCode === location.locationCode}
           >
             <strong>{location.locationCode}</strong><small>{location.isRevealed ? (location.face === 'FRONT' ? '正面' : '背面') : '尚未揭示'}</small>
             {occupied && <MapPin aria-hidden="true" />}
@@ -723,7 +721,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         })}
       </div>
 
-      {locationDraft && !locationBatchMode && <div className="location-editor">
+      {locationDraft && !locationSelection.active && <div className="location-editor">
         <div className="location-editor-fields">
           <div className="map-editor-actions">
             <button className={'reveal-toggle ' + (locationDraft.isRevealed ? 'is-revealed' : '')} disabled={Boolean(busy)} onClick={() => void flipLocationCard()} type="button"><Check aria-hidden="true" />{busy === 'location-flip' ? '翻轉儲存中…' : '翻轉並儲存'}<small>{locationDraft.isRevealed ? '目前：正面' : '目前：覆蓋面'}</small></button>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { ApiErrorResponse } from '../../shared/types';
+import { ApiError, isVersionConflictError, readApiJson } from './apiClient';
 
 export interface OptimisticSaveConflict<TLatest = unknown> {
   scope: string;
@@ -10,9 +10,9 @@ export interface OptimisticSaveConflict<TLatest = unknown> {
 }
 
 export type OptimisticSaveResult<TSaved, TLatest> =
-  | { status: 'saved'; data: TSaved }
+  | { status: 'saved'; data: TSaved; responseStatus: number }
   | { status: 'conflict'; conflict: OptimisticSaveConflict<TLatest> }
-  | { status: 'error' }
+  | { status: 'error'; error: ApiError }
   | { status: 'busy' };
 
 export interface UseOptimisticSaveOptions<TSaved, TLatest> {
@@ -36,12 +36,76 @@ export interface UseOptimisticSaveReturn<TSaved, TPayload, TLatest> {
     url: string,
     payload: TPayload,
     options?: {
-      method?: 'PUT' | 'PATCH' | 'POST';
+      method?: 'PUT' | 'PATCH' | 'POST' | 'DELETE';
       expectedVersion?: number | null;
       customSuccessMessage?: string;
+      optimisticUpdate?: () => void;
+      rollback?: () => void;
     },
   ) => Promise<OptimisticSaveResult<TSaved, TLatest>>;
   resetConflict: () => void;
+}
+
+export interface OptimisticMutationOptions<TPayload, TLatest> {
+  url: string;
+  method?: 'PUT' | 'PATCH' | 'POST' | 'DELETE';
+  payload: TPayload;
+  expectedVersion?: number | null;
+  fallbackMessage?: string;
+  optimisticUpdate?: () => void;
+  rollback?: () => void;
+  computeChangedFields?: (latest: TLatest) => string[];
+}
+
+export async function executeOptimisticMutation<TSaved, TPayload = object, TLatest = TSaved>(
+  options: OptimisticMutationOptions<TPayload, TLatest>,
+): Promise<OptimisticSaveResult<TSaved, TLatest>> {
+  options.optimisticUpdate?.();
+  try {
+    const response = await fetch(options.url, {
+      method: options.method ?? 'PUT',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...(options.payload as Record<string, unknown>),
+        ...(options.expectedVersion !== undefined ? { expectedVersion: options.expectedVersion } : {}),
+      }),
+    });
+    const result = await readApiJson<{ data: TSaved }>(response, options.fallbackMessage);
+
+    return { status: 'saved', data: result.data, responseStatus: response.status };
+  } catch (cause) {
+    options.rollback?.();
+    const error = cause instanceof ApiError
+      ? cause
+      : new ApiError(
+        cause instanceof Error ? cause.message : (options.fallbackMessage ?? '網路連線失敗，請稍後重試。'),
+        0,
+        'NETWORK_ERROR',
+      );
+    const conflictInfo = error.conflict as {
+      scope?: string;
+      expectedVersion?: number | null;
+      currentVersion?: number;
+      latest?: TLatest;
+    } | undefined;
+    if (
+      isVersionConflictError(error)
+      && conflictInfo?.scope
+      && typeof conflictInfo.currentVersion === 'number'
+      && conflictInfo.latest !== undefined
+    ) {
+      const conflict: OptimisticSaveConflict<TLatest> = {
+        scope: conflictInfo.scope,
+        expectedVersion: conflictInfo.expectedVersion ?? null,
+        currentVersion: conflictInfo.currentVersion,
+        latest: conflictInfo.latest,
+        changedFields: options.computeChangedFields?.(conflictInfo.latest) ?? ['最新版本資料'],
+      };
+      return { status: 'conflict', conflict };
+    }
+    return { status: 'error', error };
+  }
 }
 
 export function useUnsavedChangesWarning(
@@ -124,9 +188,11 @@ export function useOptimisticSave<TSaved = unknown, TPayload = unknown, TLatest 
       url: string,
       payload: TPayload,
       options?: {
-        method?: 'PUT' | 'PATCH' | 'POST';
+        method?: 'PUT' | 'PATCH' | 'POST' | 'DELETE';
         expectedVersion?: number | null;
         customSuccessMessage?: string;
+        optimisticUpdate?: () => void;
+        rollback?: () => void;
       },
     ): Promise<OptimisticSaveResult<TSaved, TLatest>> => {
       if (savingRef.current) return { status: 'busy' };
@@ -135,63 +201,35 @@ export function useOptimisticSave<TSaved = unknown, TPayload = unknown, TLatest 
       setMessage('');
       setMessageKind('');
 
-      const method = options?.method ?? 'PUT';
-      const bodyPayload = {
-        ...(payload as Record<string, unknown>),
-        ...(options?.expectedVersion !== undefined ? { expectedVersion: options.expectedVersion } : {}),
-      };
-
       try {
-        const response = await fetch(url, {
-          method,
-          credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bodyPayload),
+        const result = await executeOptimisticMutation<TSaved, TPayload, TLatest>({
+          url,
+          method: options?.method,
+          payload,
+          expectedVersion: options?.expectedVersion,
+          optimisticUpdate: options?.optimisticUpdate,
+          rollback: options?.rollback,
+          computeChangedFields: optionsRef.current.computeChangedFields,
+          fallbackMessage: '儲存失敗，請稍後重試。',
         });
 
-        const result = (await response.json().catch(() => null)) as
-          | { data: TSaved }
-          | ApiErrorResponse
-          | null;
-
-        if (!response.ok || !result || 'error' in result) {
-          const apiError = (result as ApiErrorResponse | null)?.error;
-          if (
-            response.status === 409
-            && apiError?.conflict
-            && apiError.code.endsWith('_VERSION_CONFLICT')
-          ) {
-            const conflictInfo = apiError.conflict;
-            const latest = conflictInfo.latest as TLatest;
-            const nextConflict: OptimisticSaveConflict<TLatest> = {
-              scope: conflictInfo.scope,
-              expectedVersion: conflictInfo.expectedVersion,
-              currentVersion: conflictInfo.currentVersion,
-              latest,
-              changedFields: optionsRef.current.computeChangedFields
-                ? optionsRef.current.computeChangedFields(latest)
-                : ['最新版本資料'],
-            };
-            setConflict(nextConflict);
-            return { status: 'conflict', conflict: nextConflict };
-          }
-
-          setMessage(apiError?.message ?? '儲存失敗，請稍後重試。');
-          setMessageKind('error');
-          return { status: 'error' };
+        if (result.status === 'conflict') {
+          setConflict(result.conflict);
+          return result;
         }
+        if (result.status === 'error') {
+          setMessage(result.error.message);
+          setMessageKind('error');
+          return result;
+        }
+        if (result.status === 'busy') return result;
 
-        const savedData = result.data;
         setIsDirty(false);
         setConflict(null);
         setMessage(options?.customSuccessMessage ?? optionsRef.current.successMessage ?? '儲存成功。');
         setMessageKind('success');
-        optionsRef.current.onSuccess?.(savedData);
-        return { status: 'saved', data: savedData };
-      } catch (err) {
-        setMessage(err instanceof Error ? err.message : '網路連線失敗，請稍後重試。');
-        setMessageKind('error');
-        return { status: 'error' };
+        optionsRef.current.onSuccess?.(result.data);
+        return result;
       } finally {
         savingRef.current = false;
         setSaving(false);

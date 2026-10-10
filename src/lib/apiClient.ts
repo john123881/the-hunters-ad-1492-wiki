@@ -25,6 +25,12 @@ export class ApiError extends Error {
   }
 }
 
+export function isVersionConflictError(error: unknown): error is ApiError {
+  return error instanceof ApiError
+    && error.status === 409
+    && (error.code.endsWith('_VERSION_CONFLICT') || error.code === 'EQUIPMENT_VERSION_CONFLICT');
+}
+
 export function getApiErrorMessage(payload: unknown, fallback = DEFAULT_ERROR_MESSAGE): string {
   return errorDetail(payload)?.message ?? fallback;
 }

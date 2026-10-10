@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, Loader2, LockKeyhole, MoreHorizontal, Move, PackageOpen, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
 import { HAND_EQUIPMENT_VISUAL } from '../../shared/equipmentBoardTemplates';
-import { ApiError, readApiJson } from '../lib/apiClient';
+import { isVersionConflictError, readApiJson } from '../lib/apiClient';
 import { preloadImages } from '../lib/imagePreload';
 import type { CampaignWagonResponse } from '../../shared/types';
 
@@ -266,9 +266,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       setMessage('裝備面板已更新。');
       return payload.data;
     } catch (cause) {
-      const isVersionConflict = cause instanceof ApiError && cause.status === 409 && (
-        cause.code.includes('VERSION_CONFLICT') || cause.code === 'EQUIPMENT_VERSION_CONFLICT'
-      );
+      const isVersionConflict = isVersionConflictError(cause);
       const latest = await refresh({ silent: true });
       if (isVersionConflict && latest) {
         if (latest.heroSlug !== loadout.heroSlug) {

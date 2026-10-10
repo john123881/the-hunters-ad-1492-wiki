@@ -6,7 +6,7 @@ import { EventRecordsSection } from '../components/EventRecordsSection';
 import { Toast } from '../components/common/Toast';
 import { readApiError } from '../lib/apiClient';
 import { preloadImages } from '../lib/imagePreload';
-import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
+import { executeOptimisticMutation, useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v3.webp';
@@ -612,23 +612,41 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
     if (busyRef.current) return;
     busyRef.current = true;
     setBusy(true);
-    const response = await fetch('/api/campaign/wagon/gold', {
-      method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sharedGold, expectedVersion: versionRef.current }),
+
+    const result = await executeOptimisticMutation<CampaignWagon, { sharedGold: number }, CampaignWagon>({
+      url: '/api/campaign/wagon/gold',
+      method: 'PATCH',
+      payload: { sharedGold },
+      expectedVersion: versionRef.current,
+      rollback: () => setDisplayValue(value),
+      fallbackMessage: '無法更新團隊共用金錢。',
     });
-    if (!response.ok) {
-      const problem = (await response.json()) as ApiErrorResponse;
-      if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/gold',payload:{sharedGold},successMessage:'團隊共用金錢已更新為 '+sharedGold});
-      else {
-        setDisplayValue(value);
-        onError(problem.error.message);
-      }
-    } else {
-      const result = await response.json() as CampaignWagonResponse;
+
+    if (result.status === 'conflict') {
+      onConflict({
+        error: {
+          code: 'WAGON_VERSION_CONFLICT',
+          message: '馬車資料已被其他玩家更新。',
+          conflict: {
+            scope: result.conflict.scope as 'WAGON',
+            expectedVersion: result.conflict.expectedVersion,
+            currentVersion: result.conflict.currentVersion,
+            latest: result.conflict.latest,
+          },
+        },
+      }, {
+        path: '/api/campaign/wagon/gold',
+        payload: { sharedGold },
+        successMessage: '團隊共用金錢已更新為 ' + sharedGold,
+      });
+    } else if (result.status === 'error') {
+      onError(result.error.message);
+    } else if (result.status === 'saved') {
       setDisplayValue(result.data.sharedGold);
       onChange(result.data);
       onToast('團隊共用金錢已更新為 ' + result.data.sharedGold);
     }
+
     busyRef.current = false;
     setBusy(false);
   }
