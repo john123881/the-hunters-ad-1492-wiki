@@ -64,9 +64,9 @@ type AttachmentCandidateResponse = {
 type AttachmentTarget = { equipment: Equipment; socket: EquipmentSocket };
 type LoadoutResponse = { data: Loadout };
 
-const EQUIPMENT_BOARD_IMAGE_URL = '/images/campaign/characters/equipment-board-gridless-v4.webp';
-const EQUIPMENT_BLOCKED_COVER_IMAGE_URL = '/images/campaign/characters/slot-cover-blocked-x-v2.webp';
-const EQUIPMENT_10_XP_COVER_IMAGE_URL = '/images/campaign/characters/slot-cover-10xp-v2.webp';
+const EQUIPMENT_BOARD_IMAGE_URL = '/images/campaign/characters/equipment-board-gridless-v5.webp';
+const EQUIPMENT_BLOCKED_COVER_IMAGE_URL = '/images/campaign/characters/slot-cover-blocked-x-v3.webp';
+const EQUIPMENT_10_XP_COVER_IMAGE_URL = '/images/campaign/characters/slot-cover-10xp-v3.webp';
 const EQUIPMENT_COVER_IMAGE_URLS = [
   EQUIPMENT_BLOCKED_COVER_IMAGE_URL,
   EQUIPMENT_10_XP_COVER_IMAGE_URL,
@@ -81,6 +81,23 @@ async function preloadEquipmentImage(url: string) {
   image.src = url;
   if (!image.complete || image.naturalWidth === 0) await loaded;
   if (typeof image.decode === 'function') await image.decode();
+}
+
+function equipmentVisualUrlsFor(loadout: Loadout) {
+  if (!loadout.templateVerified) return [];
+  return [...new Set([
+    EQUIPMENT_BOARD_IMAGE_URL,
+    ...EQUIPMENT_COVER_IMAGE_URLS,
+    ...loadout.equipment.flatMap(item => [
+      item.imageUrl,
+      ...item.attachments.map(attachment => attachment.imageUrl),
+    ]),
+    ...loadout.retainedAttachments.map(item => item.imageUrl),
+  ].filter(Boolean))];
+}
+
+async function preloadLoadoutImages(loadout: Loadout) {
+  await Promise.all(equipmentVisualUrlsFor(loadout).map(preloadEquipmentImage));
 }
 
 class EquipmentApiError extends Error {
@@ -151,6 +168,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         fetch('/api/campaign/characters/' + playerNumber + '/loadout', { credentials: 'same-origin' }).then(response => readJson<LoadoutResponse>(response)),
         fetch('/api/campaign/wagon', { credentials: 'same-origin' }).then(response => readJson<CampaignWagonResponse>(response)),
       ]);
+      if (options?.silent) await preloadLoadoutImages(loadoutPayload.data);
       setLoadout(loadoutPayload.data);
       setWagonVersion(wagonPayload.data.version);
       onVersionChange(loadoutPayload.data.version);
@@ -166,18 +184,10 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
 
   useEffect(() => { void refresh(); }, [refresh]);
 
-  const equipmentVisualUrls = useMemo(() => {
-    if (!loadout?.templateVerified) return [];
-    return [...new Set([
-      EQUIPMENT_BOARD_IMAGE_URL,
-      ...EQUIPMENT_COVER_IMAGE_URLS,
-      ...loadout.equipment.flatMap(item => [
-        item.imageUrl,
-        ...item.attachments.map(attachment => attachment.imageUrl),
-      ]),
-      ...loadout.retainedAttachments.map(item => item.imageUrl),
-    ].filter(Boolean))];
-  }, [loadout]);
+  const equipmentVisualUrls = useMemo(
+    () => loadout ? equipmentVisualUrlsFor(loadout) : [],
+    [loadout],
+  );
 
   useEffect(() => {
     if (!equipmentVisualUrls.length) return;
@@ -277,6 +287,12 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...body, expectedCharacterVersion: loadout.version }),
       }).then(response => readJson<LoadoutResponse>(response));
+      try {
+        await preloadLoadoutImages(payload.data);
+        setVisualStatus('ready');
+      } catch {
+        setVisualStatus('error');
+      }
       setLoadout(payload.data);
       onVersionChange(payload.data.version);
       setMessage('裝備面板已更新。');
@@ -285,7 +301,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       const isVersionConflict = cause instanceof EquipmentApiError && cause.status === 409 && (
         cause.code.includes('VERSION_CONFLICT') || cause.code === 'EQUIPMENT_VERSION_CONFLICT'
       );
-      const latest = await refresh();
+      const latest = await refresh({ silent: true });
       if (isVersionConflict && latest) {
         if (latest.heroSlug !== loadout.heroSlug) {
           closePicker();
@@ -441,6 +457,13 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       return;
     }
     if (slot.status === 'BLOCKED') return;
+    if (slot.status === 'LOCKED_10') {
+      if (!window.confirm('確認已自行調整角色 XP，並移除這個 10 XP 蓋板？')) return;
+      await mutate('/api/campaign/characters/' + playerNumber + '/slots/' + slot.slotKey + '/open', 'POST', {
+        confirmedManualXpAdjustment: true,
+      });
+      return;
+    }
     if (slot.category === 'ATTACHMENT') {
       if (slot.status !== 'OPEN') return;
       const handSlotKey = 'HAND_' + slot.rowIndex;
@@ -459,13 +482,6 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         setSelectedEquipment(equipment);
         setMessage(openSockets.length ? '請選擇要安裝附件的孔位。' : '這一列的武器沒有可用附件孔位。');
       }
-      return;
-    }
-    if (slot.status === 'LOCKED_10') {
-      if (!window.confirm('確認已自行調整角色 XP，並移除這個 10 XP 蓋板？')) return;
-      await mutate('/api/campaign/characters/' + playerNumber + '/slots/' + slot.slotKey + '/open', 'POST', {
-        confirmedManualXpAdjustment: true,
-      });
       return;
     }
     if (slot.status === 'OCCUPIED') {
@@ -797,7 +813,11 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     if (index < 0 || target < 0 || target >= hand.length) return;
     const ids = hand.map(entry => entry.instanceId);
     [ids[index], ids[target]] = [ids[target], ids[index]];
-    await mutate('/api/campaign/characters/' + playerNumber + '/loadout/hand-order', 'PUT', { orderedInstanceIds: ids });
+    const updated = await mutate('/api/campaign/characters/' + playerNumber + '/loadout/hand-order', 'PUT', { orderedInstanceIds: ids });
+    if (updated) {
+      setSelectedEquipment(null);
+      await refresh({ silent: true });
+    }
   }
 
   const filteredCandidates = useMemo(() => {

@@ -711,10 +711,15 @@ export async function reorderHandItems(c:Ctx){
   const {session,playerNumber,input,expectedCharacterVersion,loadout}=state;
   const ids=Array.isArray(input.orderedInstanceIds)?input.orderedInstanceIds.map(value=>integer(value)):[];
   if(ids.some(value=>value==null)||new Set(ids).size!==ids.length)return error(c,400,'INVALID_HAND_ORDER','手部裝備順序含有無效或重複編號。');
-  const handItems=loadout.equipment.filter(row=>{
+  const handItems=(loadout.equipment.filter(row=>{
     const item=row as {slotKeys:string[]};
     return item.slotKeys.some(slotKey=>getEquipmentBoardSlot(slotKey)?.category==='HAND');
-  }) as Array<Record<string,unknown>&{instanceId:number;slotKeys:string[];slotCount:number;categoryCode:string}>;
+  }) as Array<Record<string,unknown>&{instanceId:number;slotKeys:string[];slotCount:number;categoryCode:string}>)
+    .sort((a,b)=>{
+      const aSlot=Math.min(...a.slotKeys.filter(k=>k.startsWith('HAND_')).map(k=>Number(k.split('_')[1])));
+      const bSlot=Math.min(...b.slotKeys.filter(k=>k.startsWith('HAND_')).map(k=>Number(k.split('_')[1])));
+      return aSlot-bSlot;
+    });
   const currentIds=handItems.map(item=>Number(item.instanceId));
   if(ids.length!==currentIds.length||ids.some(id=>!currentIds.includes(id!)))return error(c,400,'INVALID_HAND_ORDER','必須完整提供目前所有手部主裝備。');
   if(ids.map(Number).join('|')===currentIds.join('|'))return c.json({data:loadout});
