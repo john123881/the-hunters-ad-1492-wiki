@@ -2,8 +2,9 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Clock3, Loader2, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRound, Wrench } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { EventRecordsSection } from '../components/EventRecordsSection';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
-import type { ApiErrorResponse, AuthSession, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
+import type { ApiErrorResponse, AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v2.png';
 const WAGON_VISUAL_URLS = [WAGON_BOARD_IMAGE_URL] as const;
@@ -110,7 +111,27 @@ export function CampaignPage({ session, loading, onLogout }: {
     }
   }
 
-  useEffect(() => { void loadWagon(); }, [session?.campaignId]);
+  const [roadEventNotes, setRoadEventNotes] = useState('');
+  const [townEventNotes, setTownEventNotes] = useState('');
+  const [mapVersion, setMapVersion] = useState<number | undefined>(undefined);
+
+  async function loadMapEventNotes() {
+    if (!session) return;
+    try {
+      const response = await fetch('/api/campaign/map', { credentials: 'same-origin' });
+      if (!response.ok) return;
+      const result = await response.json() as CampaignMapResponse;
+      if (result?.data) {
+        setRoadEventNotes(result.data.roadEventNotes ?? '');
+        setTownEventNotes(result.data.townEventNotes ?? '');
+        setMapVersion(result.data.version);
+      }
+    } catch {
+      // Map notes loading failure shouldn't break the wagon page
+    }
+  }
+
+  useEffect(() => { void loadWagon(); void loadMapEventNotes(); }, [session?.campaignId]);
 
   useEffect(() => {
     if (!toast) return;
@@ -530,6 +551,19 @@ export function CampaignPage({ session, loading, onLogout }: {
       <ResourceInventory resources={wagon.resources} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
       <EquipmentInventory equipment={wagon.equipment} onChange={setWagon} onError={setFailure} onToast={setToast} />
       <WagonNotes notes={wagon.notes} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
+      <EventRecordsSection
+        initialRoadNotes={roadEventNotes}
+        initialTownNotes={townEventNotes}
+        expectedVersion={mapVersion}
+        onSaved={(newRoad, newTown) => {
+          setRoadEventNotes(newRoad);
+          setTownEventNotes(newTown);
+          setMapVersion(v => typeof v === 'number' ? v + 1 : v);
+        }}
+        onToast={setToast}
+        onError={setFailure}
+        variant="wagon"
+      />
     </section>
 
     {pendingDay !== null && <div className="confirm-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) setPendingDay(null); }}>

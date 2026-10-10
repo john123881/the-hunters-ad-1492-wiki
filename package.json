@@ -20,6 +20,7 @@
     "test": "tsx --test test/**/*.test.ts",
     "test:visual": "playwright test",
     "images:optimize": "node scripts/optimize-images.mjs",
+    "images:audit": "node scripts/audit-image-performance.mjs",
     "deploy:prod": "./scripts/deploy-cloudflare.sh",
     "auth:hash-password": "node scripts/hash-campaign-password.mjs",
     "admin:hash-password": "node scripts/hash-admin-password.mjs",

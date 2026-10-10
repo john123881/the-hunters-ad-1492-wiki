@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Clock3, MapPin, MapPinned, Save, Shield, Trash2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { EventRecordsSection } from '../components/EventRecordsSection';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignLocationCard, CampaignMap, CampaignMapCard, CampaignMapResponse, CampaignMapTile, CampaignWagonResponse } from '../../shared/types';
 
@@ -524,47 +525,63 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     const tokenLabel = card.timeToken
       ? card.timeToken.tokenCode + (card.timeToken.unlockAtDay === null ? '' : ' · 第 ' + card.timeToken.unlockAtDay + ' 天')
       : '';
-    return <article key={card.id}>
-      <div><button className="placed-card-progress-link" type="button" onClick={() => openProgressCard(card)}>{card.cardCode}</button><small>{typeLabel}</small></div>
-      {card.timeToken && <span className="time-token-chip"><Clock3 aria-hidden="true" />{tokenLabel}</span>}
-      <select aria-label={'移動 ' + card.cardCode} disabled={Boolean(busy) || card.status === 'RESOLVED'} value={card.locationType + ':' + card.locationCode} onChange={event => {
-        const [locationType, locationCode] = event.target.value.split(':');
-        mutate('/api/campaign/map/cards', 'POST', {
-          cardCode: card.cardCode, locationType, locationCode,
-          status: card.status, notes: card.notes, isInTownDeck: card.isInTownDeck,
-        }, 'move-card');
-      }}>{placementOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
-      {card.cardType === 'FEATURE' && <button className={'status-toggle ' + (card.isInTownDeck ? 'resolved' : 'pending')} disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/cards', 'POST', {
-        cardCode: card.cardCode, locationType: card.locationType, locationCode: card.locationCode,
-        status: card.status, notes: card.notes, isInTownDeck: !card.isInTownDeck,
-      }, 'town-deck')} type="button">{card.isInTownDeck ? '已加入城鎮' : '未加入城鎮'}</button>}
-      <button className="status-toggle pending" disabled={Boolean(busy)} onClick={() => {
-        setEditingCardNoteId(current => current === card.id ? null : card.id);
-        setEditingCardNote(card.notes);
-      }} type="button">{card.notes ? '修改備註' : '新增備註'}</button>
-      {card.cardType === 'STORY' && card.status === 'PENDING' && !card.timeToken && <button className="status-toggle pending" disabled={Boolean(busy) || availableTimeTokenCodes.length === 0} onClick={() => {
-        const nextCode = availableTimeTokenCodes[0];
-        if (nextCode) setTokenCode(nextCode);
-        setTokenCardCode(current => current === card.cardCode ? '' : card.cardCode);
-      }} type="button">{availableTimeTokenCodes.length === 0 ? 'Token 已用完' : '放置 Token'}</button>}
-      <button className={'status-toggle ' + card.status.toLowerCase()} disabled={Boolean(busy) || card.status === 'RESOLVED'} onClick={() => {
-        if (!confirmResolutionWithTimeToken(card.cardCode, card.timeToken)) return;
-        mutate('/api/campaign/map/cards', 'POST', {
+    return <article className="placed-card-item" key={card.id}>
+      <header className="placed-card-item-header">
+        <div className="placed-card-identity">
+          <div className="placed-card-title-line">
+            <button className="placed-card-progress-link" type="button" onClick={() => openProgressCard(card)}>{card.cardCode}</button>
+            <small>{typeLabel}</small>
+          </div>
+          {card.timeToken && <span className="time-token-chip"><Clock3 aria-hidden="true" />{tokenLabel}</span>}
+        </div>
+        <div className="placed-card-quick-actions">
+          <select aria-label={'移動 ' + card.cardCode} disabled={Boolean(busy) || card.status === 'RESOLVED'} value={card.locationType + ':' + card.locationCode} onChange={event => {
+            const [locationType, locationCode] = event.target.value.split(':');
+            mutate('/api/campaign/map/cards', 'POST', {
+              cardCode: card.cardCode, locationType, locationCode,
+              status: card.status, notes: card.notes, isInTownDeck: card.isInTownDeck,
+            }, 'move-card');
+          }}>{placementOptions.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select>
+          <button className="icon-button danger" aria-label={'移除 ' + card.cardCode} disabled={Boolean(busy)} onClick={() => {
+            if (window.confirm('移除 ' + card.cardCode + ' 的位置紀錄？')) {
+              mutate('/api/campaign/map/cards/' + card.id, 'DELETE', {}, 'remove-card');
+            }
+          }} type="button"><Trash2 aria-hidden="true" /></button>
+        </div>
+      </header>
+
+      {card.notes && editingCardNoteId !== card.id && (
+        <p className="placed-card-note"><strong>備註</strong><span>{card.notes}</span></p>
+      )}
+
+      <div className="placed-card-actions-row">
+        {card.cardType === 'FEATURE' && <button className={'status-toggle ' + (card.isInTownDeck ? 'resolved' : 'pending')} disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/cards', 'POST', {
           cardCode: card.cardCode, locationType: card.locationType, locationCode: card.locationCode,
-          status: 'RESOLVED', notes: card.notes, isInTownDeck: card.isInTownDeck,
-        }, 'card-status');
-      }} type="button">{card.status === 'PENDING' ? '標記完成' : '已完成'}</button>
-      <button className="icon-button danger" aria-label={'移除 ' + card.cardCode} disabled={Boolean(busy)} onClick={() => {
-        if (window.confirm('移除 ' + card.cardCode + ' 的位置紀錄？')) {
-          mutate('/api/campaign/map/cards/' + card.id, 'DELETE', {}, 'remove-card');
-        }
-      }} type="button"><Trash2 aria-hidden="true" /></button>
+          status: card.status, notes: card.notes, isInTownDeck: !card.isInTownDeck,
+        }, 'town-deck')} type="button">{card.isInTownDeck ? '已加入城鎮' : '未加入城鎮'}</button>}
+        <button className="status-toggle pending" disabled={Boolean(busy)} onClick={() => {
+          setEditingCardNoteId(current => current === card.id ? null : card.id);
+          setEditingCardNote(card.notes);
+        }} type="button">{card.notes ? '修改備註' : '新增備註'}</button>
+        {card.cardType === 'STORY' && card.status === 'PENDING' && !card.timeToken && <button className="status-toggle pending" disabled={Boolean(busy) || availableTimeTokenCodes.length === 0} onClick={() => {
+          const nextCode = availableTimeTokenCodes[0];
+          if (nextCode) setTokenCode(nextCode);
+          setTokenCardCode(current => current === card.cardCode ? '' : card.cardCode);
+        }} type="button">{availableTimeTokenCodes.length === 0 ? 'Token 已用完' : '放置 Token'}</button>}
+        <button className={'status-toggle ' + card.status.toLowerCase()} disabled={Boolean(busy) || card.status === 'RESOLVED'} onClick={() => {
+          if (!confirmResolutionWithTimeToken(card.cardCode, card.timeToken)) return;
+          mutate('/api/campaign/map/cards', 'POST', {
+            cardCode: card.cardCode, locationType: card.locationType, locationCode: card.locationCode,
+            status: 'RESOLVED', notes: card.notes, isInTownDeck: card.isInTownDeck,
+          }, 'card-status');
+        }} type="button">{card.status === 'PENDING' ? '標記完成' : '已完成'}</button>
+      </div>
+
       {tokenCardCode === card.cardCode && <div className="inline-time-token-form">
         <label><span>Time Token</span><select value={tokenCode} onChange={event => setTokenCode(event.target.value as 'A' | 'B' | 'C' | 'D')}>{availableTimeTokenCodes.map(code => <option key={code} value={code}>{code}</option>)}</select></label>
         <label><span>等待天數</span><input min={1} max={59} type="number" value={tokenDelay} onChange={event => setTokenDelay(Math.max(1, Number(event.target.value) || 1))} /></label>
         <button className="button" disabled={Boolean(busy)} onClick={() => void placeTimeToken(card.cardCode)} type="button">{busy === 'time-token-' + card.cardCode ? '放置中…' : '確認放置'}</button>
       </div>}
-      {card.notes && editingCardNoteId !== card.id && <p className="placed-card-note"><strong>備註</strong><span>{card.notes}</span></p>}
       {editingCardNoteId === card.id && <div className="inline-card-note-form">
         <label><span>卡片備註</span><textarea maxLength={500} rows={2} value={editingCardNote} onChange={event => setEditingCardNote(event.target.value)} /></label>
         <div>
@@ -591,7 +608,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
       <span><MapPinned aria-hidden="true" />4 × 5</span>
     </header>
 
-    {versionConflict&&failedMutation&&<VersionConflictPanel title="地圖資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={Boolean(busy)} onReload={()=>{setFailedMutation(null);setVersionConflict(null);setMessageKind('success');setMessage('已採用最新地圖資料。');}} onReapply={()=>void mutate(failedMutation.path,failedMutation.method,failedMutation.payload,failedMutation.action)}/>}
+    {!editorOpen&&versionConflict&&failedMutation&&<VersionConflictPanel title="地圖資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={Boolean(busy)} onReload={()=>{setFailedMutation(null);setVersionConflict(null);setMessageKind('success');setMessage('已採用最新地圖資料。');}} onReapply={()=>void mutate(failedMutation.path,failedMutation.method,failedMutation.payload,failedMutation.action)}/>}
 
     {message && <div className={'toast map-toast ' + messageKind} role={messageKind === 'error' ? 'alert' : 'status'}><span>{message}</span><div className="map-toast-actions">{failedMutation && <button onClick={() => void mutate(failedMutation.path, failedMutation.method, failedMutation.payload, failedMutation.action)} type="button">重新嘗試</button>}{reauthRequired && <button onClick={() => window.location.assign('/login')} type="button">重新登入</button>}<button aria-label="關閉通知" onClick={() => setMessage('')} type="button"><X aria-hidden="true" /></button></div></div>}
 
@@ -620,6 +637,8 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
             <img
               alt={tile.mapCode + (displayRevealed ? ' 正面' : ' 背面')}
               src={mapImageUrl(tile.mapCode, displayRevealed)}
+              loading="lazy"
+              decoding="async"
             />
             <span className="map-tile-state">{displayRevealed ? '已揭示' : '未揭示'}</span>
             {occupied && <span className="hunter-marker" title={map.currentLocationType === 'LOCATION' ? '獵人目前位於 ' + map.currentLocationCode : '獵人目前位置'}><MapPin aria-hidden="true" /></span>}
@@ -641,6 +660,8 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
 
       {draft && editorOpen && <aside className="map-editor map-editor-drawer" aria-labelledby="map-editor-title" aria-modal="true" role="dialog">
         <header><div><p className="eyebrow">SELECTED MAP CARD</p><h2 id="map-editor-title">{draft.mapCode}</h2>{mapDraftDirty && <span className="unsaved-badge">尚未儲存</span>}</div><div className="map-editor-header-actions">{returnToProgress && <button className="text-button" onClick={returnToCardProgress} type="button">返回卡片清單</button>}<button className="icon-button" aria-label="關閉地圖卡紀錄" onClick={closeMapEditor} type="button"><X aria-hidden="true" /></button></div></header>
+
+        {versionConflict&&failedMutation&&<VersionConflictPanel title="地圖資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={Boolean(busy)} onReload={()=>{setFailedMutation(null);setVersionConflict(null);setMessageKind('success');setMessage('已採用最新地圖資料。');}} onReapply={()=>void mutate(failedMutation.path,failedMutation.method,failedMutation.payload,failedMutation.action)}/>}
 
         <div className="map-editor-actions">
           <button
@@ -817,11 +838,32 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
       </>}
     </section>
 
-    <section className="event-notes-section" aria-labelledby="event-notes-title">
-      <header className="campaign-module-heading compact"><div><p className="eyebrow">EVENT RECORDS</p><h2 id="event-notes-title">事件人工紀錄</h2><p>直接記錄已觸發的卡片名稱或桌遊結果。</p></div></header>
-      <div className="event-note-fields"><label className="map-field"><span>道路事件卡 Road Card</span><textarea value={roadEventNotes} onChange={event => setRoadEventNotes(event.target.value)} rows={6} placeholder="每行記錄一張已觸發的道路事件卡" /></label><label className="map-field"><span>城鎮事件卡 Town Card</span><textarea value={townEventNotes} onChange={event => setTownEventNotes(event.target.value)} rows={6} placeholder="每行記錄一張已觸發的城鎮事件卡" /></label></div>
-      <div className="map-editor-primary-actions"><button className="button" disabled={Boolean(busy)} onClick={() => mutate('/api/campaign/map/event-notes', 'PATCH', { roadEventNotes, townEventNotes }, 'event-notes')} type="button"><Save aria-hidden="true" />{busy === 'event-notes' ? '儲存中…' : savedAction === 'event-notes' ? '已儲存' : '儲存事件紀錄'}</button></div>
-    </section>
+    <EventRecordsSection
+      initialRoadNotes={roadEventNotes}
+      initialTownNotes={townEventNotes}
+      expectedVersion={map.version}
+      onSaved={updatedMap => {
+        setMap(updatedMap);
+        setRoadEventNotes(updatedMap.roadEventNotes);
+        setTownEventNotes(updatedMap.townEventNotes);
+      }}
+      onAdoptLatest={latestMap => {
+        setMap(latestMap);
+        setRoadEventNotes(latestMap.roadEventNotes);
+        setTownEventNotes(latestMap.townEventNotes);
+      }}
+      disabled={Boolean(busy)}
+      onSavingChange={saving => setBusy(saving ? 'event-notes' : '')}
+      onToast={msg => {
+        setMessageKind('success');
+        setMessage(msg);
+      }}
+      onError={err => {
+        setMessageKind('error');
+        setMessage(err);
+      }}
+      variant="map"
+    />
   </section>;
 }
 

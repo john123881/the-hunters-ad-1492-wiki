@@ -320,6 +320,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
         </aside>
       </div>
       {character && <CharacterEquipmentBoard
+        key={`${selectedNumber}-${character.heroSlug}`}
         playerNumber={selectedNumber}
         heroSlug={character.heroSlug}
         canEdit={canEdit}

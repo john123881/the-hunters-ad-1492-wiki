@@ -144,8 +144,8 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
   const previousHeroSlug = useRef(heroSlug);
   const dialogPreviousFocus = useRef<HTMLElement | null>(null);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) setLoading(true);
     try {
       const [loadoutPayload, wagonPayload] = await Promise.all([
         fetch('/api/campaign/characters/' + playerNumber + '/loadout', { credentials: 'same-origin' }).then(response => readJson<LoadoutResponse>(response)),
@@ -160,7 +160,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       setMessage(cause instanceof Error ? cause.message : '裝備面板載入失敗。');
       return null;
     } finally {
-      setLoading(false);
+      if (!options?.silent) setLoading(false);
     }
   }, [onVersionChange, playerNumber]);
 
@@ -182,14 +182,22 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
   useEffect(() => {
     if (!equipmentVisualUrls.length) return;
     let cancelled = false;
-    setVisualStatus('loading');
+    // 只有在初次載入或之前出錯重試時才顯示整片遮罩；一旦 ready 後就靜默預載新圖片，不遮蔽畫面
+    setVisualStatus(current => current === 'ready' ? 'ready' : 'loading');
     void Promise.all(equipmentVisualUrls.map(preloadEquipmentImage))
       .then(() => { if (!cancelled) setVisualStatus('ready'); })
       .catch(() => { if (!cancelled) setVisualStatus('error'); });
     return () => { cancelled = true; };
   }, [equipmentVisualUrls, visualRetry]);
 
+  const isInitialMount = useRef(true);
+
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      previousHeroSlug.current = heroSlug;
+      return;
+    }
     if (previousHeroSlug.current === heroSlug) return;
     previousHeroSlug.current = heroSlug;
     setSelectedSlot(null);
@@ -561,7 +569,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     );
     if (updated) {
       closePicker();
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
@@ -581,7 +589,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       );
     if (updated) {
       closePicker();
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
@@ -595,7 +603,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     if (updated) {
       setMovingEquipment(null);
       setMoveStartSlot(null);
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
@@ -696,7 +704,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     );
     if (updated) {
       closeAttachmentPicker();
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
@@ -716,7 +724,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     );
     if (updated) {
       setSelectedInstalledAttachment(null);
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
@@ -734,7 +742,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     );
     if (updated) {
       setSelectedRetainedAttachment(null);
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
@@ -757,7 +765,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     }
     if (updated) {
       setSelectedEquipment(null);
-      await refresh();
+      await refresh({ silent: true });
     }
   }
 
