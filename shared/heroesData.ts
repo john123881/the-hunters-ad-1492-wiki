@@ -19,7 +19,7 @@ export const heroDefinitions: HeroDefinition[] = [
   ['witch','巫師','克洛伊','你遵循著經驗與知識的指引，使用的力量如同河神、山靈一般古老。你能夠增幅同伴、詛咒敵人，甚至扭曲自然法則。沒什麼能逃過你的感知。'],
 ].map(([slug,roleNameZhTw,displayNameZhTw,storyZhTw]) => ({
   slug, roleNameZhTw, displayNameZhTw, storyZhTw,
-  boardImageUrl: `/images/campaign/characters/${slug}-board-v1.png`,
+  boardImageUrl: `/images/campaign/characters/${slug}-board-v2.webp`,
   initialLayoutImageUrl: `/images/campaign/characters/${slug}-initial-layout.webp`,
 }));
 

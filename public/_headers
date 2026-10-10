@@ -1,5 +1,38 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-/images/*
+/images/campaign/characters/equipment-board-gridless-v5.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/campaign/characters/slot-cover-10xp-v3.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/campaign/characters/slot-cover-blocked-x-v3.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/campaign/characters/*-board-v2.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/campaign/wagon-board-concept-v3.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/hero-keyart.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/hero-keyart-640.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/campaign/maps/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/images/items/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/images/icons/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/images/resources/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/images/workshops/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
