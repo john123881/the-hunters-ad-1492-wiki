@@ -1,0 +1,230 @@
+/* Navigation & site header */
+.site-header {
+  position: relative;
+  z-index: 5;
+  background: #050708f2;
+  border-bottom: 1px solid #8e714c66;
+}
+.header-inner {
+  max-width: 1320px;
+  margin: auto;
+  padding: 0 40px;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #dbc394;
+  flex-shrink: 0;
+  min-width: 245px;
+}
+.brand-emblem { width: 39px; height: 48px; }
+.brand-type {
+  color: #ead5a9;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.35rem;
+  letter-spacing: .08em;
+  line-height: 1;
+  text-shadow: 0 2px 18px #000;
+}
+.brand-type small {
+  display: block;
+  margin-top: 8px;
+  color: #b9955d;
+  font-size: .56rem;
+  letter-spacing: .32em;
+}
+.main-nav {
+  display: flex;
+  gap: 32px;
+  margin-left: auto;
+  height: 100%;
+}
+.main-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #a5afb0;
+  font-size: 13px;
+  letter-spacing: .1em;
+}
+.main-nav a:hover, .main-nav .active { color: #e2c995; }
+.main-nav .active::after {
+  content: '';
+  height: 2px;
+  background: var(--gold);
+  bottom: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  box-shadow: 0 -3px 18px #d4ae5866;
+}
+.header-edition {
+  color: #849396;
+  font-size: 11px;
+  letter-spacing: .08em;
+  padding-left: 30px;
+  border-left: 1px solid var(--line);
+}
+.header-edition span { margin: 0 8px; color: #b49a69; }
+
+/* Login link & player menu in header */
+.login-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid #9f8052;
+  color: #e5c98f;
+  font-size: 12px;
+  letter-spacing: .1em;
+  flex-shrink: 0;
+}
+.login-link:hover, .login-link.active {
+  color: #fff0c7;
+  border-color: #d4ad68;
+  background: #a8803524;
+}
+.player-menu { position: relative; flex-shrink: 0; }
+.player-menu > summary { list-style: none; cursor: pointer; }
+.player-menu > summary::-webkit-details-marker { display: none; }
+.player-menu[open] > summary { border-color: #d4ad68; background: #a8803524; color: #fff0c7; }
+.player-roster {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 230px;
+  padding: 16px;
+  border: 1px solid #8f754d;
+  background: #0b1518f7;
+  box-shadow: 0 18px 50px #000b;
+}
+.player-roster > p { margin: 0 0 10px; color: #d7bc82; font-size: 9px; letter-spacing: .16em; }
+.player-roster ol { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+.player-roster li {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+  padding: 5px 8px;
+  border-bottom: 1px solid #334144;
+  color: #7e8d8d;
+}
+.player-roster li.current { color: #ead49e; background: #a8803518; }
+.player-roster li > span { color: #c8aa6c; font-family: var(--serif); }
+.player-roster li > strong {
+  overflow: hidden;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player-roster li > small { color: #d6b86f; font-size: 8px; }
+.player-roster > a { display: block; margin-top: 13px; color: #d8be84; font-size: 10px; text-align: right; }
+
+/* Site footer */
+.site-footer { border-top: 1px solid #575c4955; background: #0a1114; }
+.footer-inner {
+  max-width: 1320px;
+  margin: auto;
+  padding: 27px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #a49775;
+  font-family: Georgia, serif;
+  font-size: 12px;
+  letter-spacing: .08em;
+}
+.footer-brand svg { display: none; }
+.footer-brand small { margin-left: 7px; font-size: 9px; color: #7f8b88; }
+.footer-inner > p {
+  margin: 0;
+  color: #8f958f;
+  font-family: Georgia, serif;
+  font-size: .62rem;
+  letter-spacing: .18em;
+}
+.footer-inner > a { display: flex; gap: 8px; align-items: center; color: #8e9a98; font-size: 10px; }
+
+/* Responsive navigation and footer */
+@media (min-width: 1500px) {
+  .header-inner, .footer-inner { max-width: 1440px; padding-left: 55px; padding-right: 55px; }
+}
+@media (max-width: 1100px) {
+  .header-inner, .footer-inner { padding-left: 28px; padding-right: 28px; }
+  .header-edition { display: none; }
+}
+@media (max-width: 900px) {
+  .header-inner { gap: 22px; }
+  .main-nav { gap: 20px; }
+  .main-nav a { font-size: 12px; letter-spacing: .04em; }
+}
+@media (max-width: 760px) {
+  .header-inner {
+    height: auto;
+    min-height: 112px;
+    padding-top: 12px;
+    padding-bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 48px 51px;
+    gap: 0 16px;
+  }
+  .brand { min-width: 0; align-self: center; }
+  .brand-type { font-size: 1rem; }
+  .brand-type small { font-size: .45rem; letter-spacing: .2em; }
+  .login-link { min-height: 36px; align-self: center; }
+  .player-menu, .header-inner > .login-link { grid-column: 2; grid-row: 1; align-self: center; }
+  .main-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    height: 51px;
+    margin: 0;
+    gap: 0;
+    border-top: 1px solid #35404480;
+  }
+  .main-nav a {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+    padding: 0 8px;
+    text-align: center;
+    font-size: 11px;
+  }
+  .footer-inner {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 17px 30px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .footer-inner > p { order: 3; flex-basis: 100%; text-align: center; font-size: 10px; }
+}
+@media (max-width: 560px) {
+  .header-inner, .footer-inner { padding-left: 18px; padding-right: 18px; }
+  .brand-emblem { display: none; }
+}
+@media (max-width: 420px) {
+  .header-inner { padding-left: 14px; padding-right: 14px; }
+  .brand-type { font-size: .9rem; }
+  .login-link { padding: 0 11px; font-size: 11px; }
+  .player-roster { position: fixed; top: 70px; right: 14px; width: min(250px, calc(100vw - 28px)); }
+  .main-nav a { padding-inline: 4px; font-size: 10px; }
+}
