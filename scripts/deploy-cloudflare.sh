@@ -24,10 +24,14 @@ echo -e "${GREEN}✔ 建置成功！${NC}"
 echo -e "\n${YELLOW}>>> [2/4] 檢查並套用遠端 D1 Migrations...${NC}"
 CI=true npx wrangler d1 migrations apply hunters-db --remote
 
-# 3. 遠端 D1 資料匯入（Seed）
-echo -e "\n${YELLOW}>>> [3/4] 匯入最新裝備資料庫至遠端 D1 (seeds/equipment_catalog.sql)...${NC}"
-npx wrangler d1 execute hunters-db --remote --file=seeds/equipment_catalog.sql -y
-echo -e "${GREEN}✔ 遠端 D1 資料同步完成！${NC}"
+# 3. 遠端 D1 資料匯入（Seed - 僅在帶有 --seed 參數時執行）
+if [[ "$*" == *"--seed"* ]]; then
+  echo -e "\n${YELLOW}>>> [3/4] 匯入最新裝備資料庫至遠端 D1 (seeds/equipment_catalog.sql)...${NC}"
+  npx wrangler d1 execute hunters-db --remote --file=seeds/equipment_catalog.sql -y
+  echo -e "${GREEN}✔ 遠端 D1 資料同步完成！${NC}"
+else
+  echo -e "\n${YELLOW}>>> [3/4] 略過遠端 D1 資料 Seed 匯入（如需匯入請執行: ./scripts/deploy-cloudflare.sh --seed）${NC}"
+fi
 
 # 4. 發布至 Cloudflare Workers
 echo -e "\n${YELLOW}>>> [4/4] 發布 Worker 與靜態資產至 Cloudflare...${NC}"

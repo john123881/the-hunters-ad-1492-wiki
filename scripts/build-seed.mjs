@@ -80,11 +80,11 @@ for (const [index, item] of items.entries()) {
 
 const sql = [
   '-- 由 data/equipment_page1.json ~ page8.json 共同產生；請修改來源 JSON 再執行 npm run data:seed。',
-  '-- 這是使用者整理資料；匯入本機 D1 時會取代目前所有物品與相依資料。',
+  '-- 這是使用者整理資料；採用 UPSERT 機制更新圖鑑，維持已有玩家裝備的外鍵完整性。',
   'PRAGMA foreign_keys = ON;',
   'DELETE FROM recipe_resources;', 'DELETE FROM recipe_ingredients;', 'DELETE FROM recipe_station_requirements;', 'DELETE FROM recipes;', 'DELETE FROM item_effects;', 'DELETE FROM weapon_traits;',
   'DELETE FROM weapon_sockets;', 'DELETE FROM attachment_specs;', 'DELETE FROM shield_roll_rules;', 'DELETE FROM defense_specs;',
-  'DELETE FROM item_action_modes;', 'DELETE FROM weapon_specs;', 'DELETE FROM items;',
+  'DELETE FROM item_action_modes;', 'DELETE FROM weapon_specs;',
 ];
 
 for (const [code, [name, group, description]] of Object.entries(effectDefinitions)) {
@@ -106,7 +106,11 @@ for (const item of items) {
     source_note: quote('來源為使用者整理資料；本站僅呈現資料，不將內容宣稱為官方中文規則。'),
     is_published: Number(Boolean(item.is_published)), sort_order: item.sort_order ?? 0,
   };
-  sql.push(`INSERT INTO items (${Object.keys(data).join(', ')}) VALUES (${Object.values(data).join(', ')});`);
+  const updateClauses = Object.keys(data)
+    .filter(key => key !== 'code')
+    .map(key => `${key} = excluded.${key}`)
+    .join(', ');
+  sql.push(`INSERT INTO items (${Object.keys(data).join(', ')}) VALUES (${Object.values(data).join(', ')}) ON CONFLICT(code) DO UPDATE SET ${updateClauses};`);
 
   if (item.category_code === 'weapon') {
     sql.push(`INSERT INTO weapon_specs (item_id, notes) VALUES (${itemId}, ${quote('依整理資料建立的武器規格。')});`);
