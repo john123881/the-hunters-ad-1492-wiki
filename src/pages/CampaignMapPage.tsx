@@ -3,6 +3,7 @@ import { Check, Clock3, MapPin, MapPinned, Save, Shield, Trash2, X } from 'lucid
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import { EventRecordsSection } from '../components/EventRecordsSection';
+import { Toast } from '../components/common/Toast';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignLocationCard, CampaignMap, CampaignMapCard, CampaignMapResponse, CampaignMapTile, CampaignWagonResponse } from '../../shared/types';
 
@@ -610,7 +611,14 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
 
     {!editorOpen&&versionConflict&&failedMutation&&<VersionConflictPanel title="地圖資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={Boolean(busy)} onReload={()=>{setFailedMutation(null);setVersionConflict(null);setMessageKind('success');setMessage('已採用最新地圖資料。');}} onReapply={()=>void mutate(failedMutation.path,failedMutation.method,failedMutation.payload,failedMutation.action)}/>}
 
-    {message && <div className={'toast map-toast ' + messageKind} role={messageKind === 'error' ? 'alert' : 'status'}><span>{message}</span><div className="map-toast-actions">{failedMutation && <button onClick={() => void mutate(failedMutation.path, failedMutation.method, failedMutation.payload, failedMutation.action)} type="button">重新嘗試</button>}{reauthRequired && <button onClick={() => window.location.assign('/login')} type="button">重新登入</button>}<button aria-label="關閉通知" onClick={() => setMessage('')} type="button"><X aria-hidden="true" /></button></div></div>}
+    <Toast
+      message={message}
+      kind={messageKind === 'error' ? 'error' : 'success'}
+      className="map-toast"
+      onClose={() => setMessage('')}
+      onRetry={failedMutation ? () => void mutate(failedMutation.path, failedMutation.method, failedMutation.payload, failedMutation.action) : undefined}
+      reauthRequired={reauthRequired}
+    />
 
     <div className="map-workspace">
       <div className="map-batch-toolbar" aria-label="地圖卡批次操作">

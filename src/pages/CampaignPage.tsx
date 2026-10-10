@@ -3,6 +3,7 @@ import { Clock3, Loader2, LogOut, PackageOpen, Pencil, Shield, Sparkles, UserRou
 import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import { EventRecordsSection } from '../components/EventRecordsSection';
+import { Toast } from '../components/common/Toast';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
@@ -586,9 +587,11 @@ export function CampaignPage({ session, loading, onLogout }: {
         <div><button className="text-button" onClick={() => setPendingDay(null)}>取消</button><button className="button" disabled={savingDay} onClick={() => void updateDay()}>{savingDay ? '更新中…' : '確認更新'}</button></div>
       </section>
     </div>}
-    {failure
-      ? <div className="toast toast-error" role="alert"><span>{failure}</span><button aria-label="關閉錯誤通知" onClick={() => setFailure('')} type="button">關閉</button></div>
-      : toast && <div className="toast" role="status">{toast}</div>}
+    {failure ? (
+      <Toast message={failure} kind="error" onClose={() => setFailure('')} />
+    ) : (
+      <Toast message={toast} kind="status" />
+    )}
   </section>;
 }
 
