@@ -2,7 +2,8 @@ import { readdir, rename, stat } from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
 
-const imageRoots = ['public/images/items', 'public/images/resources', 'public/images/workshops'];
+const imageRoots = ['public/images/resources', 'public/images/workshops'];
+const itemSourceRoot = 'source-assets/items';
 const normalizedIconRoots = ['public/images/resources', 'public/images/workshops'];
 const webpOptions = { quality: 84, alphaQuality: 100, effort: 5 };
 const iconCanvas = 96;
@@ -50,6 +51,15 @@ let converted = 0;
 let sourceBytes = 0;
 let outputBytes = 0;
 
+for (const input of await pngFiles(itemSourceRoot)) {
+  const output = path.join('public/images/items', path.basename(input).replace(/\.png$/i, '.webp'));
+  if (input.includes('.bak.png') || input.includes('.cleaned.png')) continue;
+  await convert(input, output);
+  sourceBytes += (await stat(input)).size;
+  outputBytes += (await stat(output)).size;
+  converted += 1;
+}
+
 for (const directory of imageRoots) {
   for (const input of await pngFiles(directory)) {
     const output = input.replace(/\.png$/i, '.webp');
@@ -60,7 +70,7 @@ for (const directory of imageRoots) {
   }
 }
 
-const heroInput = 'public/images/hero-keyart.png';
+const heroInput = 'source-assets/site/hero-keyart.png';
 const heroOutputs = [
   ['public/images/hero-keyart-640.webp', { width: 640, withoutEnlargement: true }],
   ['public/images/hero-keyart.webp', { width: 1200, withoutEnlargement: true }],

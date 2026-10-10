@@ -40,10 +40,10 @@ async function seedCatalog() {
       description,original_effect_text,image_url,is_published,sort_order,
       original_name,usage_verified,image_alt,source_kind,source_note
     ) VALUES
-      (1,'phase_weapon_2','phase-weapon-2','測試雙格武器',(SELECT id FROM item_categories WHERE code='weapon'),2,'permanent','unlimited','','Test weapon','/test/weapon-2.webp',1,1,'Phase Weapon 2',1,'測試雙格武器','reference','Phase E fixture'),
-      (2,'phase_weapon_1','phase-weapon-1','測試單格武器',(SELECT id FROM item_categories WHERE code='weapon'),1,'permanent','unlimited','','Test weapon','/test/weapon-1.webp',1,2,'Phase Weapon 1',1,'測試單格武器','reference','Phase E fixture'),
-      (3,'phase_attachment','phase-attachment','測試近戰附件',(SELECT id FROM item_categories WHERE code='weapon_attachment'),1,'permanent','unlimited','','Test attachment','/test/attachment.webp',1,3,'Phase Attachment',1,'測試近戰附件','reference','Phase E fixture'),
-      (4,'phase_armor','phase-armor','測試護甲',(SELECT id FROM item_categories WHERE code='armor'),1,'permanent','unlimited','','Test armor','/test/armor.webp',1,4,'Phase Armor',1,'測試護甲','reference','Phase E fixture');
+      (1,'phase_weapon_2','phase-weapon-2','測試雙格武器',(SELECT id FROM item_categories WHERE code='weapon'),2,'permanent','unlimited','','Test weapon','/images/items/phase-weapon-2.webp',1,1,'Phase Weapon 2',1,'測試雙格武器','reference','Phase E fixture'),
+      (2,'phase_weapon_1','phase-weapon-1','測試單格武器',(SELECT id FROM item_categories WHERE code='weapon'),1,'permanent','unlimited','','Test weapon','/images/items/phase-weapon-1.webp',1,2,'Phase Weapon 1',1,'測試單格武器','reference','Phase E fixture'),
+      (3,'phase_attachment','phase-attachment','測試近戰附件',(SELECT id FROM item_categories WHERE code='weapon_attachment'),1,'permanent','unlimited','','Test attachment','/images/items/phase-attachment.webp',1,3,'Phase Attachment',1,'測試近戰附件','reference','Phase E fixture'),
+      (4,'phase_armor','phase-armor','測試護甲',(SELECT id FROM item_categories WHERE code='armor'),1,'permanent','unlimited','','Test armor','/images/items/phase-armor.webp',1,4,'Phase Armor',1,'測試護甲','reference','Phase E fixture');
     INSERT INTO weapon_specs(item_id,notes) VALUES (1,'Phase E'),(2,'Phase E');
     INSERT INTO weapon_sockets(weapon_item_id,slot_index,socket_index,connector_type_id)
       VALUES
@@ -115,6 +115,48 @@ describe('Character Equipment Board Hono → D1 integration', () => {
 
   after(async () => {
     await miniflare.dispose();
+  });
+
+  it('圖鑑、詳情、馬車、裝備面板與附件候選皆回傳 WebP 路徑', async () => {
+    const catalog = await app.request('/api/items?q=phase', {}, { DB: db } as never);
+    assert.equal(catalog.status, 200);
+    const catalogPayload = await catalog.json() as any;
+    assert.ok(catalogPayload.data.length >= 4);
+
+    const detail = await app.request('/api/items/phase-weapon-2', {}, { DB: db } as never);
+    assert.equal(detail.status, 200);
+
+    const wagon = await request('/api/campaign/wagon');
+    assert.equal(wagon.status, 200);
+
+    const equipped = await request('/api/campaign/characters/1/equipment/101', 'PUT', {
+      expectedCharacterVersion: 1, expectedWagonVersion: 1, startSlotKey: 'HAND_1',
+    });
+    assert.equal(equipped.status, 200);
+
+    const responses = [
+      catalogPayload,
+      await detail.json(),
+      await wagon.json(),
+      await equipped.json(),
+      await (await request('/api/campaign/characters/1/loadout')).json(),
+      await (await request('/api/campaign/characters/1/equipment-candidates?slotKey=HAND_3')).json(),
+      await (await request('/api/campaign/characters/1/equipment-catalog-candidates?slotKey=HAND_3')).json(),
+      await (await request('/api/campaign/characters/1/equipment/101/attachment-candidates')).json(),
+      await (await request('/api/campaign/characters/1/equipment/101/attachment-catalog-candidates')).json(),
+    ];
+    const imageUrls: string[] = [];
+    const visit = (value: unknown) => {
+      if (Array.isArray(value)) return value.forEach(visit);
+      if (!value || typeof value !== 'object') return;
+      for (const [key, child] of Object.entries(value)) {
+        if (key === 'imageUrl' && typeof child === 'string' && child.startsWith('/images/items/')) imageUrls.push(child);
+        else visit(child);
+      }
+    };
+    responses.forEach(visit);
+    assert.ok(imageUrls.length >= 10);
+    assert.ok(imageUrls.every(url => url.endsWith('.webp')), imageUrls.join(', '));
   });
 
   it('從馬車放置裝備後同步更新角色、馬車、占格與日誌；過期版本不產生額外寫入', async () => {

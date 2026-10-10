@@ -1,7 +1,12 @@
-import { writeFile } from 'node:fs/promises';
+import { readdir, writeFile } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
 const baseUrl=process.env.IMAGE_AUDIT_BASE_URL??'http://127.0.0.1:4173';
+const itemImagePaths = (await readdir(new URL('../public/images/items', import.meta.url)))
+  .filter(name => name.endsWith('.webp'))
+  .sort()
+  .map(name => '/images/items/' + name);
 const groups=[
+['物品卡圖片',itemImagePaths],
 ['裝備面板基本載入組',['/images/campaign/characters/equipment-board-gridless-v5.webp','/images/campaign/characters/slot-cover-10xp-v3.webp','/images/campaign/characters/slot-cover-blocked-x-v3.webp']],
 ['角色面板',['brawler','crossbowman','cutthroat','huntress','landsknecht','man-at-arms','medic','sorceress','witch'].map(name=>'/images/campaign/characters/'+name+'-board-v2.webp')],
 ['馬車面板',['/images/campaign/wagon-board-concept-v3.webp']],
