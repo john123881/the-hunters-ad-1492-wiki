@@ -4,22 +4,13 @@ import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import { EventRecordsSection } from '../components/EventRecordsSection';
 import { Toast } from '../components/common/Toast';
+import { readApiError } from '../lib/apiClient';
+import { preloadImages } from '../lib/imagePreload';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v3.webp';
 const WAGON_VISUAL_URLS = [WAGON_BOARD_IMAGE_URL] as const;
-
-async function preloadImage(url: string) {
-  const image = new Image();
-  const loaded = new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve();
-    image.onerror = () => reject(new Error('圖片載入失敗：' + url));
-  });
-  image.src = url;
-  if (!image.complete || image.naturalWidth === 0) await loaded;
-  if (typeof image.decode === 'function') await image.decode();
-}
 
 const DAY_ROWS = [Array.from({ length: 10 }, (_, index) => index + 1), Array.from({ length: 10 }, (_, index) => index + 11), Array.from({ length: 10 }, (_, index) => index + 21)];
 const WORKSHOP_GEOMETRY: Record<string, { centers: [number, number][] }> = {
@@ -48,10 +39,6 @@ function diamondPoints(cx: number, cy: number, halfX: number, halfY: number) {
   return cx + ',' + (cy - halfY) + ' ' + (cx + halfX) + ',' + cy + ' ' + cx + ',' + (cy + halfY) + ' ' + (cx - halfX) + ',' + cy;
 }
 
-async function readError(response: Response) {
-  try { return ((await response.json()) as ApiErrorResponse).error.message; }
-  catch { return '操作失敗，請稍後再試。'; }
-}
 
 export function CampaignPage({ session, loading, onLogout }: {
   session: AuthSession | null; loading: boolean; onLogout: () => Promise<void>;
@@ -85,15 +72,15 @@ export function CampaignPage({ session, loading, onLogout }: {
     let active = true;
     setWagonVisualStatus('loading');
     setWagonImagesLoaded(0);
-    Promise.all(WAGON_VISUAL_URLS.map(async url => {
-      await preloadImage(url);
-      if (active) setWagonImagesLoaded(count => count + 1);
-    }))
-      .then(() => { if (active) setWagonVisualStatus('ready'); })
+    preloadImages(WAGON_VISUAL_URLS)
+      .then(() => {
+        if (!active) return;
+        setWagonImagesLoaded(WAGON_VISUAL_URLS.length);
+        setWagonVisualStatus('ready');
+      })
       .catch(() => { if (active) setWagonVisualStatus('error'); });
     return () => { active = false; };
   }, [wagonVisualAttempt]);
-
 
   async function loadWagon() {
     if (!session) return;
@@ -101,7 +88,7 @@ export function CampaignPage({ session, loading, onLogout }: {
     setFailure('');
     try {
       const response = await fetch('/api/campaign/wagon', { credentials: 'same-origin' });
-      if (!response.ok) throw new Error(await readError(response));
+      if (!response.ok) throw new Error((await readApiError(response)).message);
       const result = await response.json() as CampaignWagonResponse;
       setWagon(result.data);
       setCampaignName(result.data.campaignName);
@@ -122,7 +109,7 @@ export function CampaignPage({ session, loading, onLogout }: {
     setMapNotesStatus('loading');
     try {
       const response = await fetch('/api/campaign/map', { credentials: 'same-origin' });
-      if (!response.ok) throw new Error(await readError(response));
+      if (!response.ok) throw new Error((await readApiError(response)).message);
       const result = await response.json() as CampaignMapResponse;
       setRoadEventNotes(result.data.roadEventNotes ?? '');
       setTownEventNotes(result.data.townEventNotes ?? '');
@@ -221,7 +208,7 @@ export function CampaignPage({ session, loading, onLogout }: {
       method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ campaignName }),
     });
-    if (!response.ok) { setFailure(await readError(response)); return; }
+    if (!response.ok) { setFailure((await readApiError(response)).message); return; }
     setWagon(current => current ? { ...current, campaignName } : current);
     setEditingName(false);
     setToast('戰役名稱已更新');
@@ -259,7 +246,7 @@ export function CampaignPage({ session, loading, onLogout }: {
       body: JSON.stringify({ storyCardCode, tokenCode, unlockAfterDays: Number(unlockAtDay) }),
     });
     if (!response.ok) {
-      setFailure(await readError(response));
+      setFailure((await readApiError(response)).message);
       setSavingToken(false);
       return;
     }
@@ -276,7 +263,7 @@ export function CampaignPage({ session, loading, onLogout }: {
     const response = await fetch(`/api/campaign/wagon/time-tokens/${tokenId}`, {
       method: 'DELETE', credentials: 'same-origin',
     });
-    if (!response.ok) { setFailure(await readError(response)); return; }
+    if (!response.ok) { setFailure((await readApiError(response)).message); return; }
     const result = await response.json() as CampaignWagonResponse;
     setWagon(result.data);
     setToast('Time Token 已移除，劇情卡可以觸發');
@@ -595,7 +582,6 @@ export function CampaignPage({ session, loading, onLogout }: {
   </section>;
 }
 
-
 function SharedGold({ value, version, onChange, onError, onToast, onConflict }: {
   value: number;
   version: number;
@@ -673,7 +659,6 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
   </div>;
 }
 
-
 function ResourceInventory({ resources, version, onChange, onError, onToast, onConflict }: {
   resources: WagonResource[];
   version: number;
@@ -722,7 +707,6 @@ function ResourceInventory({ resources, version, onChange, onError, onToast, onC
     </div>
   </article>;
 }
-
 
 function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: {
   notes: string;
@@ -808,7 +792,7 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
     event.preventDefault();
     setSearching(true);
     const response = await fetch('/api/items?q=' + encodeURIComponent(query.trim()) + '&pageSize=12');
-    if (!response.ok) onError(await readError(response));
+    if (!response.ok) onError((await readApiError(response)).message);
     else {
       const result = await response.json() as ItemsResponse;
       setResults(result.data);
@@ -823,7 +807,7 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
       method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ itemId: Number(selectedItemId) }),
     });
-    if (!response.ok) onError(await readError(response));
+    if (!response.ok) onError((await readApiError(response)).message);
     else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);
@@ -837,7 +821,7 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
       method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ damageMarkers: Math.max(0, damageMarkers), notes: item.notes }),
     });
-    if (!response.ok) onError(await readError(response));
+    if (!response.ok) onError((await readApiError(response)).message);
     else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);
@@ -852,7 +836,7 @@ function EquipmentInventory({ equipment, onChange, onError, onToast }: {
     const response = await fetch('/api/campaign/wagon/equipment/' + item.id, {
       method: 'DELETE', credentials: 'same-origin',
     });
-    if (!response.ok) onError(await readError(response));
+    if (!response.ok) onError((await readApiError(response)).message);
     else {
       const result = await response.json() as CampaignWagonResponse;
       onChange(result.data);

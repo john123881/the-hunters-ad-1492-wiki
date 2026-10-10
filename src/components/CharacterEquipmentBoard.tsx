@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, Loader2, LockKeyhole, MoreHorizontal, Move, PackageOpen, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
 import { HAND_EQUIPMENT_VISUAL } from '../../shared/equipmentBoardTemplates';
-import type { ApiErrorResponse, CampaignWagonResponse } from '../../shared/types';
+import { ApiError, readApiJson } from '../lib/apiClient';
+import { preloadImages } from '../lib/imagePreload';
+import type { CampaignWagonResponse } from '../../shared/types';
 
 type SlotStatus = 'OPEN' | 'LOCKED_10' | 'BLOCKED' | 'OCCUPIED';
 type Slot = {
@@ -72,17 +74,6 @@ const EQUIPMENT_COVER_IMAGE_URLS = [
   EQUIPMENT_10_XP_COVER_IMAGE_URL,
 ] as const;
 
-async function preloadEquipmentImage(url: string) {
-  const image = new Image();
-  const loaded = new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve();
-    image.onerror = () => reject(new Error('圖片載入失敗：' + url));
-  });
-  image.src = url;
-  if (!image.complete || image.naturalWidth === 0) await loaded;
-  if (typeof image.decode === 'function') await image.decode();
-}
-
 function equipmentVisualUrlsFor(loadout: Loadout) {
   if (!loadout.templateVerified) return [];
   return [...new Set([
@@ -97,32 +88,9 @@ function equipmentVisualUrlsFor(loadout: Loadout) {
 }
 
 async function preloadLoadoutImages(loadout: Loadout) {
-  await Promise.all(equipmentVisualUrlsFor(loadout).map(preloadEquipmentImage));
+  await preloadImages(equipmentVisualUrlsFor(loadout));
 }
 
-class EquipmentApiError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-    readonly code: string,
-    readonly conflict?: unknown,
-  ) {
-    super(message);
-    this.name = 'EquipmentApiError';
-  }
-}
-
-async function readJson<T extends object>(response: Response): Promise<T> {
-  const payload = await response.json() as T | ApiErrorResponse;
-  if (!response.ok || (typeof payload === 'object' && payload !== null && 'error' in payload)) {
-    if (typeof payload === 'object' && payload !== null && 'error' in payload) {
-      const detail = payload.error as ApiErrorResponse['error'] & { conflict?: unknown };
-      throw new EquipmentApiError(detail.message, response.status, detail.code, detail.conflict);
-    }
-    throw new EquipmentApiError('操作失敗，請稍後再試。', response.status, 'UNKNOWN_ERROR');
-  }
-  return payload as T;
-}
 
 export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVersionChange }: {
   playerNumber: number;
@@ -165,8 +133,8 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     if (!options?.silent) setLoading(true);
     try {
       const [loadoutPayload, wagonPayload] = await Promise.all([
-        fetch('/api/campaign/characters/' + playerNumber + '/loadout', { credentials: 'same-origin' }).then(response => readJson<LoadoutResponse>(response)),
-        fetch('/api/campaign/wagon', { credentials: 'same-origin' }).then(response => readJson<CampaignWagonResponse>(response)),
+        fetch('/api/campaign/characters/' + playerNumber + '/loadout', { credentials: 'same-origin' }).then(response => readApiJson<LoadoutResponse>(response)),
+        fetch('/api/campaign/wagon', { credentials: 'same-origin' }).then(response => readApiJson<CampaignWagonResponse>(response)),
       ]);
       if (options?.silent) await preloadLoadoutImages(loadoutPayload.data);
       setLoadout(loadoutPayload.data);
@@ -194,7 +162,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     let cancelled = false;
     // 只有在初次載入或之前出錯重試時才顯示整片遮罩；一旦 ready 後就靜默預載新圖片，不遮蔽畫面
     setVisualStatus(current => current === 'ready' ? 'ready' : 'loading');
-    void Promise.all(equipmentVisualUrls.map(preloadEquipmentImage))
+    void preloadImages(equipmentVisualUrls)
       .then(() => { if (!cancelled) setVisualStatus('ready'); })
       .catch(() => { if (!cancelled) setVisualStatus('error'); });
     return () => { cancelled = true; };
@@ -286,7 +254,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...body, expectedCharacterVersion: loadout.version }),
-      }).then(response => readJson<LoadoutResponse>(response));
+      }).then(response => readApiJson<LoadoutResponse>(response));
       try {
         await preloadLoadoutImages(payload.data);
         setVisualStatus('ready');
@@ -298,7 +266,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       setMessage('裝備面板已更新。');
       return payload.data;
     } catch (cause) {
-      const isVersionConflict = cause instanceof EquipmentApiError && cause.status === 409 && (
+      const isVersionConflict = cause instanceof ApiError && cause.status === 409 && (
         cause.code.includes('VERSION_CONFLICT') || cause.code === 'EQUIPMENT_VERSION_CONFLICT'
       );
       const latest = await refresh({ silent: true });
@@ -359,7 +327,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
             const currentCandidates = await fetch(
               '/api/campaign/characters/' + playerNumber + '/equipment-candidates?' + query,
               { credentials: 'same-origin' },
-            ).then(response => readJson<CandidateResponse>(response));
+            ).then(response => readApiJson<CandidateResponse>(response));
             setCandidates(currentCandidates.data.items);
             const currentPreview = currentCandidates.data.items.find(item => item.instanceId === preview.instanceId) ?? null;
             setPreview(currentPreview);
@@ -379,7 +347,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
             const currentCandidates = await fetch(
               '/api/campaign/characters/' + playerNumber + '/equipment-catalog-candidates?' + query,
               { credentials: 'same-origin' },
-            ).then(response => readJson<CatalogCandidateResponse>(response));
+            ).then(response => readApiJson<CatalogCandidateResponse>(response));
             setCatalogCandidates(currentCandidates.data.items);
             const currentPreview = currentCandidates.data.items.find(item => item.itemId === catalogPreview.itemId) ?? null;
             setCatalogPreview(currentPreview);
@@ -417,7 +385,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
             const payload = await fetch(
               '/api/campaign/characters/' + playerNumber + '/equipment/' + currentEquipment.instanceId + '/attachment-catalog-candidates?' + query,
               { credentials: 'same-origin' },
-            ).then(response => readJson<AttachmentCatalogCandidateResponse>(response));
+            ).then(response => readApiJson<AttachmentCatalogCandidateResponse>(response));
             setAttachmentCatalogCandidates(payload.data.items);
             setSelectedAttachmentCatalogCandidate(previous =>
               previous ? payload.data.items.find(item => item.itemId === previous.itemId) ?? null : null
@@ -426,7 +394,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
             const payload = await fetch(
               '/api/campaign/characters/' + playerNumber + '/equipment/' + currentEquipment.instanceId + '/attachment-candidates?' + query,
               { credentials: 'same-origin' },
-            ).then(response => readJson<AttachmentCandidateResponse>(response));
+            ).then(response => readApiJson<AttachmentCandidateResponse>(response));
             setAttachmentCandidates(payload.data.items);
             setSelectedAttachmentCandidate(previous =>
               previous ? payload.data.items.find(item => item.instanceId === previous.instanceId) ?? null : null
@@ -494,7 +462,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       const payload = await fetch(
         '/api/campaign/characters/' + playerNumber + '/equipment-candidates?slotKey=' + encodeURIComponent(slot.slotKey),
         { credentials: 'same-origin' },
-      ).then(response => readJson<CandidateResponse>(response));
+      ).then(response => readApiJson<CandidateResponse>(response));
       setSelectedSlot(slot.slotKey);
       setPickerSource('WAGON');
       setCandidates(payload.data.items);
@@ -520,7 +488,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       const payload = await fetch(
         '/api/campaign/characters/' + playerNumber + '/equipment-candidates?' + query,
         { credentials: 'same-origin' },
-      ).then(response => readJson<CandidateResponse>(response));
+      ).then(response => readApiJson<CandidateResponse>(response));
       setReplacementTarget(item);
       setSelectedSlot(item.slotKeys[0]);
       setCandidates(payload.data.items);
@@ -560,7 +528,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
           ...(replacementTarget ? { replaceInstanceId: String(replacementTarget.instanceId) } : {}),
         }),
         { credentials: 'same-origin' },
-      ).then(response => readJson<CatalogCandidateResponse>(response));
+      ).then(response => readApiJson<CatalogCandidateResponse>(response));
       setCatalogCandidates(payload.data.items);
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入物品圖鑑。');
@@ -638,7 +606,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       const payload = await fetch(
         '/api/campaign/characters/' + playerNumber + '/equipment/' + equipment.instanceId + '/attachment-candidates?' + query,
         { credentials: 'same-origin' },
-      ).then(response => readJson<AttachmentCandidateResponse>(response));
+      ).then(response => readApiJson<AttachmentCandidateResponse>(response));
       setAttachmentTarget({ equipment, socket });
       setAttachmentSource('WAGON');
       setAttachmentCandidates(payload.data.items);
@@ -680,7 +648,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       const payload = await fetch(
         '/api/campaign/characters/' + playerNumber + '/equipment/' + attachmentTarget.equipment.instanceId + '/attachment-catalog-candidates?' + query,
         { credentials: 'same-origin' },
-      ).then(response => readJson<AttachmentCatalogCandidateResponse>(response));
+      ).then(response => readApiJson<AttachmentCatalogCandidateResponse>(response));
       setAttachmentCatalogCandidates(payload.data.items);
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入附件列表。');

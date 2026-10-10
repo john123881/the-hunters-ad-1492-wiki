@@ -4,12 +4,10 @@ import { Link } from 'react-router-dom';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
 import { EventRecordsSection } from '../components/EventRecordsSection';
 import { Toast } from '../components/common/Toast';
+import { getApiErrorMessage, readApiJson } from '../lib/apiClient';
+import { preloadImage, preloadImages } from '../lib/imagePreload';
 import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
 import type { ApiErrorResponse, AuthSession, CampaignLocationCard, CampaignMap, CampaignMapCard, CampaignMapResponse, CampaignMapTile, CampaignWagonResponse } from '../../shared/types';
-
-function errorMessage(payload: unknown, fallback: string) {
-  return (payload as ApiErrorResponse | null)?.error?.message ?? fallback;
-}
 
 
 function changedMapFields(before:CampaignMap,latest:CampaignMap){
@@ -31,34 +29,8 @@ type MutationRequest = {
   action: string;
 };
 
-const mapImageLoadCache = new Map<string, Promise<void>>();
-
 function mapImageUrl(mapCode: string, revealed: boolean) {
   return '/images/campaign/maps/' + mapCode + '-' + (revealed ? 'front' : 'back') + '.webp?v=12';
-}
-
-function preloadMapImage(url: string) {
-  const cached = mapImageLoadCache.get(url);
-  if (cached) return cached;
-
-  const pending = new Promise<void>((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => {
-      if (typeof image.decode !== 'function') {
-        resolve();
-        return;
-      }
-      image.decode().then(resolve).catch(() => resolve());
-    };
-    image.onerror = () => reject(new Error('地圖圖片載入失敗'));
-    image.src = url;
-  }).catch(error => {
-    mapImageLoadCache.delete(url);
-    throw error;
-  });
-
-  mapImageLoadCache.set(url, pending);
-  return pending;
 }
 
 export function CampaignMapPage({ session, loading }: { session: AuthSession | null; loading: boolean }) {
@@ -105,8 +77,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   const loadMap = useCallback(async () => {
     if (!session) return;
     const response = await fetch('/api/campaign/map', { credentials: 'same-origin' });
-    const payload = await response.json() as CampaignMapResponse | ApiErrorResponse;
-    if (!response.ok || !('data' in payload)) throw new Error(errorMessage(payload, '目前無法讀取地圖。'));
+    const payload = await readApiJson<CampaignMapResponse>(response, '目前無法讀取地圖。');
     setMap(payload.data);
   }, [session]);
 
@@ -130,7 +101,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
 
   useEffect(() => {
     if (!draft || !editorOpen) return;
-    void preloadMapImage(mapImageUrl(draft.mapCode, !draft.isRevealed)).catch(() => undefined);
+    void preloadImage(mapImageUrl(draft.mapCode, !draft.isRevealed)).catch(() => undefined);
   }, [draft?.mapCode, draft?.isRevealed, editorOpen]);
 
   useEffect(() => {
@@ -250,7 +221,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     });
     if (kind === 'MAP') {
       try {
-        await Promise.all(updates.filter(update => update.isRevealed).map(update => preloadMapImage(mapImageUrl(update.code, true))));
+        await preloadImages(updates.filter(update => update.isRevealed).map(update => mapImageUrl(update.code, true)));
       } catch {
         setMessageKind('error');
         setMessage('部分地圖圖片載入失敗，請檢查網路後重試。');
@@ -361,7 +332,6 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
   ]), [map]);
   const availableTimeTokenCodes = (['A', 'B', 'C', 'D'] as const).filter(code => !usedTimeTokenCodes.has(code));
 
-
   async function placeTimeToken(storyCardCode: string) {
     if (busy || !availableTimeTokenCodes.includes(tokenCode)) return;
     setBusy('time-token-' + storyCardCode);
@@ -387,7 +357,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
         } else if (response.status >= 500) {
           setMessage('伺服器暫時無法放置 Time Token，請稍後重試。');
         } else {
-          setMessage(errorMessage(result, '無法放置 Time Token，請檢查輸入。'));
+          setMessage(getApiErrorMessage(result, '無法放置 Time Token，請檢查輸入。'));
         }
         await loadMap().catch(() => undefined);
         return;
@@ -428,7 +398,7 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     setLoadingFlipCode(mapCode);
     setMessage('');
     try {
-      await preloadMapImage(mapImageUrl(mapCode, nextRevealed));
+      await preloadImage(mapImageUrl(mapCode, nextRevealed));
     } catch {
       setMessageKind('error');
       setMessage('地圖圖片載入失敗，請檢查網路後重試。');
@@ -485,12 +455,12 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
           setVersionConflict({fields,expectedVersion:map.version,currentVersion:latest.version});
           setMessage('');
         } else if (response.status === 409) {
-          setMessage(errorMessage(result,'資料發生衝突，請檢查後再試。'));
+          setMessage(getApiErrorMessage(result,'資料發生衝突，請檢查後再試。'));
         } else if (response.status >= 500) {
           setFailedMutation(request);
           setMessage('伺服器暫時無法完成儲存，請稍後重試。');
         } else {
-          setMessage(errorMessage(result, '資料格式不正確，請檢查輸入內容。'));
+          setMessage(getApiErrorMessage(result, '資料格式不正確，請檢查輸入內容。'));
         }
         return false;
       }
@@ -874,5 +844,4 @@ export function CampaignMapPage({ session, loading }: { session: AuthSession | n
     />
   </section>;
 }
-
 
