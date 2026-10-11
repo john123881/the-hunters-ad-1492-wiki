@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowUp, Loader2, LockKeyhole, MoreHorizontal, Move, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
 import { HAND_EQUIPMENT_VISUAL } from '../../shared/equipmentBoardTemplates';
-import { isVersionConflictError, readApiJson } from '../lib/apiClient';
+import { readApiJson } from '../lib/apiClient';
 import { preloadImages } from '../lib/imagePreload';
-import { EquipmentCandidatePreview, EquipmentCandidateThumbnail } from './EquipmentCandidatePreview';
+import { useEquipmentMutation } from '../hooks/useEquipmentMutation';
+import type { CampaignMutationMethod } from '../hooks/useCampaignMutation';
+import { AttachmentCandidatePreview, EquipmentCandidatePreview, EquipmentCandidateThumbnail } from './EquipmentCandidatePreview';
 import type { CampaignWagonResponse } from '../../shared/types';
 
 type SlotStatus = 'OPEN' | 'LOCKED_10' | 'BLOCKED' | 'OCCUPIED';
@@ -104,7 +106,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
   const [loading, setLoading] = useState(true);
   const [visualStatus, setVisualStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [visualRetry, setVisualRetry] = useState(0);
-  const [busy, setBusy] = useState(false);
+  const [queryBusy, setQueryBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -246,169 +248,182 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     };
   }, [dialogOpen]);
 
-  async function mutate(url: string, method: string, body: Record<string, unknown>) {
-    if (!loadout) return null;
-    setBusy(true);
+  async function applySavedLoadout(next: Loadout) {
     try {
-      const payload = await fetch(url, {
-        method,
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...body, expectedCharacterVersion: loadout.version }),
-      }).then(response => readApiJson<LoadoutResponse>(response));
-      try {
-        await preloadLoadoutImages(payload.data);
-        setVisualStatus('ready');
-      } catch {
-        setVisualStatus('error');
-      }
-      setLoadout(payload.data);
-      onVersionChange(payload.data.version);
-      setMessage('裝備面板已更新。');
-      return payload.data;
-    } catch (cause) {
-      const isVersionConflict = isVersionConflictError(cause);
-      const latest = await refresh({ silent: true });
-      if (isVersionConflict && latest) {
-        if (latest.heroSlug !== loadout.heroSlug) {
-          closePicker();
-          closeAttachmentPicker();
-          setSelectedEquipment(null);
-          setSelectedRetainedAttachment(null);
-          setMovingEquipment(null);
-          setMoveStartSlot(null);
-          setMessage('角色已更換，請重新選擇裝備位置。');
-          return null;
-        }
-
-        if (movingEquipment) {
-          const current = latest.equipment.find(item => item.instanceId === movingEquipment.instanceId);
-          if (current) {
-            setMovingEquipment(current);
-            if (moveStartSlot) {
-              const target = latest.slots.find(slot => slot.slotKey === moveStartSlot);
-              const occupiedByCurrent = current.slotKeys.includes(moveStartSlot);
-              if (!target || (target.status !== 'OPEN' && !occupiedByCurrent)) {
-                setMoveStartSlot(null);
-                setMessage('資料已更新；原位置已無法使用，已保留物品，請重新選擇空格。');
-                return null;
-              }
-            }
-          } else {
-            setMovingEquipment(null);
-            setMoveStartSlot(null);
-            setMessage('資料已更新；這件角色裝備已被移動，請重新操作。');
-            return null;
-          }
-        }
-        if (selectedEquipment) {
-          setSelectedEquipment(latest.equipment.find(item => item.instanceId === selectedEquipment.instanceId) ?? null);
-        }
-        if (selectedRetainedAttachment) {
-          setSelectedRetainedAttachment(
-            latest.retainedAttachments.find(item => item.instanceId === selectedRetainedAttachment.instanceId) ?? null,
-          );
-        }
-        if (selectedInstalledAttachment) {
-          const weapon = latest.equipment.find(item => item.instanceId === selectedInstalledAttachment.weaponInstanceId);
-          const attachment = weapon?.attachments.find(item => item.instanceId === selectedInstalledAttachment.instanceId);
-          setSelectedInstalledAttachment(weapon && attachment ? {
-            ...attachment,
-            weaponInstanceId: weapon.instanceId,
-            weaponName: weapon.name,
-          } : null);
-        }
-
-        if (selectedSlot && preview) {
-          const query = new URLSearchParams({ slotKey: selectedSlot });
-          if (replacementTarget) query.set('replaceInstanceId', String(replacementTarget.instanceId));
-          try {
-            const currentCandidates = await fetch(
-              '/api/campaign/characters/' + playerNumber + '/equipment-candidates?' + query,
-              { credentials: 'same-origin' },
-            ).then(response => readApiJson<CandidateResponse>(response));
-            setCandidates(currentCandidates.data.items);
-            const currentPreview = currentCandidates.data.items.find(item => item.instanceId === preview.instanceId) ?? null;
-            setPreview(currentPreview);
-            if (!currentPreview) {
-              setMessage('資料已更新；原物品已不在馬車，已保留起始格，請重新選擇裝備。');
-              return null;
-            }
-          } catch {
-            setPreview(null);
-          }
-        }
-
-        if (selectedSlot && catalogPreview) {
-          const query = new URLSearchParams({ slotKey: selectedSlot });
-          if (replacementTarget) query.set('replaceInstanceId', String(replacementTarget.instanceId));
-          try {
-            const currentCandidates = await fetch(
-              '/api/campaign/characters/' + playerNumber + '/equipment-catalog-candidates?' + query,
-              { credentials: 'same-origin' },
-            ).then(response => readApiJson<CatalogCandidateResponse>(response));
-            setCatalogCandidates(currentCandidates.data.items);
-            const currentPreview = currentCandidates.data.items.find(item => item.itemId === catalogPreview.itemId) ?? null;
-            setCatalogPreview(currentPreview);
-            if (!currentPreview) {
-              setSelectedSlot(null);
-              setMessage('資料已更新；原位置已無法放置這件物品，請重新選擇裝備位置。');
-              return null;
-            }
-          } catch {
-            setCatalogPreview(null);
-            setSelectedSlot(null);
-            setMessage('資料已更新；原位置已失效，請重新選擇裝備位置。');
-            return null;
-          }
-        }
-
-        if (attachmentTarget) {
-          const currentEquipment = latest.equipment.find(item => item.instanceId === attachmentTarget.equipment.instanceId);
-          const currentSocket = currentEquipment?.sockets.find(socket =>
-            socket.weaponSlotIndex === attachmentTarget.socket.weaponSlotIndex &&
-            socket.socketIndex === attachmentTarget.socket.socketIndex &&
-            socket.attachmentInstanceId == null
-          );
-          if (!currentEquipment || !currentSocket) {
-            closeAttachmentPicker();
-            setMessage('資料已更新；原附件孔位已失效或被占用，請重新選擇孔位。');
-            return null;
-          }
-          setAttachmentTarget({ equipment: currentEquipment, socket: currentSocket });
-          const query = new URLSearchParams({
-            weaponSlotIndex: String(currentSocket.weaponSlotIndex),
-            socketIndex: String(currentSocket.socketIndex),
-          });
-          if (attachmentSource === 'CATALOG') {
-            const payload = await fetch(
-              '/api/campaign/characters/' + playerNumber + '/equipment/' + currentEquipment.instanceId + '/attachment-catalog-candidates?' + query,
-              { credentials: 'same-origin' },
-            ).then(response => readApiJson<AttachmentCatalogCandidateResponse>(response));
-            setAttachmentCatalogCandidates(payload.data.items);
-            setSelectedAttachmentCatalogCandidate(previous =>
-              previous ? payload.data.items.find(item => item.itemId === previous.itemId) ?? null : null
-            );
-          } else {
-            const payload = await fetch(
-              '/api/campaign/characters/' + playerNumber + '/equipment/' + currentEquipment.instanceId + '/attachment-candidates?' + query,
-              { credentials: 'same-origin' },
-            ).then(response => readApiJson<AttachmentCandidateResponse>(response));
-            setAttachmentCandidates(payload.data.items);
-            setSelectedAttachmentCandidate(previous =>
-              previous ? payload.data.items.find(item => item.instanceId === previous.instanceId) ?? null : null
-            );
-          }
-        }
-
-        setMessage('角色或馬車資料已被其他玩家更新。已重新驗證並保留操作內容，請檢查預覽後再次確認。');
-      } else {
-        setMessage(cause instanceof Error ? cause.message : '裝備操作失敗。');
-      }
-      return null;
-    } finally {
-      setBusy(false);
+      await preloadLoadoutImages(next);
+      setVisualStatus('ready');
+    } catch {
+      setVisualStatus('error');
     }
+    setLoadout(next);
+    onVersionChange(next.version);
+    setMessage('裝備面板已更新。');
+  }
+
+  async function reconcileEquipmentConflict(latestFromConflict: Loadout) {
+    const previousLoadout = loadout;
+    if (!previousLoadout) return;
+    const latest = await refresh({ silent: true }) ?? latestFromConflict;
+
+    if (latest.heroSlug !== previousLoadout.heroSlug) {
+      closePicker();
+      closeAttachmentPicker();
+      setSelectedEquipment(null);
+      setSelectedRetainedAttachment(null);
+      setMovingEquipment(null);
+      setMoveStartSlot(null);
+      setMessage('角色已更換，請重新選擇裝備位置。');
+      return;
+    }
+
+    if (movingEquipment) {
+      const current = latest.equipment.find(item => item.instanceId === movingEquipment.instanceId);
+      if (current) {
+        setMovingEquipment(current);
+        if (moveStartSlot) {
+          const target = latest.slots.find(slot => slot.slotKey === moveStartSlot);
+          const occupiedByCurrent = current.slotKeys.includes(moveStartSlot);
+          if (!target || (target.status !== 'OPEN' && !occupiedByCurrent)) {
+            setMoveStartSlot(null);
+            setMessage('資料已更新；原位置已無法使用，已保留物品，請重新選擇空格。');
+            return;
+          }
+        }
+      } else {
+        setMovingEquipment(null);
+        setMoveStartSlot(null);
+        setMessage('資料已更新；這件角色裝備已被移動，請重新操作。');
+        return;
+      }
+    }
+    if (selectedEquipment) {
+      setSelectedEquipment(latest.equipment.find(item => item.instanceId === selectedEquipment.instanceId) ?? null);
+    }
+    if (selectedRetainedAttachment) {
+      setSelectedRetainedAttachment(
+        latest.retainedAttachments.find(item => item.instanceId === selectedRetainedAttachment.instanceId) ?? null,
+      );
+    }
+    if (selectedInstalledAttachment) {
+      const weapon = latest.equipment.find(item => item.instanceId === selectedInstalledAttachment.weaponInstanceId);
+      const attachment = weapon?.attachments.find(item => item.instanceId === selectedInstalledAttachment.instanceId);
+      setSelectedInstalledAttachment(weapon && attachment ? {
+        ...attachment,
+        weaponInstanceId: weapon.instanceId,
+        weaponName: weapon.name,
+      } : null);
+    }
+
+    if (selectedSlot && preview) {
+      const query = new URLSearchParams({ slotKey: selectedSlot });
+      if (replacementTarget) query.set('replaceInstanceId', String(replacementTarget.instanceId));
+      try {
+        const currentCandidates = await fetch(
+          '/api/campaign/characters/' + playerNumber + '/equipment-candidates?' + query,
+          { credentials: 'same-origin' },
+        ).then(response => readApiJson<CandidateResponse>(response));
+        setCandidates(currentCandidates.data.items);
+        const currentPreview = currentCandidates.data.items.find(item => item.instanceId === preview.instanceId) ?? null;
+        setPreview(currentPreview);
+        if (!currentPreview) {
+          setMessage('資料已更新；原物品已不在馬車，已保留起始格，請重新選擇裝備。');
+          return;
+        }
+      } catch {
+        setPreview(null);
+      }
+    }
+
+    if (selectedSlot && catalogPreview) {
+      const query = new URLSearchParams({ slotKey: selectedSlot });
+      if (replacementTarget) query.set('replaceInstanceId', String(replacementTarget.instanceId));
+      try {
+        const currentCandidates = await fetch(
+          '/api/campaign/characters/' + playerNumber + '/equipment-catalog-candidates?' + query,
+          { credentials: 'same-origin' },
+        ).then(response => readApiJson<CatalogCandidateResponse>(response));
+        setCatalogCandidates(currentCandidates.data.items);
+        const currentPreview = currentCandidates.data.items.find(item => item.itemId === catalogPreview.itemId) ?? null;
+        setCatalogPreview(currentPreview);
+        if (!currentPreview) {
+          setSelectedSlot(null);
+          setMessage('資料已更新；原位置已無法放置這件物品，請重新選擇裝備位置。');
+          return;
+        }
+      } catch {
+        setCatalogPreview(null);
+        setSelectedSlot(null);
+        setMessage('資料已更新；原位置已失效，請重新選擇裝備位置。');
+        return;
+      }
+    }
+
+    if (attachmentTarget) {
+      const currentEquipment = latest.equipment.find(item => item.instanceId === attachmentTarget.equipment.instanceId);
+      const currentSocket = currentEquipment?.sockets.find(socket =>
+        socket.weaponSlotIndex === attachmentTarget.socket.weaponSlotIndex &&
+        socket.socketIndex === attachmentTarget.socket.socketIndex &&
+        socket.attachmentInstanceId == null
+      );
+      if (!currentEquipment || !currentSocket) {
+        closeAttachmentPicker();
+        setMessage('資料已更新；原附件孔位已失效或被占用，請重新選擇孔位。');
+        return;
+      }
+      setAttachmentTarget({ equipment: currentEquipment, socket: currentSocket });
+      const query = new URLSearchParams({
+        weaponSlotIndex: String(currentSocket.weaponSlotIndex),
+        socketIndex: String(currentSocket.socketIndex),
+      });
+      if (attachmentSource === 'CATALOG') {
+        const payload = await fetch(
+          '/api/campaign/characters/' + playerNumber + '/equipment/' + currentEquipment.instanceId + '/attachment-catalog-candidates?' + query,
+          { credentials: 'same-origin' },
+        ).then(response => readApiJson<AttachmentCatalogCandidateResponse>(response));
+        setAttachmentCatalogCandidates(payload.data.items);
+        setSelectedAttachmentCatalogCandidate(previous =>
+          previous ? payload.data.items.find(item => item.itemId === previous.itemId) ?? null : null
+        );
+      } else {
+        const payload = await fetch(
+          '/api/campaign/characters/' + playerNumber + '/equipment/' + currentEquipment.instanceId + '/attachment-candidates?' + query,
+          { credentials: 'same-origin' },
+        ).then(response => readApiJson<AttachmentCandidateResponse>(response));
+        setAttachmentCandidates(payload.data.items);
+        setSelectedAttachmentCandidate(previous =>
+          previous ? payload.data.items.find(item => item.instanceId === previous.instanceId) ?? null : null
+        );
+      }
+    }
+
+    setMessage('角色或馬車資料已被其他玩家更新。已重新驗證並保留操作內容，請檢查預覽後再次確認。');
+  }
+
+  async function handleEquipmentMutationError(cause: unknown) {
+    await refresh({ silent: true });
+    setMessage(cause instanceof Error ? cause.message : '裝備操作失敗。');
+  }
+
+  const equipmentMutation = useEquipmentMutation({
+    loadout,
+    onSaved: applySavedLoadout,
+    onConflict: reconcileEquipmentConflict,
+    onError: handleEquipmentMutationError,
+  });
+  const busy = queryBusy || Boolean(equipmentMutation.busy);
+
+  async function mutate(
+    url: string,
+    method: CampaignMutationMethod,
+    body: Record<string, unknown>,
+  ) {
+    const saved = await equipmentMutation.mutateEquipment(
+      url,
+      method,
+      body,
+      'equipment:' + method + ':' + url,
+    );
+    return saved ? true : null;
   }
 
   async function chooseSlot(slot: Slot) {
@@ -456,7 +471,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
       if (item) setSelectedEquipment(item);
       return;
     }
-    setBusy(true);
+    setQueryBusy(true);
     try {
       const payload = await fetch(
         '/api/campaign/characters/' + playerNumber + '/equipment-candidates?slotKey=' + encodeURIComponent(slot.slotKey),
@@ -472,13 +487,13 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入馬車裝備。');
     } finally {
-      setBusy(false);
+      setQueryBusy(false);
     }
   }
 
   async function openReplacementPicker(item: Equipment) {
     if (!item.slotKeys[0]) return;
-    setBusy(true);
+    setQueryBusy(true);
     try {
       const query = new URLSearchParams({
         slotKey: item.slotKeys[0],
@@ -497,7 +512,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入可更換的馬車裝備。');
     } finally {
-      setBusy(false);
+      setQueryBusy(false);
     }
   }
 
@@ -519,7 +534,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     setCatalogPreview(null);
     if (source === 'WAGON') return;
     if (catalogCandidates.length) return;
-    setBusy(true);
+    setQueryBusy(true);
     try {
       const payload = await fetch(
         '/api/campaign/characters/' + playerNumber + '/equipment-catalog-candidates?' + new URLSearchParams({
@@ -532,7 +547,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入物品圖鑑。');
     } finally {
-      setBusy(false);
+      setQueryBusy(false);
     }
   }
 
@@ -596,7 +611,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
   }
 
   async function openAttachmentPicker(equipment: Equipment, socket: EquipmentSocket) {
-    setBusy(true);
+    setQueryBusy(true);
     try {
       const query = new URLSearchParams({
         weaponSlotIndex: String(socket.weaponSlotIndex),
@@ -617,7 +632,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入相容附件。');
     } finally {
-      setBusy(false);
+      setQueryBusy(false);
     }
   }
 
@@ -638,7 +653,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     setSelectedAttachmentCandidate(null);
     setSelectedAttachmentCatalogCandidate(null);
     if (source === 'WAGON' || attachmentCatalogCandidates.length) return;
-    setBusy(true);
+    setQueryBusy(true);
     try {
       const query = new URLSearchParams({
         weaponSlotIndex: String(attachmentTarget.socket.weaponSlotIndex),
@@ -652,7 +667,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : '無法載入附件列表。');
     } finally {
-      setBusy(false);
+      setQueryBusy(false);
     }
   }
 
@@ -731,7 +746,7 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
 
   async function equipmentAction(action: 'wagon' | 'remove' | 'damage') {
     if (!selectedEquipment || wagonVersion == null) return;
-    let updated: Loadout | null = null;
+    let updated: boolean | null = null;
     if (action === 'wagon') {
       updated = await mutate('/api/campaign/characters/' + playerNumber + '/equipment/' + selectedEquipment.instanceId + '/unequip', 'POST', {
         expectedWagonVersion: wagonVersion,
@@ -1063,15 +1078,34 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         <label className="character-equipment-search"><Search /><input autoFocus value={attachmentQuery} onChange={event => setAttachmentQuery(event.target.value)} placeholder={attachmentSource === 'WAGON' ? '搜尋名稱、ID 或 #ID' : '搜尋附件名稱或圖鑑 ID'} /></label>
         <div className="equipment-candidate-list">{attachmentSource === 'WAGON'
           ? (filteredAttachmentCandidates.length ? filteredAttachmentCandidates.map(item => <button type="button" key={item.instanceId} className={selectedAttachmentCandidate?.instanceId === item.instanceId ? 'active' : ''} onClick={() => setSelectedAttachmentCandidate(item)}>
-              {item.imageUrl ? <img src={item.imageUrl} alt="" /> : <Wrench />}
-              <span><strong>{item.name} #{item.instanceId}</strong><small>{item.connectorName}{item.damageMarkers ? ' · 毀損' : ''}</small><small>{item.notes || '無備註'}</small></span>
+              <EquipmentCandidateThumbnail imageUrl={item.imageUrl} name={item.name} />
+              <span className="equipment-candidate-copy"><strong>{item.name} #{item.instanceId}</strong><small>{item.connectorName}{item.damageMarkers ? ' · 毀損' : ''}</small><small>{item.notes || '無備註'}</small></span>
             </button>) : <p className="equipment-empty">馬車內沒有可連接的附件。</p>)
           : (filteredAttachmentCatalogCandidates.length ? filteredAttachmentCatalogCandidates.map(item => <button type="button" key={item.itemId} className={selectedAttachmentCatalogCandidate?.itemId === item.itemId ? 'active' : ''} onClick={() => setSelectedAttachmentCatalogCandidate(item)}>
-              {item.imageUrl ? <img src={item.imageUrl} alt="" /> : <Wrench />}
-              <span><strong>{item.name}</strong><small>{item.connectorName}</small><small>附件列表 · 將建立新的附件實體</small></span>
+              <EquipmentCandidateThumbnail imageUrl={item.imageUrl} name={item.name} />
+              <span className="equipment-candidate-copy"><strong>{item.name}</strong><small>{item.connectorName}</small><small>附件列表 · 將建立新的附件實體</small></span>
             </button>) : <p className="equipment-empty">附件列表沒有可連接的附件。</p>)}</div>
-        {attachmentSource === 'WAGON' && selectedAttachmentCandidate && <footer><p>將安裝：{selectedAttachmentCandidate.name} #{selectedAttachmentCandidate.instanceId}</p><button className="button" type="button" disabled={busy} onClick={() => void confirmAttachmentInstall()}>確認安裝</button></footer>}
-        {attachmentSource === 'CATALOG' && selectedAttachmentCatalogCandidate && <footer><p>將建立並安裝：{selectedAttachmentCatalogCandidate.name}</p><button className="button" type="button" disabled={busy} onClick={() => void confirmCatalogAttachmentInstall()}>確認建立並安裝</button></footer>}
+        {attachmentSource === 'WAGON' && selectedAttachmentCandidate && <footer className="equipment-drawer-footer">
+          <AttachmentCandidatePreview
+            imageUrl={selectedAttachmentCandidate.imageUrl}
+            name={selectedAttachmentCandidate.name}
+            connectorName={selectedAttachmentCandidate.connectorName}
+            source="WAGON"
+            instanceId={selectedAttachmentCandidate.instanceId}
+            damageMarkers={selectedAttachmentCandidate.damageMarkers}
+            notes={selectedAttachmentCandidate.notes}
+          />
+          <button className="button equipment-preview-confirm" type="button" disabled={busy} onClick={() => void confirmAttachmentInstall()}>確認安裝</button>
+        </footer>}
+        {attachmentSource === 'CATALOG' && selectedAttachmentCatalogCandidate && <footer className="equipment-drawer-footer">
+          <AttachmentCandidatePreview
+            imageUrl={selectedAttachmentCatalogCandidate.imageUrl}
+            name={selectedAttachmentCatalogCandidate.name}
+            connectorName={selectedAttachmentCatalogCandidate.connectorName}
+            source="CATALOG"
+          />
+          <button className="button equipment-preview-confirm" type="button" disabled={busy} onClick={() => void confirmCatalogAttachmentInstall()}>確認建立並安裝</button>
+        </footer>}
       </section>
     </div>}
 

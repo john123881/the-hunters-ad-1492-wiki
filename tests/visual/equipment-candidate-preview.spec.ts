@@ -165,3 +165,114 @@ test('desktop mouse and keyboard focus expose the high resolution candidate prev
   await expect(zoom).toBeVisible();
   await context.close();
 });
+
+test('attachment catalog thumbnails stay inside their rows and each row remains selectable', async ({ page }) => {
+  await installApi(page);
+
+  await page.route('**/api/campaign/characters/1/loadout', route => route.fulfill({
+    json: {
+      data: {
+        playerNumber: 1,
+        characterId: 1,
+        heroSlug: 'brawler',
+        version: 3,
+        templateVerified: true,
+        openedSlotKeys: [],
+        retainedAttachments: [],
+        equipment: [{
+          instanceId: 40,
+          itemId: 40,
+          name: '測試手槍',
+          imageUrl: '/images/items/petronel.webp',
+          categoryCode: 'weapon',
+          slotCount: 1,
+          damageMarkers: 0,
+          notes: '',
+          slotKeys: ['HAND_1'],
+          attachments: [],
+          sockets: [{
+            weaponSlotIndex: 1,
+            socketIndex: 1,
+            connectorCode: 'barrel',
+            connectorName: '槍械接口',
+            attachmentInstanceId: null,
+          }],
+        }],
+        slots: [
+          {
+            slotKey: 'HAND_1',
+            category: 'HAND',
+            laneKey: 'HAND',
+            rowIndex: 1,
+            boardRect: { xPercent: 2, yPercent: 5, widthPercent: 18, heightPercent: 18 },
+            initialStatus: 'OPEN',
+            status: 'OCCUPIED',
+          },
+          {
+            slotKey: 'ATTACHMENT_1',
+            category: 'ATTACHMENT',
+            laneKey: 'ATTACHMENT',
+            rowIndex: 1,
+            boardRect: { xPercent: 20, yPercent: 5, widthPercent: 14, heightPercent: 18 },
+            initialStatus: 'OPEN',
+            status: 'OPEN',
+          },
+        ],
+      },
+    },
+  }));
+  await page.route('**/api/campaign/characters/1/equipment/40/attachment-candidates?*', route => route.fulfill({
+    json: {
+      data: {
+        weaponInstanceId: 40,
+        weaponSlotIndex: 1,
+        socketIndex: 1,
+        connector: { code: 'barrel', name: '槍械接口' },
+        items: [],
+      },
+    },
+  }));
+  await page.route('**/api/campaign/characters/1/equipment/40/attachment-catalog-candidates?*', route => route.fulfill({
+    json: {
+      data: {
+        weaponInstanceId: 40,
+        weaponSlotIndex: 1,
+        socketIndex: 1,
+        items: [
+          { itemId: 101, name: '加長槍管', imageUrl: '/images/items/elongated-barrel.webp', connectorCode: 'barrel', connectorName: '槍械接口' },
+          { itemId: 102, name: '改良火藥', imageUrl: '/images/items/improved-gunpowder.webp', connectorCode: 'barrel', connectorName: '槍械接口' },
+          { itemId: 103, name: '銀彈', imageUrl: '/images/items/silver-balls.webp', connectorCode: 'barrel', connectorName: '槍械接口' },
+        ],
+      },
+    },
+  }));
+
+  await page.goto('/campaigns/characters/1');
+  await page.getByRole('button', { name: /測試手槍 #40/ }).click();
+  await page.getByRole('button', { name: '選擇附件' }).click();
+  await page.getByRole('tab', { name: '附件列表' }).click();
+
+  const rows = page.locator('.equipment-candidate-list > button');
+  await expect(rows).toHaveCount(3);
+  const firstThumb = rows.nth(0).locator('.equipment-candidate-thumb-wrap');
+  await expect(firstThumb).toBeVisible();
+
+  const firstBox = await rows.nth(0).boundingBox();
+  const secondBox = await rows.nth(1).boundingBox();
+  const thumbBox = await firstThumb.boundingBox();
+  expect(firstBox).not.toBeNull();
+  expect(secondBox).not.toBeNull();
+  expect(thumbBox).not.toBeNull();
+  expect(thumbBox!.width).toBeLessThanOrEqual(74);
+  expect(thumbBox!.height).toBeLessThanOrEqual(74);
+  expect(firstBox!.y + firstBox!.height).toBeLessThanOrEqual(secondBox!.y);
+
+  await rows.nth(1).click();
+  await expect(rows.nth(1)).toHaveClass(/active/);
+  const attachmentFooter = page.locator('.equipment-drawer-footer');
+  await expect(attachmentFooter).toBeVisible();
+  await expect(attachmentFooter.getByText('改良火藥', { exact: true })).toBeVisible();
+  await expect(attachmentFooter.getByText('槍械接口', { exact: true })).toBeVisible();
+  await expect(attachmentFooter.locator('.equipment-preview-card-frame img')).toHaveClass(/ready/);
+  await expect(attachmentFooter.getByRole('button', { name: '確認建立並安裝' })).toBeVisible();
+});

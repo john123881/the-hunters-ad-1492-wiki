@@ -151,3 +151,62 @@ export function EquipmentCandidatePreview({
   );
 }
 
+
+type AttachmentCandidatePreviewProps = {
+  imageUrl: string;
+  name: string;
+  connectorName: string;
+  source: 'WAGON' | 'CATALOG';
+  instanceId?: number;
+  damageMarkers?: number;
+  notes?: string;
+};
+
+export function AttachmentCandidatePreview({
+  imageUrl,
+  name,
+  connectorName,
+  source,
+  instanceId,
+  damageMarkers = 0,
+  notes,
+}: AttachmentCandidatePreviewProps) {
+  const [imageStatus, setImageStatus] = useState<'loading' | 'ready' | 'error'>(
+    imageUrl ? 'loading' : 'error',
+  );
+
+  useEffect(() => {
+    if (!imageUrl) {
+      setImageStatus('error');
+      return;
+    }
+    let active = true;
+    setImageStatus('loading');
+    void preloadImage(imageUrl)
+      .then(() => { if (active) setImageStatus('ready'); })
+      .catch(() => { if (active) setImageStatus('error'); });
+    return () => { active = false; };
+  }, [imageUrl]);
+
+  return (
+    <div className="equipment-selected-preview attachment-selected-preview">
+      <div className={'equipment-preview-card-frame status-' + imageStatus}>
+        {imageStatus === 'loading' && <Loader2 className="spinning-icon" aria-hidden="true" />}
+        {imageStatus === 'error' && <PackageOpen aria-hidden="true" />}
+        {imageUrl && <img src={imageUrl} alt="" decoding="async" className={imageStatus === 'ready' ? 'ready' : ''} />}
+      </div>
+      <div className="equipment-preview-details">
+        <div className="equipment-preview-header">
+          <strong>{name}</strong>
+          {instanceId != null && <span className="equipment-preview-id">#{instanceId}</span>}
+        </div>
+        <div className="equipment-preview-meta">
+          <span>{connectorName}</span>
+          <span>{source === 'WAGON' ? '馬車附件' : '附件列表新增'}</span>
+          {damageMarkers > 0 && <span className="danger">已毀損</span>}
+        </div>
+        {notes && <p className="equipment-preview-notes">{notes}</p>}
+      </div>
+    </div>
+  );
+}

@@ -131,6 +131,7 @@
 .equipment-preview-card-frame > img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; opacity: 0; }
 .equipment-preview-card-frame > img.ready { opacity: 1; }
 .equipment-preview-card-frame > svg { width: 28px; color: #d6ae55; }
+.attachment-selected-preview .equipment-preview-card-frame { flex-basis: clamp(150px,34vw,190px); width: clamp(150px,34vw,190px); height: min(132px,22svh); }
 .equipment-preview-details { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 8px; }
 .equipment-preview-header { display: flex; align-items: baseline; gap: 8px; }
 .equipment-preview-header strong { color: #f5eedb; font-size: 16px; }
@@ -204,6 +205,7 @@
   .equipment-drawer-footer { max-height: 52svh; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); }
   .equipment-selected-preview { gap: 10px; padding: 8px; }
   .equipment-preview-card-frame { flex-basis: clamp(100px,34vw,140px); width: clamp(100px,34vw,140px); height: min(210px,32svh); }
+  .attachment-selected-preview .equipment-preview-card-frame { flex-basis: clamp(116px,38vw,150px); width: clamp(116px,38vw,150px); height: min(112px,20svh); }
   .equipment-drawer-footer .button { justify-content: center; min-height: 44px; }
   .equipment-socket-list > div { align-items: stretch; grid-template-columns: 1fr; }
   .equipment-socket-list .button { justify-content: center; min-height: 44px; }
