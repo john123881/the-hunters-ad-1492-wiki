@@ -4,22 +4,12 @@ import { Link, useParams } from 'react-router-dom';
 import { heroDefinitionBySlug, heroDefinitions } from '../../shared/heroesData';
 import { heroBoardHotspots, type BoardPoint } from '../../shared/heroBoardHotspots';
 import { VersionConflictPanel } from '../components/VersionConflictPanel';
+import { Toast } from '../components/common/Toast';
 import { CharacterEquipmentBoard } from '../components/CharacterEquipmentBoard';
-import { useOptimisticSave } from '../lib/useOptimisticSave';
+import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
+import { useCharacterMutation, type CharacterMutationState } from '../hooks/useCharacterMutation';
 import type { ApiErrorResponse, AuthSession, CampaignCharacter, CampaignCharactersResponse } from '../../shared/types';
 
-const characterFieldLabels: Record<string, string> = {
-  heroSlug: '角色', customName: '角色名稱', moralePosition: '士氣位置', strengthLevel: '力量',
-  knowledgeLevel: '知識', perceptionLevel: '洞察', agilityLevel: '敏捷', maxHealthLevel: '最大生命軌',
-  currentHealth: '當前生命', xpTens: '經驗值十位', xpOnes: '經驗值個位', accumulatedXp: '累積經驗值',
-  isPoisoned: '中毒狀態', notes: '角色備註',
-};
-
-function changedCharacterFields(before: CampaignCharacter | null, latest: CampaignCharacter) {
-  if (!before) return ['角色已由其他玩家建立'];
-  const fields = Object.keys(characterFieldLabels).filter(key => before[key as keyof CampaignCharacter] !== latest[key as keyof CampaignCharacter]);
-  return fields.length ? fields.map(key => characterFieldLabels[key]) : ['角色版本'];
-}
 
 type Draft = Omit<CampaignCharacter, 'id' | 'playerNumber' | 'version'> & { version: number | null };
 const emptyDraft = (heroSlug: string): Draft => ({
@@ -80,44 +70,72 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
   const [modal, setModal] = useState<'story' | 'layout' | null>(null);
   const [choosingHero, setChoosingHero] = useState(false);
   const [boardImageLoaded, setBoardImageLoaded] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
   const character = characters.find(entry => entry.playerNumber === selectedNumber) ?? null;
 
-  const optimisticSave = useOptimisticSave<CampaignCharactersResponse['data'], Draft, CampaignCharacter[]>({
-    successMessage: '角色面板已儲存。',
-    computeChangedFields: latest => {
-      const latestChar = latest.find(entry => entry.playerNumber === selectedNumber);
-      return latestChar ? changedCharacterFields(character, latestChar) : ['角色版本'];
-    },
-    onSuccess: data => {
-      const savedCharacter = data.characters.find(entry => entry.playerNumber === selectedNumber);
-      if (savedCharacter) setDraft(toDraft(savedCharacter));
-      setCharacters(data.characters);
-    },
-  });
+  const applySavedCharacterState = useCallback((next: CharacterMutationState) => {
+    setCharacters(next.characters);
+    if (next.character) setDraft(toDraft(next.character));
+  }, []);
 
-  const { saving, isDirty, setIsDirty, message, setMessage, conflict, resetConflict } = optimisticSave;
+  const applyConflictingCharacterState = useCallback((next: CharacterMutationState) => {
+    setCharacters(next.characters);
+    if (next.character) {
+      setDraft(current => current ? { ...current, version: next.character!.version } : current);
+    }
+  }, []);
+
+  const characterMutation = useCharacterMutation({
+    playerNumber: selectedNumber,
+    state: {
+      version: draft?.version ?? character?.version ?? null,
+      character,
+      characters,
+    },
+    onSaved: applySavedCharacterState,
+    onConflict: applyConflictingCharacterState,
+  });
+  const {
+    busy,
+    message,
+    messageKind,
+    versionConflict,
+    reauthRequired,
+    canRetry,
+    mutate,
+    retry,
+    adoptLatest,
+    clearToast,
+    showSuccess,
+    showError,
+    beginExternal,
+    endExternal,
+  } = characterMutation;
+  const saving = busy === 'save-character' || busy === 'switch-hero';
+
+  useUnsavedChangesWarning(isDirty);
 
   useEffect(() => {
     if (!session) return;
     setBusyLoading(true);
-    setMessage('');
+    clearToast();
     fetch('/api/campaign/characters', { credentials: 'same-origin' })
       .then(async response => {
         const payload = (await response.json()) as CampaignCharactersResponse | ApiErrorResponse;
         if (!response.ok || 'error' in payload) throw new Error('error' in payload ? payload.error.message : '角色資料載入失敗。');
         setCharacters(payload.data.characters);
       })
-      .catch(error => setMessage(error instanceof Error ? error.message : '角色資料載入失敗。'))
+      .catch(error => showError(error instanceof Error ? error.message : '角色資料載入失敗。'))
       .finally(() => setBusyLoading(false));
-  }, [session, setMessage]);
+  }, [session, clearToast, showError]);
 
   useEffect(() => {
-    if (conflict) return;
+    if (versionConflict) return;
     setDraft(character ? toDraft(character) : null);
     setIsDirty(false);
     setChoosingHero(false);
-  }, [character?.id, character?.version, selectedNumber, conflict, setIsDirty]);
+  }, [character?.id, character?.version, selectedNumber, versionConflict]);
 
   // 只有在英雄底圖更換時（例如切換角色或切換席位）才重設圖片載入狀態
   useEffect(() => {
@@ -141,48 +159,56 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
     ));
   }, [selectedNumber]);
   async function save() {
-    if (!draft || !session) return;
+    if (!draft || !session || saving) return;
     let saveVersion = draft.version;
-    if (character && draft.heroSlug !== character.heroSlug) {
+    const isSwitchingHero = Boolean(character && draft.heroSlug !== character.heroSlug);
+
+    if (isSwitchingHero) {
       if (draft.version == null) return;
       if (!window.confirm('更換角色會將目前裝備面板上的全部裝備與附件移入馬車，確定繼續？')) return;
+      if (!beginExternal('switch-hero')) return;
       try {
-        setMessage('正在更換角色…');
         const wagonResponse = await fetch('/api/campaign/wagon', { credentials: 'same-origin' });
         const wagonPayload = await wagonResponse.json() as { data?: { version: number }; error?: { message: string } };
         if (!wagonResponse.ok || !wagonPayload.data) throw new Error(wagonPayload.error?.message ?? '無法讀取馬車版本。');
         const switchResponse = await fetch('/api/campaign/characters/' + selectedNumber + '/switch-hero', {
-          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ heroSlug: draft.heroSlug, expectedCharacterVersion: draft.version, expectedWagonVersion: wagonPayload.data.version, confirmed: true }),
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            heroSlug: draft.heroSlug,
+            expectedCharacterVersion: draft.version,
+            expectedWagonVersion: wagonPayload.data.version,
+            confirmed: true,
+          }),
         });
         const switchPayload = await switchResponse.json() as { data?: { version: number }; error?: { message: string } };
         if (!switchResponse.ok || !switchPayload.data) throw new Error(switchPayload.error?.message ?? '更換角色失敗。');
         saveVersion = switchPayload.data.version;
         setDraft(current => current ? { ...current, version: saveVersion } : current);
       } catch (cause) {
-        setMessage(cause instanceof Error ? cause.message : '更換角色失敗。');
+        showError(cause instanceof Error ? cause.message : '更換角色失敗。');
         return;
+      } finally {
+        endExternal();
       }
     }
-    const result = await optimisticSave.save('/api/campaign/characters/' + selectedNumber, { ...draft, version: saveVersion }, {
-      method: 'PUT',
-      expectedVersion: saveVersion,
-      customSuccessMessage: character && draft.heroSlug !== character.heroSlug ? '角色已更換，原裝備已移入馬車。' : undefined,
-    });
-    if (result.status === 'conflict') {
-      const latestChars = result.conflict.latest;
-      const latest = latestChars.find(entry => entry.playerNumber === selectedNumber);
-      if (latest) {
-        setCharacters(latestChars);
-        setDraft(current => (current ? { ...current, version: latest.version } : null));
-      }
-    }
+
+    const saved = await mutate(
+      '/api/campaign/characters/' + selectedNumber,
+      'PUT',
+      { ...draft, version: saveVersion },
+      'save-character',
+      {
+        expectedVersion: saveVersion,
+        successMessage: isSwitchingHero ? '角色已更換，原裝備已移入馬車。' : undefined,
+      },
+    );
+    if (saved) setIsDirty(false);
   }
 
   if (loading) return <section className="campaign-gate"><p className="eyebrow">VERIFYING SESSION</p><h1>正在確認戰役憑證…</h1></section>;
   if (!session) return <section className="campaign-gate"><Shield aria-hidden="true" /><p className="eyebrow">CAMPAIGN ACCESS REQUIRED</p><h1>登入後查看角色</h1><Link className="button" to="/login" state={{ from: '/campaigns/characters' }}>登入戰役</Link></section>;
-
-  const conflictLatest = conflict?.latest.find(entry => entry.playerNumber === selectedNumber);
 
   return <section className="campaign-page campaign-characters-page" aria-labelledby="campaign-characters-title">
     <header className="campaign-module-heading">
@@ -199,24 +225,36 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
       })}
     </nav>
 
-    {conflict && <VersionConflictPanel
+    {versionConflict && <VersionConflictPanel
       title="角色資料已被其他玩家更新"
-      changedFields={conflict.changedFields}
-      expectedVersion={conflict.expectedVersion}
-      currentVersion={conflict.currentVersion}
+      changedFields={versionConflict.fields}
+      expectedVersion={versionConflict.expectedVersion}
+      currentVersion={versionConflict.currentVersion}
       busy={saving}
       onReload={() => {
-        if (conflictLatest) {
-          setDraft(toDraft(conflictLatest));
+        const latest = versionConflict.latest.character;
+        if (latest) {
+          setDraft(toDraft(latest));
           setIsDirty(false);
-          resetConflict();
-          setMessage('已載入最新角色資料。');
+          adoptLatest('已載入最新角色資料。');
         }
       }}
-      onReapply={() => void save()}
+      onReapply={() => {
+        void retry().then(saved => {
+          if (saved) setIsDirty(false);
+        });
+      }}
     />}
 
-    {message && <div className={message.includes('已儲存') ? 'character-notice success' : 'character-notice'} role="status">{message}</div>}
+    <Toast
+      message={message}
+      kind={messageKind}
+      onClose={clearToast}
+      onRetry={canRetry && !versionConflict ? () => void retry().then(saved => {
+        if (saved) setIsDirty(false);
+      }) : undefined}
+      reauthRequired={reauthRequired}
+    />
     {busyLoading ? <div className="character-loading">正在載入角色資料…</div>
       : !selectedPlayer ? <article className="character-preview-panel"><p className="eyebrow">EMPTY PLAYER SLOT</p><h2>玩家席位 {selectedNumber} 從缺</h2><p>此席位尚未加入戰役。</p></article>
       : (!draft || choosingHero) ? <article className="hero-picker">
@@ -230,7 +268,7 @@ export function CampaignCharactersPage({ session, loading }: { session: AuthSess
             setIsDirty(true);
             setChoosingHero(false);
             setBoardImageLoaded(false);
-            setMessage('已選擇新角色，尚未儲存。');
+            showSuccess('已選擇新角色，尚未儲存。');
           }}>
             <img src={option.boardImageUrl} alt="" loading="lazy" decoding="async" /><span><strong>{option.displayNameZhTw}</strong><small>{option.roleNameZhTw}{used ? ' · 已被選擇' : current ? ' · 目前角色' : ''}</small></span>
           </button>;

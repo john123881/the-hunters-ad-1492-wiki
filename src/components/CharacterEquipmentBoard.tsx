@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Loader2, LockKeyhole, MoreHorizontal, Move, PackageOpen, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
+import { ArrowDown, ArrowUp, Loader2, LockKeyhole, MoreHorizontal, Move, RotateCcw, Search, Trash2, Wrench } from 'lucide-react';
 import { HAND_EQUIPMENT_VISUAL } from '../../shared/equipmentBoardTemplates';
 import { isVersionConflictError, readApiJson } from '../lib/apiClient';
 import { preloadImages } from '../lib/imagePreload';
+import { EquipmentCandidatePreview, EquipmentCandidateThumbnail } from './EquipmentCandidatePreview';
 import type { CampaignWagonResponse } from '../../shared/types';
 
 type SlotStatus = 'OPEN' | 'LOCKED_10' | 'BLOCKED' | 'OCCUPIED';
@@ -967,16 +968,45 @@ export function CharacterEquipmentBoard({ playerNumber, heroSlug, canEdit, onVer
         </div>}
         <label className="character-equipment-search"><Search /><input autoFocus value={candidateQuery} onChange={event => setCandidateQuery(event.target.value)} placeholder={pickerSource === 'WAGON' ? '搜尋名稱、ID 或 #ID' : '搜尋物品名稱或圖鑑 ID'} /></label>
         {pickerSource === 'WAGON'
-          ? <div className="equipment-candidate-list">{filteredCandidates.length ? filteredCandidates.map(item => <button type="button" key={item.instanceId} className={preview?.instanceId === item.instanceId ? 'active' : ''} onClick={() => setPreview(item)}>
-            {item.imageUrl ? <img src={item.imageUrl} alt="" /> : <PackageOpen />}
-            <span><strong>{item.name} #{item.instanceId}</strong><small>{item.categoryName} · 占 {item.slotCount} 格{item.damageMarkers ? ' · 毀損' : ''}</small><small>{item.notes || '無備註'}</small></span>
-          </button>) : <p className="equipment-empty">沒有可放在此格的馬車裝備。</p>}</div>
-          : <div className="equipment-candidate-list">{filteredCatalogCandidates.length ? filteredCatalogCandidates.map(item => <button type="button" key={item.itemId} className={catalogPreview?.itemId === item.itemId ? 'active' : ''} onClick={() => setCatalogPreview(item)}>
-            {item.imageUrl ? <img src={item.imageUrl} alt="" /> : <PackageOpen />}
-            <span><strong>{item.name}</strong><small>{item.categoryName} · 占 {item.slotCount} 格</small><small>圖鑑物品 · 將建立新的裝備實體</small></span>
-          </button>) : <p className="equipment-empty">沒有可放在此格的圖鑑物品。</p>}</div>}
-        {preview && pickerSource === 'WAGON' && <footer><p>預覽占用：{preview.previewSlotKeys.join('、')}</p><button className="button" type="button" disabled={busy} onClick={() => void confirmEquip()}>{replacementTarget ? '確認更換' : '確認從馬車放置'}</button></footer>}
-        {catalogPreview && pickerSource === 'CATALOG' && <footer><p>預覽占用：{catalogPreview.previewSlotKeys.join('、')}；將建立一件新的裝備。</p><button className="button" type="button" disabled={busy} onClick={() => void confirmCatalogEquip()}>確認建立並放置</button></footer>}
+          ? <div className="equipment-candidate-list">{filteredCandidates.length ? filteredCandidates.map(item => {
+            const selected = preview?.instanceId === item.instanceId;
+            return <button type="button" key={item.instanceId} className={selected ? 'active' : ''} aria-pressed={selected} onClick={() => setPreview(item)}>
+              <EquipmentCandidateThumbnail imageUrl={item.imageUrl} name={item.name} />
+              <span className="equipment-candidate-copy"><strong>{item.name} #{item.instanceId}</strong><small>{item.categoryName} · 占 {item.slotCount} 格{item.damageMarkers ? ' · 毀損' : ''}</small><small>{item.notes || '無備註'}</small></span>
+            </button>;
+          }) : <p className="equipment-empty">沒有可放在此格的馬車裝備。</p>}</div>
+          : <div className="equipment-candidate-list">{filteredCatalogCandidates.length ? filteredCatalogCandidates.map(item => {
+            const selected = catalogPreview?.itemId === item.itemId;
+            return <button type="button" key={item.itemId} className={selected ? 'active' : ''} aria-pressed={selected} onClick={() => setCatalogPreview(item)}>
+              <EquipmentCandidateThumbnail imageUrl={item.imageUrl} name={item.name} />
+              <span className="equipment-candidate-copy"><strong>{item.name}</strong><small>{item.categoryName} · 占 {item.slotCount} 格</small><small>圖鑑物品 · 將建立新的裝備實體</small></span>
+            </button>;
+          }) : <p className="equipment-empty">沒有可放在此格的圖鑑物品。</p>}</div>}
+        {preview && pickerSource === 'WAGON' && <footer className="equipment-drawer-footer">
+          <EquipmentCandidatePreview
+            imageUrl={preview.imageUrl}
+            name={preview.name}
+            categoryName={preview.categoryName}
+            slotCount={preview.slotCount}
+            previewSlotKeys={preview.previewSlotKeys}
+            source="WAGON"
+            instanceId={preview.instanceId}
+            damageMarkers={preview.damageMarkers}
+            notes={preview.notes}
+          />
+          <button className="button equipment-preview-confirm" type="button" disabled={busy} onClick={() => void confirmEquip()}>{replacementTarget ? '確認更換裝備' : '確認從馬車放置'}</button>
+        </footer>}
+        {catalogPreview && pickerSource === 'CATALOG' && <footer className="equipment-drawer-footer">
+          <EquipmentCandidatePreview
+            imageUrl={catalogPreview.imageUrl}
+            name={catalogPreview.name}
+            categoryName={catalogPreview.categoryName}
+            slotCount={catalogPreview.slotCount}
+            previewSlotKeys={catalogPreview.previewSlotKeys}
+            source="CATALOG"
+          />
+          <button className="button equipment-preview-confirm" type="button" disabled={busy} onClick={() => void confirmCatalogEquip()}>確認建立並放置</button>
+        </footer>}
       </section>
     </div>}
 
