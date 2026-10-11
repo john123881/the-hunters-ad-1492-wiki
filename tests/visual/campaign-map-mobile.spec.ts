@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Route } from '@playwright/test';
+import type { CampaignCardProgress } from '../../shared/types';
 
 const session = {
   campaignId: 'visual-test',
@@ -10,7 +11,7 @@ const session = {
   players: [{ playerNumber: 1, playerAlias: 'XD' }],
 };
 
-function makeMap() {
+function makeMap(cardProgress: CampaignCardProgress[] = []) {
   return {
     campaignId: 'visual-test',
     version: 7,
@@ -52,7 +53,7 @@ function makeMap() {
         timeToken: null,
       },
     ],
-    cardProgress: [],
+    cardProgress,
   };
 }
 
@@ -60,9 +61,10 @@ async function installApi(
   page: Page,
   conflictFirst = false,
   position?: { locationType: 'MAP' | 'LOCATION'; locationCode: string; mapCode: string },
+  cardProgress: CampaignCardProgress[] = [],
 ) {
   let map = {
-    ...makeMap(),
+    ...makeMap(cardProgress),
     currentLocationType: position?.locationType ?? null,
     currentLocationCode: position?.locationCode ?? null,
     currentMapCode: position?.mapCode ?? null,
@@ -255,4 +257,68 @@ test('map and location cards share the complete batch selection workflow', async
   await expect(page.getByText('已選擇 2 張地點卡')).toBeVisible();
   await page.locator('.location-batch-toolbar').getByRole('button', { name: '翻轉並儲存' }).click();
   await expect(page.getByRole('button', { name: '批次選取地點卡' })).toBeVisible();
+});
+
+test('card progress drawer owns filtering and returns to the located card', async ({ page }) => {
+  await installApi(page, false, undefined, [
+    {
+      cardCode: 'S005',
+      cardType: 'STORY',
+      edition: 'CORE',
+      isResolved: false,
+      locationType: 'LOCATION',
+      locationCode: 'L01',
+      timeToken: { tokenCode: 'A', unlockAtDay: 19 },
+    },
+    {
+      cardCode: 'S006',
+      cardType: 'STORY',
+      edition: 'CORE',
+      isResolved: false,
+      locationType: null,
+      locationCode: null,
+      timeToken: null,
+    },
+  ]);
+  await page.goto('/campaigns/map');
+
+  const openDrawer = page.getByRole('button', { name: '開啟卡片清單' });
+  if (await openDrawer.isVisible()) await openDrawer.click();
+
+  await page.getByLabel('搜尋卡號').fill('S005');
+  await expect(page.getByText('找到 1 張')).toBeVisible();
+  await page.locator('[data-card-code="S005"] .card-progress-code').click();
+  await expect(page.locator('.location-card-button').filter({ hasText: 'L01' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: '返回卡片清單' }).click();
+  await expect(page.getByLabel('搜尋卡號')).toHaveValue('S005');
+  await expect(page.locator('[data-card-code="S005"] .card-progress-code')).toBeFocused();
+});
+
+test('card progress layout follows the shared media query while resizing', async ({ page }) => {
+  await installApi(page);
+  await page.setViewportSize({ width: 619, height: 800 });
+  await page.goto('/campaigns/map');
+  await expect(page.getByRole('button', { name: '開啟卡片清單' })).toBeVisible();
+
+  await page.setViewportSize({ width: 621, height: 800 });
+  await expect(page.getByRole('button', { name: '開啟卡片清單' })).toHaveCount(0);
+  await expect(page.getByLabel('搜尋卡號')).toBeVisible();
+
+  await page.setViewportSize({ width: 619, height: 800 });
+  await expect(page.getByRole('button', { name: '開啟卡片清單' })).toBeVisible();
+});
+
+test('open map editor updates its scroll lock across the compact breakpoint', async ({ page }) => {
+  await installApi(page);
+  await page.setViewportSize({ width: 800, height: 800 });
+  await page.goto('/campaigns/map');
+  await page.locator('.map-card-placeholder').first().click();
+  await expect(page.locator('.map-editor-drawer')).toBeVisible();
+  await expect(page.locator('body')).not.toHaveCSS('position', 'fixed');
+
+  await page.setViewportSize({ width: 700, height: 800 });
+  await expect(page.locator('body')).toHaveCSS('position', 'fixed');
+
+  await page.setViewportSize({ width: 800, height: 800 });
+  await expect(page.locator('body')).not.toHaveCSS('position', 'fixed');
 });

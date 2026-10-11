@@ -6,8 +6,10 @@ import { EventRecordsSection } from '../components/EventRecordsSection';
 import { Toast } from '../components/common/Toast';
 import { readApiError } from '../lib/apiClient';
 import { preloadImages } from '../lib/imagePreload';
-import { executeOptimisticMutation, useUnsavedChangesWarning } from '../lib/useOptimisticSave';
-import type { ApiErrorResponse, AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
+import { useUnsavedChangesWarning } from '../lib/useOptimisticSave';
+import { useWagonMutation } from '../hooks/useWagonMutation';
+import type { CampaignMutationMethod } from '../hooks/useCampaignMutation';
+import type { AuthSession, CampaignMapResponse, CampaignWagon, CampaignWagonResponse, ItemsResponse, WagonEquipmentInstance, WagonResource, WagonTimeToken } from '../../shared/types';
 
 const WAGON_BOARD_IMAGE_URL = '/images/campaign/wagon-board-concept-v3.webp';
 const WAGON_VISUAL_URLS = [WAGON_BOARD_IMAGE_URL] as const;
@@ -21,19 +23,13 @@ const WORKSHOP_GEOMETRY: Record<string, { centers: [number, number][] }> = {
   blacksmiths_tools: { centers: [[1132, 553], [1132, 504], [1132, 455]] },
 };
 
-type WagonMutationRequest={path:string;payload:Record<string,unknown>;successMessage:string};
-function changedWagonFields(before:CampaignWagon,latest:CampaignWagon){
-  const fields:string[]=[];
-  if(before.elapsedDays!==latest.elapsedDays)fields.push('累計時間');
-  if(before.sharedGold!==latest.sharedGold)fields.push('團隊共用金錢');
-  if(before.notes!==latest.notes)fields.push('馬車備註');
-  if(before.campaignName!==latest.campaignName)fields.push('戰役名稱');
-  if(JSON.stringify(before.upgrades)!==JSON.stringify(latest.upgrades))fields.push('工坊等級');
-  if(JSON.stringify(before.resources)!==JSON.stringify(latest.resources))fields.push('素材庫存');
-  if(JSON.stringify(before.timeTokens)!==JSON.stringify(latest.timeTokens))fields.push('Time Token');
-  if(JSON.stringify(before.equipment)!==JSON.stringify(latest.equipment))fields.push('裝備庫存');
-  return fields.length?fields:['馬車版本'];
-}
+type WagonMutate = (
+  path: string,
+  method: CampaignMutationMethod,
+  payload: object,
+  action: string,
+  options?: { successMessage?: string },
+) => Promise<boolean>;
 
 function diamondPoints(cx: number, cy: number, halfX: number, halfY: number) {
   return cx + ',' + (cy - halfY) + ' ' + (cx + halfX) + ',' + cy + ' ' + cx + ',' + (cy + halfY) + ' ' + (cx - halfX) + ',' + cy;
@@ -51,7 +47,6 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [failure, setFailure] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
   const [pendingDay, setPendingDay] = useState<number | null>(null);
-  const [savingDay, setSavingDay] = useState(false);
   const [toast, setToast] = useState('');
   const [editingName, setEditingName] = useState(false);
   const [campaignName, setCampaignName] = useState('');
@@ -60,11 +55,19 @@ export function CampaignPage({ session, loading, onLogout }: {
   const [tokenCode, setTokenCode] = useState<'A' | 'B' | 'C' | 'D'>('A');
   const [unlockAtDay, setUnlockAtDay] = useState('');
   const [savingToken, setSavingToken] = useState(false);
-  const [savingUpgradeCode, setSavingUpgradeCode] = useState('');
-  const savingUpgradeRef = useRef(false);
   const [activeFocusTab, setActiveFocusTab] = useState<'workshops' | 'timetrack'>('workshops');
-  const [versionConflict,setVersionConflict]=useState<{request:WagonMutationRequest;fields:string[];expectedVersion:number;currentVersion:number}|null>(null);
-  const [retryingConflict,setRetryingConflict]=useState(false);
+  const {
+    busy: wagonMutationBusy,
+    message: wagonMutationMessage,
+    messageKind: wagonMutationMessageKind,
+    versionConflict,
+    reauthRequired,
+    canRetry: canRetryWagonMutation,
+    mutate: mutateWagon,
+    retry: retryWagonMutation,
+    adoptLatest: adoptLatestWagon,
+    clearToast: clearWagonMutationToast,
+  } = useWagonMutation(wagon, setWagon);
 
   useEffect(() => { document.title = '馬車面板｜THE HUNTERS A.D. 1492 WIKI'; }, []);
 
@@ -158,48 +161,17 @@ export function CampaignPage({ session, loading, onLogout }: {
     setLoggingOut(false);
   }
 
-  function showWagonConflict(problem:ApiErrorResponse,request:WagonMutationRequest){
-    if(!wagon||problem.error.conflict?.scope!=='WAGON'){setFailure(problem.error.message);return;}
-    const latest=problem.error.conflict.latest as CampaignWagon;
-    setVersionConflict({request,fields:changedWagonFields(wagon,latest),expectedVersion:wagon.version,currentVersion:latest.version});
-    setWagon(latest);setFailure('');
-  }
-  async function retryWagonConflict(){
-    if(!wagon||!versionConflict)return;
-    setRetryingConflict(true);
-    try{
-      const response=await fetch(versionConflict.request.path,{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({...versionConflict.request.payload,expectedVersion:wagon.version})});
-      const payload=await response.json() as CampaignWagonResponse|ApiErrorResponse;
-      if(!response.ok||'error' in payload){
-        if('error' in payload&&payload.error.code==='WAGON_VERSION_CONFLICT'){showWagonConflict(payload,versionConflict.request);return;}
-        throw new Error('error' in payload?payload.error.message:'無法重新套用修改。');
-      }
-      setWagon(payload.data);setVersionConflict(null);setPendingDay(null);setToast(versionConflict.request.successMessage);
-    }catch(cause){setFailure(cause instanceof Error?cause.message:'無法重新套用修改。');}
-    finally{setRetryingConflict(false);}
-  }
-
   async function updateDay() {
-    if (!wagon || pendingDay === null) return;
-    setSavingDay(true);
-    try {
-      const response = await fetch('/api/campaign/wagon/day', {
-        method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ elapsedDays: pendingDay, expectedVersion: wagon.version }),
-      });
-      if(!response.ok){
-        const problem=await response.json() as ApiErrorResponse;
-        if(problem.error.code==='WAGON_VERSION_CONFLICT'){showWagonConflict(problem,{path:'/api/campaign/wagon/day',payload:{elapsedDays:pendingDay},successMessage:'時間已更新為第 '+pendingDay+' 天'});return;}
-        throw new Error(problem.error.message);
-      }
-      const result = await response.json() as CampaignWagonResponse;
-      setWagon(result.data);
-      setToast(`時間已更新為第 ${result.data.elapsedDays} 天`);
-      setPendingDay(null);
-    } catch (cause) {
-      setFailure(cause instanceof Error ? cause.message : '無法更新時間。');
-      setPendingDay(null);
-    } finally { setSavingDay(false); }
+    if (pendingDay === null) return;
+    const targetDay = pendingDay;
+    const saved = await mutateWagon(
+      '/api/campaign/wagon/day',
+      'PATCH',
+      { elapsedDays: targetDay },
+      'update-day',
+      { successMessage: '時間已更新為第 ' + targetDay + ' 天' },
+    );
+    if (saved) setPendingDay(null);
   }
 
   async function saveName(event: FormEvent) {
@@ -215,27 +187,13 @@ export function CampaignPage({ session, loading, onLogout }: {
   }
 
   async function setUpgrade(stationCode: string, level: number) {
-    if (!wagon || savingUpgradeRef.current) return;
-    savingUpgradeRef.current = true;
-    setSavingUpgradeCode(stationCode);
-    try {
-      const response = await fetch(`/api/campaign/wagon/upgrades/${stationCode}`, {
-        method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level, expectedVersion: wagon.version }),
-      });
-      if (!response.ok) {
-        const problem = (await response.json()) as ApiErrorResponse;
-        if(problem.error.code==='WAGON_VERSION_CONFLICT')showWagonConflict(problem,{path:'/api/campaign/wagon/upgrades/'+stationCode,payload:{level},successMessage:'工坊等級已更新'});
-        else setFailure(problem.error.message);
-        return;
-      }
-      const result = await response.json() as CampaignWagonResponse;
-      setWagon(result.data);
-      setToast('工坊等級已更新');
-    } finally {
-      savingUpgradeRef.current = false;
-      setSavingUpgradeCode('');
-    }
+    await mutateWagon(
+      '/api/campaign/wagon/upgrades/' + stationCode,
+      'PATCH',
+      { level },
+      'upgrade:' + stationCode,
+      { successMessage: '工坊等級已更新' },
+    );
   }
 
   async function addTimeToken(event: FormEvent) {
@@ -290,7 +248,18 @@ export function CampaignPage({ session, loading, onLogout }: {
       <span className={session.isActive ? 'campaign-state active' : 'campaign-state'}>{session.isActive ? '進行中' : '已凍結'}</span>
     </header>
 
-    {versionConflict&&<VersionConflictPanel title="馬車資料已被其他玩家更新" changedFields={versionConflict.fields} expectedVersion={versionConflict.expectedVersion} currentVersion={versionConflict.currentVersion} busy={retryingConflict} onReload={()=>{setVersionConflict(null);setPendingDay(null);setToast('已採用最新馬車資料。');}} onReapply={()=>void retryWagonConflict()}/>}
+    {versionConflict && <VersionConflictPanel
+      title="馬車資料已被其他玩家更新"
+      changedFields={versionConflict.fields}
+      expectedVersion={versionConflict.expectedVersion}
+      currentVersion={versionConflict.currentVersion}
+      busy={Boolean(wagonMutationBusy)}
+      onReload={() => {
+        setPendingDay(null);
+        adoptLatestWagon('已採用最新馬車資料。');
+      }}
+      onReapply={() => void retryWagonMutation()}
+    />}
 
     <div className="campaign-session-card">
       <UserRound aria-hidden="true" />
@@ -302,7 +271,11 @@ export function CampaignPage({ session, loading, onLogout }: {
       <header className="wagon-board-head">
         <div><p className="eyebrow">WAGON RECORD</p><h2>馬車全景總覽</h2></div>
         <div className="wagon-board-status">
-          <SharedGold value={wagon.sharedGold} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
+          <SharedGold
+            value={wagon.sharedGold}
+            busy={wagonMutationBusy === 'shared-gold'}
+            mutate={mutateWagon}
+          />
           <div className="elapsed-day">
             <small>累計時間</small>
             <strong>{wagon.elapsedDays}</strong>
@@ -500,7 +473,7 @@ export function CampaignPage({ session, loading, onLogout }: {
           {wagon.upgrades.map(upgrade => <div className="workshop-row" key={upgrade.code}>
             <div>{upgrade.imageUrl && <img src={upgrade.imageUrl} alt="" loading="lazy" decoding="async" />}<span><strong>{upgrade.name}</strong><small>{upgrade.originalName}</small></span></div>
             <div className="level-selector" aria-label={`${upgrade.name}等級`}>
-              {[0, 1, 2, 3].map(level => <button key={level} disabled={Boolean(savingUpgradeCode)} className={level === upgrade.level ? 'selected' : ''} onClick={() => void setUpgrade(upgrade.code, level)} aria-pressed={level === upgrade.level}>{level}</button>)}
+              {[0, 1, 2, 3].map(level => <button key={level} disabled={Boolean(wagonMutationBusy)} className={level === upgrade.level ? 'selected' : ''} onClick={() => void setUpgrade(upgrade.code, level)} aria-pressed={level === upgrade.level}>{level}</button>)}
             </div>
           </div>)}
         </div>
@@ -537,9 +510,17 @@ export function CampaignPage({ session, loading, onLogout }: {
         </div>
       </article>
 
-      <ResourceInventory resources={wagon.resources} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
+      <ResourceInventory
+        resources={wagon.resources}
+        busyAction={wagonMutationBusy}
+        mutate={mutateWagon}
+      />
       <EquipmentInventory equipment={wagon.equipment} onChange={setWagon} onError={setFailure} onToast={setToast} />
-      <WagonNotes notes={wagon.notes} version={wagon.version} onChange={setWagon} onError={setFailure} onToast={setToast} onConflict={showWagonConflict} />
+      <WagonNotes
+        notes={wagon.notes}
+        busy={wagonMutationBusy === 'save-notes'}
+        mutate={mutateWagon}
+      />
       {mapNotesStatus === 'ready' && typeof mapVersion === 'number'
         ? <EventRecordsSection
             initialRoadNotes={roadEventNotes}
@@ -571,34 +552,31 @@ export function CampaignPage({ session, loading, onLogout }: {
         <p className="eyebrow">CONFIRM TIME CHANGE</p>
         <h2 id="confirm-day-title">將時間改為第 {pendingDay} 天？</h2>
         <p>目前是第 {wagon.elapsedDays} 天。這只更新網頁紀錄，不會自動處理或重新鎖定劇情卡。</p>
-        <div><button className="text-button" onClick={() => setPendingDay(null)}>取消</button><button className="button" disabled={savingDay} onClick={() => void updateDay()}>{savingDay ? '更新中…' : '確認更新'}</button></div>
+        <div><button className="text-button" onClick={() => setPendingDay(null)}>取消</button><button className="button" disabled={wagonMutationBusy === 'update-day'} onClick={() => void updateDay()}>{wagonMutationBusy === 'update-day' ? '更新中…' : '確認更新'}</button></div>
       </section>
     </div>}
-    {failure ? (
-      <Toast message={failure} kind="error" onClose={() => setFailure('')} />
-    ) : (
-      <Toast message={toast} kind="status" />
-    )}
+    <Toast
+      message={failure || wagonMutationMessage || toast}
+      kind={failure || wagonMutationMessageKind === 'error' ? 'error' : 'status'}
+      onClose={() => {
+        setFailure('');
+        setToast('');
+        clearWagonMutationToast();
+      }}
+      onRetry={canRetryWagonMutation ? () => void retryWagonMutation() : undefined}
+      reauthRequired={reauthRequired}
+    />
   </section>;
 }
 
-function SharedGold({ value, version, onChange, onError, onToast, onConflict }: {
+function SharedGold({ value, busy, mutate }: {
   value: number;
-  version: number;
-  onChange: (wagon: CampaignWagon) => void;
-  onError: (message: string) => void;
-  onToast: (message: string) => void;
-  onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
+  busy: boolean;
+  mutate: WagonMutate;
 }) {
   const [displayValue, setDisplayValue] = useState(value);
-  const [busy, setBusy] = useState(false);
-  const busyRef = useRef(false);
+  const savingRef = useRef(false);
   const saveTimerRef = useRef<number | null>(null);
-  const versionRef = useRef(version);
-
-  useEffect(() => {
-    versionRef.current = version;
-  }, [version]);
 
   useEffect(() => {
     setDisplayValue(value);
@@ -609,50 +587,21 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
   }, []);
 
   async function update(sharedGold: number) {
-    if (busyRef.current) return;
-    busyRef.current = true;
-    setBusy(true);
-
-    const result = await executeOptimisticMutation<CampaignWagon, { sharedGold: number }, CampaignWagon>({
-      url: '/api/campaign/wagon/gold',
-      method: 'PATCH',
-      payload: { sharedGold },
-      expectedVersion: versionRef.current,
-      rollback: () => setDisplayValue(value),
-      fallbackMessage: '無法更新團隊共用金錢。',
-    });
-
-    if (result.status === 'conflict') {
-      onConflict({
-        error: {
-          code: 'WAGON_VERSION_CONFLICT',
-          message: '馬車資料已被其他玩家更新。',
-          conflict: {
-            scope: result.conflict.scope as 'WAGON',
-            expectedVersion: result.conflict.expectedVersion,
-            currentVersion: result.conflict.currentVersion,
-            latest: result.conflict.latest,
-          },
-        },
-      }, {
-        path: '/api/campaign/wagon/gold',
-        payload: { sharedGold },
-        successMessage: '團隊共用金錢已更新為 ' + sharedGold,
-      });
-    } else if (result.status === 'error') {
-      onError(result.error.message);
-    } else if (result.status === 'saved') {
-      setDisplayValue(result.data.sharedGold);
-      onChange(result.data);
-      onToast('團隊共用金錢已更新為 ' + result.data.sharedGold);
-    }
-
-    busyRef.current = false;
-    setBusy(false);
+    if (savingRef.current) return;
+    savingRef.current = true;
+    const saved = await mutate(
+      '/api/campaign/wagon/gold',
+      'PATCH',
+      { sharedGold },
+      'shared-gold',
+      { successMessage: '團隊共用金錢已更新為 ' + sharedGold },
+    );
+    if (!saved) setDisplayValue(value);
+    savingRef.current = false;
   }
 
   function adjust(delta: number) {
-    if (busyRef.current) return;
+    if (savingRef.current || busy) return;
     setDisplayValue(current => {
       const next = Math.max(0, Math.min(99999, current + delta));
       if (next === current) return current;
@@ -677,37 +626,22 @@ function SharedGold({ value, version, onChange, onError, onToast, onConflict }: 
   </div>;
 }
 
-function ResourceInventory({ resources, version, onChange, onError, onToast, onConflict }: {
+function ResourceInventory({ resources, busyAction, mutate }: {
   resources: WagonResource[];
-  version: number;
-  onChange: (wagon: CampaignWagon) => void;
-  onError: (message: string) => void;
-  onToast: (message: string) => void;
-  onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
+  busyAction: string;
+  mutate: WagonMutate;
 }) {
-  const [busyCode, setBusyCode] = useState('');
-  const busyRef = useRef(false);
   async function setQuantity(resource: WagonResource, quantity: number) {
-    if (busyRef.current) return;
-    busyRef.current = true;
-    setBusyCode(resource.code);
     const nextQuantity = Math.max(0, Math.min(999, quantity));
-    const response = await fetch('/api/campaign/wagon/resources/' + resource.code, {
-      method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quantity: nextQuantity, expectedVersion: version }),
-    });
-    if (!response.ok) {
-      const problem = (await response.json()) as ApiErrorResponse;
-      if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/resources/'+resource.code,payload:{quantity:nextQuantity},successMessage:resource.name+'已更新為 '+nextQuantity});
-      else onError(problem.error.message);
-    } else {
-      const result = await response.json() as CampaignWagonResponse;
-      onChange(result.data);
-      onToast(resource.name + '已更新為 ' + nextQuantity);
-    }
-    busyRef.current = false;
-    setBusyCode('');
+    await mutate(
+      '/api/campaign/wagon/resources/' + resource.code,
+      'PATCH',
+      { quantity: nextQuantity },
+      'resource:' + resource.code,
+      { successMessage: resource.name + '已更新為 ' + nextQuantity },
+    );
   }
+
   return <article className="wagon-panel resource-inventory">
     <header><div><p className="eyebrow">CRAFTING RESOURCES</p><h2><PackageOpen size={20} />素材庫存</h2></div><small>素材以數量保存</small></header>
     <div className="resource-grid">
@@ -715,28 +649,23 @@ function ResourceInventory({ resources, version, onChange, onError, onToast, onC
         {resource.imageUrl ? <img src={resource.imageUrl} alt="" loading="lazy" decoding="async" /> : <span className="resource-fallback" />}
         <span><strong>{resource.name}</strong><small>{resource.code.replace(/^(material|plant|trophy)_/, '')}</small></span>
         <div>
-          <button aria-label={resource.name + '減少 5'} disabled={Boolean(busyCode) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 5)}>−5</button>
-          <button aria-label={resource.name + '減少 1'} disabled={Boolean(busyCode) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 1)}>−</button>
+          <button aria-label={resource.name + '減少 5'} disabled={Boolean(busyAction) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 5)}>−5</button>
+          <button aria-label={resource.name + '減少 1'} disabled={Boolean(busyAction) || resource.quantity === 0} onClick={() => void setQuantity(resource, resource.quantity - 1)}>−</button>
           <output aria-label={resource.name + '數量'}>{resource.quantity}</output>
-          <button aria-label={resource.name + '增加 1'} disabled={Boolean(busyCode) || resource.quantity >= 999} onClick={() => void setQuantity(resource, resource.quantity + 1)}>＋</button>
-          <button aria-label={resource.name + '增加 5'} disabled={Boolean(busyCode) || resource.quantity >= 999} onClick={() => void setQuantity(resource, resource.quantity + 5)}>＋5</button>
+          <button aria-label={resource.name + '增加 1'} disabled={Boolean(busyAction) || resource.quantity >= 999} onClick={() => void setQuantity(resource, resource.quantity + 1)}>＋</button>
+          <button aria-label={resource.name + '增加 5'} disabled={Boolean(busyAction) || resource.quantity >= 999} onClick={() => void setQuantity(resource, resource.quantity + 5)}>＋5</button>
         </div>
       </div>)}
     </div>
   </article>;
 }
 
-function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: {
+function WagonNotes({ notes, busy, mutate }: {
   notes: string;
-  version: number;
-  onChange: (wagon: CampaignWagon) => void;
-  onError: (message: string) => void;
-  onToast: (message: string) => void;
-  onConflict: (problem:ApiErrorResponse,request:WagonMutationRequest) => void;
+  busy: boolean;
+  mutate: WagonMutate;
 }) {
   const [draft, setDraft] = useState(notes);
-  const [saving, setSaving] = useState(false);
-  const savingRef = useRef(false);
   const dirty = draft !== notes;
 
   useEffect(() => { if (!dirty) setDraft(notes); }, [notes, dirty]);
@@ -744,29 +673,15 @@ function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: 
   useUnsavedChangesWarning(dirty);
 
   async function saveNotes() {
-    if (!dirty || savingRef.current) return;
+    if (!dirty || busy) return;
     if (!window.confirm('儲存目前的馬車備註？')) return;
-    savingRef.current = true;
-    setSaving(true);
-    try {
-      const response = await fetch('/api/campaign/wagon/notes', {
-        method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes: draft, expectedVersion: version }),
-      });
-      if (!response.ok) {
-        const problem = (await response.json()) as ApiErrorResponse;
-        if(problem.error.code==='WAGON_VERSION_CONFLICT')onConflict(problem,{path:'/api/campaign/wagon/notes',payload:{notes:draft},successMessage:'馬車備註已儲存'});
-        else onError(problem.error.message);
-        return;
-      }
-      const result = await response.json() as CampaignWagonResponse;
-      onChange(result.data);
-      setDraft(result.data.notes);
-      onToast('馬車備註已儲存');
-    } finally {
-      savingRef.current = false;
-      setSaving(false);
-    }
+    await mutate(
+      '/api/campaign/wagon/notes',
+      'PATCH',
+      { notes: draft },
+      'save-notes',
+      { successMessage: '馬車備註已儲存' },
+    );
   }
 
   return <article className="wagon-panel wagon-notes">
@@ -786,8 +701,8 @@ function WagonNotes({ notes, version, onChange, onError, onToast, onConflict }: 
       />
       <div>
         <span>{draft.length} / 5000</span>
-        <button className="button" type="button" disabled={!dirty || saving} onClick={() => void saveNotes()}>
-          {saving ? '儲存中…' : '儲存備註'}
+        <button className="button" type="button" disabled={!dirty || busy} onClick={() => void saveNotes()}>
+          {busy ? '儲存中…' : '儲存備註'}
         </button>
       </div>
     </div>

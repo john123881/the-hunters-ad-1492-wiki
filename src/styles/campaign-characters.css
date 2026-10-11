@@ -13,7 +13,7 @@
 .hero-picker-grid strong { font-family: var(--serif); font-size: 17px; }
 .hero-picker-grid small { color: #bda45f; }
 .character-workspace { display: grid; grid-template-columns: minmax(340px, .92fr) minmax(390px, 1.08fr); border: 1px solid #3d4e50; background: rgba(5, 14, 16, .9); }
-.character-board-stage { position: relative; min-width: 0; align-self: start; background: #050707; }
+.character-board-stage { position: relative; min-width: 0; align-self: center; background: #050707; }
 .character-board-stage > img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: contain; }
 .character-board-caption { position: absolute; top: 3.5%; left: 20%; right: 8%; text-align: center; color: #17130d; text-shadow: 0 1px rgba(255,255,255,.45); pointer-events: none; }
 .character-board-caption span {
