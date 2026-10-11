@@ -19,6 +19,7 @@ playwright-report/
 /Rules_Compendium_EN_small.pdf
 /public/images/compendium/
 /data/compendium.json
+/data/audio/
 /seeds/compendium.sql
 /drizzle
 /AGENTS.md
