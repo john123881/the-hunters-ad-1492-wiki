@@ -75,7 +75,8 @@
 .card-art > picture { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 .card-art > picture > img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)); transition: transform .3s ease, filter .3s ease; }
 .card-tile:hover .card-art > picture > img { transform: translateY(-4px) scale(1.03); filter: drop-shadow(0 8px 16px rgba(0,0,0,0.85)); }
-.card-category { position: absolute; top: 12px; left: 12px; width: 40px; height: 40px; padding: 0; justify-content: center; overflow: hidden; background: #131c1ef0; color: #d3c29e; border: 1px solid #917f4e80; border-radius: 2px; box-shadow: 0 3px 10px #0008; }
+.card-category { position: absolute; top: 12px; left: 12px; width: 40px; height: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; background: #131c1ef0; color: #d3c29e; border: 1px solid #917f4e80; border-radius: 2px; box-shadow: 0 3px 10px #0008; }
+.card-category .item-glyph { margin: 0; }
 .card-category.item { color: #bfccb0; border-color: #768d6d88; }
 .card-category.action { color: #bdcfd4; border-color: #72909b88; }
 .art-corner { position: absolute; right: 12px; bottom: 12px; color: #d7c595; opacity: 0; transform: translate(-4px,4px); transition: opacity .2s, transform .2s; }

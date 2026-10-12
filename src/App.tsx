@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { ArrowUpRight, LogIn, LogOut, UserRound } from 'lucide-react';
+import { ArrowUpRight, Dices, LogIn, LogOut, UserRound } from 'lucide-react';
 import type { AuthSession, AuthSessionResponse } from '../shared/types';
 import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
@@ -15,10 +15,16 @@ import { CampaignMapPage } from './pages/CampaignMapPage';
 import { CampaignCharactersPage } from './pages/CampaignCharactersPage';
 import { CampaignTabs } from './components/CampaignTabs';
 
+const DiceRollerOverlay = lazy(() =>
+  import('./components/dice/DiceRollerOverlay').then(module => ({ default: module.DiceRollerOverlay })),
+);
+
 export function App() {
   const location = useLocation();
   const [session, setSession] = useState<AuthSession | null>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
+  const [diceOpen, setDiceOpen] = useState(false);
+  const diceButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     fetch('/api/auth/session', { credentials: 'same-origin' })
@@ -49,6 +55,7 @@ export function App() {
           <NavLink to="/about">關於本站</NavLink>
           <NavLink to="/items">物品圖鑑</NavLink>
           <NavLink to="/campaigns">戰役紀錄</NavLink>
+          <button ref={diceButtonRef} className="dice-launcher" type="button" onClick={() => setDiceOpen(true)}><Dices aria-hidden="true" />擲骰</button>
         </nav>
         {session
           ? <details className="player-menu" onToggle={event => {
@@ -107,6 +114,7 @@ export function App() {
         <Link to="/about">關於本站 <ArrowUpRight size={13} /></Link>
       </div>
     </footer>
+    {diceOpen && <Suspense fallback={null}><DiceRollerOverlay onClose={() => { setDiceOpen(false); window.requestAnimationFrame(() => diceButtonRef.current?.focus()); }} /></Suspense>}
   </>;
 }
 
