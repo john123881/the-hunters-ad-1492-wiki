@@ -6,48 +6,112 @@ const TARGET_JS_URL = 'http://124.223.63.219/static/js/app.c8193c85bc6723833e89.
 const BASE_MEDIA_URL = 'http://124.223.63.219/static/media/';
 const OUTPUT_DIR = path.resolve(process.cwd(), 'data/audio');
 const MAP_FILE = path.resolve(process.cwd(), 'data/audio_map.json');
-const CONCURRENCY = 8; // 同時下載 8 個檔案，穩定且不壓垮對方伺服器
+const CONCURRENCY = 3; // 降低連線併發，避免對方伺服器 socket hang up 或 ETIMEDOUT
+const MAX_RETRIES = 5;
 
-async function fetchText(url) {
+function downloadFileOnce(url, destPath) {
   return new Promise((resolve, reject) => {
-    http.get(url, res => {
-      if (res.statusCode !== 200) {
-        reject(new Error(`Failed to fetch ${url}: ${res.statusCode}`));
-        return;
-      }
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve(data));
-    }).on('error', reject);
-  });
-}
-
-function downloadFile(url, destPath) {
-  return new Promise((resolve, reject) => {
-    if (fs.existsSync(destPath) && fs.statSync(destPath).size > 0) {
-      resolve('SKIPPED');
-      return;
+    const tempPath = `${destPath}.part`;
+    let startBytes = 0;
+    if (fs.existsSync(tempPath)) {
+      startBytes = fs.statSync(tempPath).size;
     }
 
-    const file = fs.createWriteStream(destPath);
-    http.get(url, res => {
-      if (res.statusCode !== 200) {
-        file.close();
-        fs.unlinkSync(destPath);
+    const headers = {};
+    if (startBytes > 0) {
+      headers['Range'] = `bytes=${startBytes}-`;
+    }
+
+    const req = http.get(url, { headers, timeout: 15000 }, res => {
+      // 處理 416 Range Not Satisfiable 或不支援 Range 的情況
+      if (res.statusCode === 416) {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+        reject(new Error('Range not satisfiable, restart needed'));
+        return;
+      }
+
+      if (res.statusCode !== 200 && res.statusCode !== 206) {
         reject(new Error(`HTTP ${res.statusCode} for ${url}`));
         return;
       }
-      res.pipe(file);
-      file.on('finish', () => {
-        file.close();
-        resolve('DOWNLOADED');
+
+      let totalExpected = 0;
+      if (res.statusCode === 206) {
+        // Content-Range: bytes 100-999/1000
+        const contentRange = res.headers['content-range'];
+        if (contentRange) {
+          const match = contentRange.match(/\/(\d+)$/);
+          if (match) totalExpected = parseInt(match[1], 10);
+        }
+      } else {
+        // 伺服器重新發送完整檔案
+        startBytes = 0;
+        totalExpected = parseInt(res.headers['content-length'] || '0', 10);
+      }
+
+      // 如果已存在且完整
+      if (fs.existsSync(destPath) && totalExpected > 0) {
+        if (fs.statSync(destPath).size === totalExpected) {
+          res.resume();
+          resolve('SKIPPED');
+          return;
+        }
+      }
+
+      const file = fs.createWriteStream(tempPath, { flags: startBytes > 0 ? 'a' : 'w' });
+      let receivedBytes = 0;
+
+      res.on('data', chunk => {
+        receivedBytes += chunk.length;
       });
-    }).on('error', err => {
-      file.close();
-      if (fs.existsSync(destPath)) fs.unlinkSync(destPath);
+
+      res.pipe(file);
+
+      file.on('finish', () => {
+        file.close(() => {
+          const currentTotal = startBytes + receivedBytes;
+          if (totalExpected > 0 && currentTotal < totalExpected) {
+            reject(new Error(`未下載完整 (目前 ${currentTotal}/${totalExpected} bytes)`));
+            return;
+          }
+          fs.renameSync(tempPath, destPath);
+          resolve('DOWNLOADED');
+        });
+      });
+
+      file.on('error', err => {
+        file.close();
+        reject(err);
+      });
+    });
+
+    req.on('timeout', () => {
+      req.destroy(new Error('連線逾時 (Timeout 15s)'));
+    });
+
+    req.on('error', err => {
       reject(err);
     });
   });
+}
+
+async function downloadFileWithRetry(url, destPath) {
+  // 若本地已存在完整檔案，先檢查大小
+  if (fs.existsSync(destPath) && fs.statSync(destPath).size > 1000) {
+    return 'SKIPPED';
+  }
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await downloadFileOnce(url, destPath);
+    } catch (err) {
+      if (attempt === MAX_RETRIES) {
+        throw err;
+      }
+      // 指數退避延遲 1s, 2s, 3s...
+      await new Promise(r => setTimeout(r, attempt * 1200));
+    }
+  }
 }
 
 async function main() {
@@ -85,7 +149,7 @@ async function main() {
       const dest = path.join(targetDir, item.filename);
 
       try {
-        const res = await downloadFile(item.url, dest);
+        const res = await downloadFileWithRetry(item.url, dest);
         if (res === 'DOWNLOADED') downloadedCount++;
         else skippedCount++;
       } catch (err) {
