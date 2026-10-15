@@ -5,3 +5,4 @@ export * from './map';
 export * from './items';
 export * from './admin';
 export * from './loadout';
+export * from './audio';

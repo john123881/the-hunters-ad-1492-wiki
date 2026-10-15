@@ -11,10 +11,12 @@ import { getCampaignCharacters, saveCampaignCharacter } from './characters';
 import { getCompatibleCharacterCatalogCandidates, getCompatibleCharacterEquipmentCandidates, getCharacterLoadout, openCharacterSlot, restoreCharacterSlotCover, restoreInitialCharacterBoard } from './characterLoadout';
 import { createAndEquipCatalogItem, createAndInstallCatalogAttachment, equipCharacterItem, getAttachmentCandidates, getAttachmentCatalogCandidates, installCharacterAttachment, moveCharacterItem, removeAllCharacterItems, removeCharacterItem, removeRetainedAttachment, removeInstalledAttachment, reorderHandItems, replaceCharacterItem, returnCharacterItemToWagon, returnInstalledAttachmentToWagon, returnRetainedAttachmentToWagon, switchCharacterHero, updateCharacterItemDamage } from './characterLoadoutMutations';
 import { addWagonEquipment, createTimeToken, getWagon, removeTimeToken, removeWagonEquipment, updateCampaignName, updateWagonDay, updateSharedGold, updateWagonEquipment, updateWagonResource, updateWagonUpgrade, updateWagonNotes } from './wagon';
+import { createAudioPlaybackLog, getAudioPlaybackHistory } from './audioPlayback';
+import { getAudioMedia } from './audioMedia';
 import { getDb } from './db';
 import { items } from './db/schema/index';
 
-type Bindings = { DB: D1Database; ASSETS: Fetcher };
+type Bindings = { DB: D1Database; ASSETS: Fetcher; AUDIO?: R2Bucket };
 const app = new Hono<{ Bindings: Bindings }>();
 app.use('/api/*', async (c, next) => {
   c.header('Cache-Control', 'no-store');
@@ -48,6 +50,8 @@ app.delete('/api/admin/activity', deleteAdminActivityLogs);
 app.post('/api/auth/campaign/login', loginCampaign);
 app.get('/api/auth/session', getSession);
 app.post('/api/auth/logout', logout);
+app.get('/api/campaign/audio-playback', getAudioPlaybackHistory);
+app.post('/api/campaign/audio-playback', createAudioPlaybackLog);
 app.get('/api/campaign/characters', getCampaignCharacters);
 app.put('/api/campaign/characters/:playerNumber', saveCampaignCharacter);
 app.get('/api/campaign/characters/:playerNumber/loadout', getCharacterLoadout);
@@ -97,6 +101,8 @@ app.patch('/api/campaign/wagon/resources/:resourceCode', updateWagonResource);
 app.post('/api/campaign/wagon/equipment', addWagonEquipment);
 app.patch('/api/campaign/wagon/equipment/:equipmentId', updateWagonEquipment);
 app.delete('/api/campaign/wagon/equipment/:equipmentId', removeWagonEquipment);
+app.get('/media/audio/*', getAudioMedia);
+app.on('HEAD', '/media/audio/*', getAudioMedia);
 app.get('/api/health', async c => {
   const db = getDb(c.env.DB);
   await db.select({ count: sql`1` }).from(items).limit(1);

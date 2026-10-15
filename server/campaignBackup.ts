@@ -3,7 +3,7 @@ import type { AdminSession } from '../shared/types';
 type JsonRow = Record<string, unknown>;
 
 const FORMAT = 'the-hunters-campaign-backup';
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 const tableColumns: Record<string, string[]> = {
   campaigns: ['id','campaign_name','password_hash','max_players','is_active','notes','created_at','updated_at','deleted_at'],
@@ -27,6 +27,7 @@ const tableColumns: Record<string, string[]> = {
   campaign_location_cards: ['campaign_id','location_code','is_revealed','face','resource_notes','notes','updated_at'],
   campaign_card_statuses: ['campaign_id','card_code','is_resolved','resolved_at','updated_by_player','updated_at'],
   character_activity_logs: ['id','campaign_id','actor_player_number','target_player_number','action_type','entity_type','entity_id','before_json','after_json','created_at'],
+  campaign_audio_playback_logs: ['id','campaign_id','client_event_id','code','category','title','player_number','player_alias','played_at'],
 };
 
 const exportQueries: Record<string, string> = {
@@ -51,6 +52,7 @@ const exportQueries: Record<string, string> = {
   campaign_location_cards: 'SELECT * FROM campaign_location_cards WHERE campaign_id=? ORDER BY location_code',
   campaign_card_statuses: 'SELECT * FROM campaign_card_statuses WHERE campaign_id=? ORDER BY card_code',
   character_activity_logs: 'SELECT * FROM character_activity_logs WHERE campaign_id=? ORDER BY id',
+  campaign_audio_playback_logs: 'SELECT * FROM campaign_audio_playback_logs WHERE campaign_id=? ORDER BY id',
 };
 
 export type CampaignBackup = {
@@ -84,24 +86,40 @@ function isRow(value: unknown): value is JsonRow {
 
 function normalizeBackup(value: unknown): unknown {
   if (!isRow(value) || value.format !== FORMAT || !isRow(value.tables)) return value;
-  if (value.schemaVersion !== 1) return value;
-  const tables = { ...value.tables };
-  const attachments = Array.isArray(tables.campaign_equipment_attachments)
-    ? tables.campaign_equipment_attachments.map(row => isRow(row)
-      ? { ...row, weapon_slot_index: row.weapon_slot_index ?? 1 }
-      : row)
-    : [];
-  return {
-    ...value,
-    schemaVersion: SCHEMA_VERSION,
-    tables: {
-      ...tables,
-      campaign_equipment_attachments: attachments,
-      campaign_character_opened_slots: [],
-      campaign_character_equipment_slots: [],
-      campaign_character_retained_attachments: [],
-    },
-  };
+
+  let normalized = value;
+  if (normalized.schemaVersion === 1) {
+    const tables: JsonRow = { ...(normalized.tables as JsonRow) };
+    const attachments = Array.isArray(tables.campaign_equipment_attachments)
+      ? tables.campaign_equipment_attachments.map((row: unknown) => isRow(row)
+        ? { ...row, weapon_slot_index: row.weapon_slot_index ?? 1 }
+        : row)
+      : [];
+    normalized = {
+      ...normalized,
+      schemaVersion: 2,
+      tables: {
+        ...tables,
+        campaign_equipment_attachments: attachments,
+        campaign_character_opened_slots: [],
+        campaign_character_equipment_slots: [],
+        campaign_character_retained_attachments: [],
+      },
+    };
+  }
+
+  if (isRow(normalized) && normalized.schemaVersion === 2 && isRow(normalized.tables)) {
+    normalized = {
+      ...normalized,
+      schemaVersion: SCHEMA_VERSION,
+      tables: {
+        ...(normalized.tables as JsonRow),
+        campaign_audio_playback_logs: [],
+      },
+    };
+  }
+
+  return normalized;
 }
 
 function validateBackup(input: unknown, campaignId: string): CampaignBackup {
