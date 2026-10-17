@@ -406,7 +406,13 @@
   .dice-history { margin-top: 0; padding-top: 4px; border-top: 0; }
   .dice-arena-status { left: 12px; bottom: 12px; }
   .dice-arena-status[data-status='settled'] { display: none; }
-  .dice-arena-results { display: flex; }
+  .dice-arena-results {
+    z-index: 5;
+    right: 18px;
+    bottom: clamp(74px, 10dvh, 104px);
+    left: 18px;
+    display: flex;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .dice-loading span { animation-duration: 1.8s; }

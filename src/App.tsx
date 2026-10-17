@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Dices, LogIn, LogOut, UserRound } from 'lucide-react';
+import { ArrowUpRight, BookOpenText, Dices, Info, LogIn, LogOut, ScrollText, UserRound, Volume2 } from 'lucide-react';
 import type { AuthSession, AuthSessionResponse } from '../shared/types';
 import { HomePage } from './pages/HomePage';
 import { CatalogPage } from './pages/CatalogPage';
@@ -14,6 +14,8 @@ import { CampaignPage } from './pages/CampaignPage';
 import { CampaignMapPage } from './pages/CampaignMapPage';
 import { CampaignCharactersPage } from './pages/CampaignCharactersPage';
 import { CampaignTabs } from './components/CampaignTabs';
+import { GlobalAudioPlayer } from './audio/GlobalAudioPlayer';
+import { useAudioPlayerControls } from './audio/useAudioPlayer';
 
 const DiceRollerOverlay = lazy(() =>
   import('./components/dice/DiceRollerOverlay').then(module => ({ default: module.DiceRollerOverlay })),
@@ -25,6 +27,7 @@ export function App() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const [diceOpen, setDiceOpen] = useState(false);
   const diceButtonRef = useRef<HTMLButtonElement>(null);
+  const { show: showAudioPlayer } = useAudioPlayerControls();
 
   useEffect(() => {
     fetch('/api/auth/session', { credentials: 'same-origin' })
@@ -52,10 +55,11 @@ export function App() {
           <span className="brand-type">THE HUNTERS<small>A.D. 1492 WIKI</small></span>
         </Link>
         <nav className="main-nav" aria-label="主要導覽">
-          <NavLink to="/about">關於本站</NavLink>
-          <NavLink to="/items">物品圖鑑</NavLink>
-          <NavLink to="/campaigns">戰役紀錄</NavLink>
-          <button ref={diceButtonRef} className="dice-launcher" type="button" onClick={() => setDiceOpen(true)}><Dices aria-hidden="true" />擲骰</button>
+          <NavLink to="/about"><Info aria-hidden="true" />關於本站</NavLink>
+          <NavLink to="/items"><BookOpenText aria-hidden="true" />物品圖鑑</NavLink>
+          <NavLink to="/campaigns"><ScrollText aria-hidden="true" />戰役紀錄</NavLink>
+          <button className="audio-launcher" type="button" onClick={showAudioPlayer}><Volume2 aria-hidden="true" />語音播放</button>
+          <button ref={diceButtonRef} className="dice-launcher" type="button" onClick={() => setDiceOpen(true)}><Dices aria-hidden="true" />擲骰模擬</button>
         </nav>
         {session
           ? <details className="player-menu" onToggle={event => {
@@ -114,6 +118,7 @@ export function App() {
         <Link to="/about">關於本站 <ArrowUpRight size={13} /></Link>
       </div>
     </footer>
+    <GlobalAudioPlayer session={session} />
     {diceOpen && <Suspense fallback={null}><DiceRollerOverlay onClose={() => { setDiceOpen(false); window.requestAnimationFrame(() => diceButtonRef.current?.focus()); }} /></Suspense>}
   </>;
 }

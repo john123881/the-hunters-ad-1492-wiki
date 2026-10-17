@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "purpose": "第一階段播放器本機驗證清單；音檔沿用 data/audio，不複製大型檔案。",
+  "entryCount": 8,
+  "entries": {
+    "1": {
+      "code": "1",
+      "category": "story",
+      "title": "劇情卡 1",
+      "path": "story/1.59be348.mp3",
+      "sourcePath": "data/audio/story/1.59be348.mp3",
+      "bytes": 10338686
+    },
+    "F001": {
+      "code": "F001",
+      "category": "character",
+      "title": "角色卡 F001",
+      "path": "character/F001.71700c5.mp3",
+      "sourcePath": "data/audio/character/F001.71700c5.mp3",
+      "bytes": 3092150
+    },
+    "Q1": {
+      "code": "Q1",
+      "category": "quest",
+      "title": "任務 Q1",
+      "path": "quest/Q1.3bdf86d.mp3",
+      "sourcePath": "data/audio/quest/Q1.3bdf86d.mp3",
+      "bytes": 854433
+    },
+    "V1": {
+      "code": "V1",
+      "category": "quest_win",
+      "title": "任務勝利 V1",
+      "path": "quest_win/V1.ff44555.mp3",
+      "sourcePath": "data/audio/quest_win/V1.ff44555.mp3",
+      "bytes": 902081
+    },
+    "L1": {
+      "code": "L1",
+      "category": "quest_loss",
+      "title": "任務失敗 L1",
+      "path": "quest_loss/L1.e27e3eb.mp3",
+      "sourcePath": "data/audio/quest_loss/L1.e27e3eb.mp3",
+      "bytes": 861522
+    },
+    "W2": {
+      "code": "W2",
+      "category": "w_quest",
+      "title": "W擴充任務 W2",
+      "path": "w_quest/W2.26d303e.mp3",
+      "sourcePath": "data/audio/w_quest/W2.26d303e.mp3",
+      "bytes": 373531
+    },
+    "VW1": {
+      "code": "VW1",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW1",
+      "path": "w_quest_win/VW1.65637c2.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW1.65637c2.mp3",
+      "bytes": 3907592
+    },
+    "LW2": {
+      "code": "LW2",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW2",
+      "path": "w_quest_loss/LW2.a760a85.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW2.a760a85.mp3",
+      "bytes": 1079432
+    }
+  }
+}

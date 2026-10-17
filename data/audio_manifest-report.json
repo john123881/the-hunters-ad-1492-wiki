@@ -1,0 +1,28 @@
+{
+  "valid": true,
+  "sourceCount": 722,
+  "manifestCount": 722,
+  "totalBytes": 1121144376,
+  "categoryCounts": {
+    "story": 570,
+    "character": 17,
+    "quest": 23,
+    "quest_win": 50,
+    "quest_loss": 46,
+    "w_quest": 1,
+    "w_quest_win": 8,
+    "w_quest_loss": 7
+  },
+  "testCodes": [
+    "1",
+    "F001",
+    "Q1",
+    "V1",
+    "L1",
+    "W2",
+    "VW1",
+    "LW2"
+  ],
+  "missingTestCodes": [],
+  "issues": []
+}

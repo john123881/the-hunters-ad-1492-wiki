@@ -48,10 +48,12 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: 7px;
   color: #a5afb0;
   font-size: 13px;
   letter-spacing: .1em;
 }
+.main-nav a svg { width: 16px; height: 16px; flex: 0 0 auto; }
 .main-nav a:hover, .main-nav .active { color: #e2c995; }
 .main-nav .active::after {
   content: '';
@@ -205,6 +207,7 @@
     justify-content: center;
     min-width: 0;
     padding: 0 8px;
+    gap: 5px;
     text-align: center;
     font-size: 11px;
   }
@@ -226,5 +229,6 @@
   .brand-type { font-size: .9rem; }
   .login-link { padding: 0 11px; font-size: 11px; }
   .player-roster { position: fixed; top: 70px; right: 14px; width: min(250px, calc(100vw - 28px)); }
-  .main-nav a { padding-inline: 4px; font-size: 10px; }
+  .main-nav a { padding-inline: 3px; gap: 4px; font-size: 10px; }
+  .main-nav a svg { width: 14px; height: 14px; }
 }

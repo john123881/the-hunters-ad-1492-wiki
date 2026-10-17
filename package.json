@@ -14,6 +14,7 @@
     "preview": "WRANGLER_LOG_PATH=.cache/wrangler vite preview --host 0.0.0.0 --port 4173",
     "db:migrate": "WRANGLER_LOG_PATH=.cache/wrangler wrangler d1 migrations apply hunters-db --local",
     "data:seed": "node scripts/build-seed.mjs",
+    "audio:manifest": "tsx scripts/build-audio-manifest.ts",
     "db:seed": "WRANGLER_LOG_PATH=.cache/wrangler wrangler d1 execute hunters-db --local --file seeds/equipment_catalog.sql",
     "db:setup": "npm run db:migrate && npm run db:seed",
     "check": "npm run build",
@@ -27,7 +28,10 @@
     "admin:hash-password": "node scripts/hash-admin-password.mjs",
     "admin:create-local": "node scripts/create-local-admin.mjs",
     "db:check": "drizzle-kit check",
-    "images:verify-release": "node scripts/verify-image-release.mjs"
+    "images:verify-release": "node scripts/verify-image-release.mjs",
+    "audio:manifest:prod": "AUDIO_MEDIA_BASE_URL=/media/audio/ tsx scripts/build-audio-manifest.ts",
+    "audio:r2:sync": "node scripts/sync-audio-r2.mjs",
+    "audio:r2:verify": "node scripts/verify-audio-media.mjs"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.21.0",

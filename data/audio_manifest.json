@@ -1,0 +1,5785 @@
+{
+  "version": 1,
+  "source": "data/audio_map.json",
+  "sourceSha256": "7e98d38c78125adb035593fab3bdceb6e3d06b733ac33ab28c0d7bcd7a0d4ee5",
+  "mediaBaseUrl": "/media/audio/",
+  "entryCount": 722,
+  "entries": {
+    "1": {
+      "code": "1",
+      "category": "story",
+      "title": "劇情卡 1",
+      "path": "story/1.59be348.mp3",
+      "sourcePath": "data/audio/story/1.59be348.mp3",
+      "bytes": 10338686
+    },
+    "2": {
+      "code": "2",
+      "category": "story",
+      "title": "劇情卡 2",
+      "path": "story/2.0802530.mp3",
+      "sourcePath": "data/audio/story/2.0802530.mp3",
+      "bytes": 4615833
+    },
+    "101": {
+      "code": "101",
+      "category": "story",
+      "title": "劇情卡 101",
+      "path": "story/101.a19ac3e.mp3",
+      "sourcePath": "data/audio/story/101.a19ac3e.mp3",
+      "bytes": 3196757
+    },
+    "201": {
+      "code": "201",
+      "category": "story",
+      "title": "劇情卡 201",
+      "path": "story/201.0a53836.mp3",
+      "sourcePath": "data/audio/story/201.0a53836.mp3",
+      "bytes": 492060
+    },
+    "202": {
+      "code": "202",
+      "category": "story",
+      "title": "劇情卡 202",
+      "path": "story/202.78a54a7.mp3",
+      "sourcePath": "data/audio/story/202.78a54a7.mp3",
+      "bytes": 755986
+    },
+    "203": {
+      "code": "203",
+      "category": "story",
+      "title": "劇情卡 203",
+      "path": "story/203.dad4de8.mp3",
+      "sourcePath": "data/audio/story/203.dad4de8.mp3",
+      "bytes": 1183966
+    },
+    "301": {
+      "code": "301",
+      "category": "story",
+      "title": "劇情卡 301",
+      "path": "story/301.7fff4f1.mp3",
+      "sourcePath": "data/audio/story/301.7fff4f1.mp3",
+      "bytes": 4862357
+    },
+    "401": {
+      "code": "401",
+      "category": "story",
+      "title": "劇情卡 401",
+      "path": "story/401.9c59c5f.mp3",
+      "sourcePath": "data/audio/story/401.9c59c5f.mp3",
+      "bytes": 665674
+    },
+    "402": {
+      "code": "402",
+      "category": "story",
+      "title": "劇情卡 402",
+      "path": "story/402.a796696.mp3",
+      "sourcePath": "data/audio/story/402.a796696.mp3",
+      "bytes": 1155507
+    },
+    "403": {
+      "code": "403",
+      "category": "story",
+      "title": "劇情卡 403",
+      "path": "story/403.75ba942.mp3",
+      "sourcePath": "data/audio/story/403.75ba942.mp3",
+      "bytes": 1860931
+    },
+    "501": {
+      "code": "501",
+      "category": "story",
+      "title": "劇情卡 501",
+      "path": "story/501.caaf3ed.mp3",
+      "sourcePath": "data/audio/story/501.caaf3ed.mp3",
+      "bytes": 9068518
+    },
+    "601": {
+      "code": "601",
+      "category": "story",
+      "title": "劇情卡 601",
+      "path": "story/601.0ee2fc3.mp3",
+      "sourcePath": "data/audio/story/601.0ee2fc3.mp3",
+      "bytes": 2291011
+    },
+    "602": {
+      "code": "602",
+      "category": "story",
+      "title": "劇情卡 602",
+      "path": "story/602.8a6eb74.mp3",
+      "sourcePath": "data/audio/story/602.8a6eb74.mp3",
+      "bytes": 2730882
+    },
+    "603": {
+      "code": "603",
+      "category": "story",
+      "title": "劇情卡 603",
+      "path": "story/603.748ef44.mp3",
+      "sourcePath": "data/audio/story/603.748ef44.mp3",
+      "bytes": 1656395
+    },
+    "604": {
+      "code": "604",
+      "category": "story",
+      "title": "劇情卡 604",
+      "path": "story/604.cae680c.mp3",
+      "sourcePath": "data/audio/story/604.cae680c.mp3",
+      "bytes": 1672587
+    },
+    "605": {
+      "code": "605",
+      "category": "story",
+      "title": "劇情卡 605",
+      "path": "story/605.de8628a.mp3",
+      "sourcePath": "data/audio/story/605.de8628a.mp3",
+      "bytes": 954930
+    },
+    "606": {
+      "code": "606",
+      "category": "story",
+      "title": "劇情卡 606",
+      "path": "story/606.83b2919.mp3",
+      "sourcePath": "data/audio/story/606.83b2919.mp3",
+      "bytes": 1096293
+    },
+    "607": {
+      "code": "607",
+      "category": "story",
+      "title": "劇情卡 607",
+      "path": "story/607.d2fe047.mp3",
+      "sourcePath": "data/audio/story/607.d2fe047.mp3",
+      "bytes": 415332
+    },
+    "608": {
+      "code": "608",
+      "category": "story",
+      "title": "劇情卡 608",
+      "path": "story/608.f6d0563.mp3",
+      "sourcePath": "data/audio/story/608.f6d0563.mp3",
+      "bytes": 1249749
+    },
+    "609": {
+      "code": "609",
+      "category": "story",
+      "title": "劇情卡 609",
+      "path": "story/609.99c2c89.mp3",
+      "sourcePath": "data/audio/story/609.99c2c89.mp3",
+      "bytes": 1807115
+    },
+    "701": {
+      "code": "701",
+      "category": "story",
+      "title": "劇情卡 701",
+      "path": "story/701.e9ed76a.mp3",
+      "sourcePath": "data/audio/story/701.e9ed76a.mp3",
+      "bytes": 1367343
+    },
+    "703": {
+      "code": "703",
+      "category": "story",
+      "title": "劇情卡 703",
+      "path": "story/703.69b5336.mp3",
+      "sourcePath": "data/audio/story/703.69b5336.mp3",
+      "bytes": 1210242
+    },
+    "704": {
+      "code": "704",
+      "category": "story",
+      "title": "劇情卡 704",
+      "path": "story/704.3540456.mp3",
+      "sourcePath": "data/audio/story/704.3540456.mp3",
+      "bytes": 1255362
+    },
+    "705": {
+      "code": "705",
+      "category": "story",
+      "title": "劇情卡 705",
+      "path": "story/705.ce2c2a2.mp3",
+      "sourcePath": "data/audio/story/705.ce2c2a2.mp3",
+      "bytes": 925664
+    },
+    "706": {
+      "code": "706",
+      "category": "story",
+      "title": "劇情卡 706",
+      "path": "story/706.552418d.mp3",
+      "sourcePath": "data/audio/story/706.552418d.mp3",
+      "bytes": 2344962
+    },
+    "707": {
+      "code": "707",
+      "category": "story",
+      "title": "劇情卡 707",
+      "path": "story/707.624730c.mp3",
+      "sourcePath": "data/audio/story/707.624730c.mp3",
+      "bytes": 1924064
+    },
+    "708": {
+      "code": "708",
+      "category": "story",
+      "title": "劇情卡 708",
+      "path": "story/708.02a4f29.mp3",
+      "sourcePath": "data/audio/story/708.02a4f29.mp3",
+      "bytes": 506561
+    },
+    "709": {
+      "code": "709",
+      "category": "story",
+      "title": "劇情卡 709",
+      "path": "story/709.7a589ff.mp3",
+      "sourcePath": "data/audio/story/709.7a589ff.mp3",
+      "bytes": 1375860
+    },
+    "710": {
+      "code": "710",
+      "category": "story",
+      "title": "劇情卡 710",
+      "path": "story/710.0816318.mp3",
+      "sourcePath": "data/audio/story/710.0816318.mp3",
+      "bytes": 820239
+    },
+    "711": {
+      "code": "711",
+      "category": "story",
+      "title": "劇情卡 711",
+      "path": "story/711.54c5b21.mp3",
+      "sourcePath": "data/audio/story/711.54c5b21.mp3",
+      "bytes": 386138
+    },
+    "712": {
+      "code": "712",
+      "category": "story",
+      "title": "劇情卡 712",
+      "path": "story/712.ae05cd3.mp3",
+      "sourcePath": "data/audio/story/712.ae05cd3.mp3",
+      "bytes": 382295
+    },
+    "713": {
+      "code": "713",
+      "category": "story",
+      "title": "劇情卡 713",
+      "path": "story/713.a2a8b81.mp3",
+      "sourcePath": "data/audio/story/713.a2a8b81.mp3",
+      "bytes": 870279
+    },
+    "714": {
+      "code": "714",
+      "category": "story",
+      "title": "劇情卡 714",
+      "path": "story/714.e4e8951.mp3",
+      "sourcePath": "data/audio/story/714.e4e8951.mp3",
+      "bytes": 446190
+    },
+    "715": {
+      "code": "715",
+      "category": "story",
+      "title": "劇情卡 715",
+      "path": "story/715.5acefd3.mp3",
+      "sourcePath": "data/audio/story/715.5acefd3.mp3",
+      "bytes": 854349
+    },
+    "716": {
+      "code": "716",
+      "category": "story",
+      "title": "劇情卡 716",
+      "path": "story/716.fc4536e.mp3",
+      "sourcePath": "data/audio/story/716.fc4536e.mp3",
+      "bytes": 895629
+    },
+    "717": {
+      "code": "717",
+      "category": "story",
+      "title": "劇情卡 717",
+      "path": "story/717.718e3db.mp3",
+      "sourcePath": "data/audio/story/717.718e3db.mp3",
+      "bytes": 519582
+    },
+    "718": {
+      "code": "718",
+      "category": "story",
+      "title": "劇情卡 718",
+      "path": "story/718.d2c756e.mp3",
+      "sourcePath": "data/audio/story/718.d2c756e.mp3",
+      "bytes": 1700611
+    },
+    "801": {
+      "code": "801",
+      "category": "story",
+      "title": "劇情卡 801",
+      "path": "story/801.542897c.mp3",
+      "sourcePath": "data/audio/story/801.542897c.mp3",
+      "bytes": 928962
+    },
+    "802": {
+      "code": "802",
+      "category": "story",
+      "title": "劇情卡 802",
+      "path": "story/802.3904707.mp3",
+      "sourcePath": "data/audio/story/802.3904707.mp3",
+      "bytes": 4067202
+    },
+    "806": {
+      "code": "806",
+      "category": "story",
+      "title": "劇情卡 806",
+      "path": "story/806.6cd194e.mp3",
+      "sourcePath": "data/audio/story/806.6cd194e.mp3",
+      "bytes": 1654722
+    },
+    "807": {
+      "code": "807",
+      "category": "story",
+      "title": "劇情卡 807",
+      "path": "story/807.6c63abf.mp3",
+      "sourcePath": "data/audio/story/807.6c63abf.mp3",
+      "bytes": 808961
+    },
+    "808": {
+      "code": "808",
+      "category": "story",
+      "title": "劇情卡 808",
+      "path": "story/808.80277d9.mp3",
+      "sourcePath": "data/audio/story/808.80277d9.mp3",
+      "bytes": 489281
+    },
+    "809": {
+      "code": "809",
+      "category": "story",
+      "title": "劇情卡 809",
+      "path": "story/809.2dee0b7.mp3",
+      "sourcePath": "data/audio/story/809.2dee0b7.mp3",
+      "bytes": 2937091
+    },
+    "811": {
+      "code": "811",
+      "category": "story",
+      "title": "劇情卡 811",
+      "path": "story/811.1d84162.mp3",
+      "sourcePath": "data/audio/story/811.1d84162.mp3",
+      "bytes": 545921
+    },
+    "812": {
+      "code": "812",
+      "category": "story",
+      "title": "劇情卡 812",
+      "path": "story/812.9af5be8.mp3",
+      "sourcePath": "data/audio/story/812.9af5be8.mp3",
+      "bytes": 450602
+    },
+    "901": {
+      "code": "901",
+      "category": "story",
+      "title": "劇情卡 901",
+      "path": "story/901.02a78f5.mp3",
+      "sourcePath": "data/audio/story/901.02a78f5.mp3",
+      "bytes": 1626881
+    },
+    "902": {
+      "code": "902",
+      "category": "story",
+      "title": "劇情卡 902",
+      "path": "story/902.0e5c209.mp3",
+      "sourcePath": "data/audio/story/902.0e5c209.mp3",
+      "bytes": 1772667
+    },
+    "903": {
+      "code": "903",
+      "category": "story",
+      "title": "劇情卡 903",
+      "path": "story/903.ddbe58c.mp3",
+      "sourcePath": "data/audio/story/903.ddbe58c.mp3",
+      "bytes": 883623
+    },
+    "904": {
+      "code": "904",
+      "category": "story",
+      "title": "劇情卡 904",
+      "path": "story/904.44020c3.mp3",
+      "sourcePath": "data/audio/story/904.44020c3.mp3",
+      "bytes": 1551811
+    },
+    "905": {
+      "code": "905",
+      "category": "story",
+      "title": "劇情卡 905",
+      "path": "story/905.8eb8692.mp3",
+      "sourcePath": "data/audio/story/905.8eb8692.mp3",
+      "bytes": 1837122
+    },
+    "906": {
+      "code": "906",
+      "category": "story",
+      "title": "劇情卡 906",
+      "path": "story/906.00c3cec.mp3",
+      "sourcePath": "data/audio/story/906.00c3cec.mp3",
+      "bytes": 1248451
+    },
+    "907": {
+      "code": "907",
+      "category": "story",
+      "title": "劇情卡 907",
+      "path": "story/907.d915761.mp3",
+      "sourcePath": "data/audio/story/907.d915761.mp3",
+      "bytes": 3110851
+    },
+    "908": {
+      "code": "908",
+      "category": "story",
+      "title": "劇情卡 908",
+      "path": "story/908.96e735f.mp3",
+      "sourcePath": "data/audio/story/908.96e735f.mp3",
+      "bytes": 871171
+    },
+    "909": {
+      "code": "909",
+      "category": "story",
+      "title": "劇情卡 909",
+      "path": "story/909.1aa3179.mp3",
+      "sourcePath": "data/audio/story/909.1aa3179.mp3",
+      "bytes": 1238851
+    },
+    "910": {
+      "code": "910",
+      "category": "story",
+      "title": "劇情卡 910",
+      "path": "story/910.d89fd06.mp3",
+      "sourcePath": "data/audio/story/910.d89fd06.mp3",
+      "bytes": 1305627
+    },
+    "911": {
+      "code": "911",
+      "category": "story",
+      "title": "劇情卡 911",
+      "path": "story/911.1654332.mp3",
+      "sourcePath": "data/audio/story/911.1654332.mp3",
+      "bytes": 1894722
+    },
+    "912": {
+      "code": "912",
+      "category": "story",
+      "title": "劇情卡 912",
+      "path": "story/912.e6d9199.mp3",
+      "sourcePath": "data/audio/story/912.e6d9199.mp3",
+      "bytes": 1931514
+    },
+    "1001": {
+      "code": "1001",
+      "category": "story",
+      "title": "劇情卡 1001",
+      "path": "story/1001.f810f6e.mp3",
+      "sourcePath": "data/audio/story/1001.f810f6e.mp3",
+      "bytes": 1014561
+    },
+    "1002": {
+      "code": "1002",
+      "category": "story",
+      "title": "劇情卡 1002",
+      "path": "story/1002.f54c46a.mp3",
+      "sourcePath": "data/audio/story/1002.f54c46a.mp3",
+      "bytes": 1524637
+    },
+    "1005": {
+      "code": "1005",
+      "category": "story",
+      "title": "劇情卡 1005",
+      "path": "story/1005.caa08a6.mp3",
+      "sourcePath": "data/audio/story/1005.caa08a6.mp3",
+      "bytes": 721410
+    },
+    "1101": {
+      "code": "1101",
+      "category": "story",
+      "title": "劇情卡 1101",
+      "path": "story/1101.2b82ed3.mp3",
+      "sourcePath": "data/audio/story/1101.2b82ed3.mp3",
+      "bytes": 4010659
+    },
+    "1102": {
+      "code": "1102",
+      "category": "story",
+      "title": "劇情卡 1102",
+      "path": "story/1102.3458b5d.mp3",
+      "sourcePath": "data/audio/story/1102.3458b5d.mp3",
+      "bytes": 1138250
+    },
+    "1103": {
+      "code": "1103",
+      "category": "story",
+      "title": "劇情卡 1103",
+      "path": "story/1103.8eaa8cc.mp3",
+      "sourcePath": "data/audio/story/1103.8eaa8cc.mp3",
+      "bytes": 795900
+    },
+    "1104": {
+      "code": "1104",
+      "category": "story",
+      "title": "劇情卡 1104",
+      "path": "story/1104.e8a989d.mp3",
+      "sourcePath": "data/audio/story/1104.e8a989d.mp3",
+      "bytes": 3305910
+    },
+    "1105": {
+      "code": "1105",
+      "category": "story",
+      "title": "劇情卡 1105",
+      "path": "story/1105.a8d2e85.mp3",
+      "sourcePath": "data/audio/story/1105.a8d2e85.mp3",
+      "bytes": 1516505
+    },
+    "1106": {
+      "code": "1106",
+      "category": "story",
+      "title": "劇情卡 1106",
+      "path": "story/1106.d622f08.mp3",
+      "sourcePath": "data/audio/story/1106.d622f08.mp3",
+      "bytes": 510677
+    },
+    "1107": {
+      "code": "1107",
+      "category": "story",
+      "title": "劇情卡 1107",
+      "path": "story/1107.4ed002f.mp3",
+      "sourcePath": "data/audio/story/1107.4ed002f.mp3",
+      "bytes": 753583
+    },
+    "1108": {
+      "code": "1108",
+      "category": "story",
+      "title": "劇情卡 1108",
+      "path": "story/1108.ac6dd31.mp3",
+      "sourcePath": "data/audio/story/1108.ac6dd31.mp3",
+      "bytes": 1284375
+    },
+    "1109": {
+      "code": "1109",
+      "category": "story",
+      "title": "劇情卡 1109",
+      "path": "story/1109.b026803.mp3",
+      "sourcePath": "data/audio/story/1109.b026803.mp3",
+      "bytes": 691525
+    },
+    "1110": {
+      "code": "1110",
+      "category": "story",
+      "title": "劇情卡 1110",
+      "path": "story/1110.70c6dd7.mp3",
+      "sourcePath": "data/audio/story/1110.70c6dd7.mp3",
+      "bytes": 961148
+    },
+    "1111": {
+      "code": "1111",
+      "category": "story",
+      "title": "劇情卡 1111",
+      "path": "story/1111.3d780ba.mp3",
+      "sourcePath": "data/audio/story/1111.3d780ba.mp3",
+      "bytes": 594225
+    },
+    "1112": {
+      "code": "1112",
+      "category": "story",
+      "title": "劇情卡 1112",
+      "path": "story/1112.7d5787b.mp3",
+      "sourcePath": "data/audio/story/1112.7d5787b.mp3",
+      "bytes": 606735
+    },
+    "1113": {
+      "code": "1113",
+      "category": "story",
+      "title": "劇情卡 1113",
+      "path": "story/1113.93249b7.mp3",
+      "sourcePath": "data/audio/story/1113.93249b7.mp3",
+      "bytes": 888532
+    },
+    "1114": {
+      "code": "1114",
+      "category": "story",
+      "title": "劇情卡 1114",
+      "path": "story/1114.e331fb4.mp3",
+      "sourcePath": "data/audio/story/1114.e331fb4.mp3",
+      "bytes": 646767
+    },
+    "1115": {
+      "code": "1115",
+      "category": "story",
+      "title": "劇情卡 1115",
+      "path": "story/1115.3cc5866.mp3",
+      "sourcePath": "data/audio/story/1115.3cc5866.mp3",
+      "bytes": 1119827
+    },
+    "1116": {
+      "code": "1116",
+      "category": "story",
+      "title": "劇情卡 1116",
+      "path": "story/1116.586ef6d.mp3",
+      "sourcePath": "data/audio/story/1116.586ef6d.mp3",
+      "bytes": 1090038
+    },
+    "1117": {
+      "code": "1117",
+      "category": "story",
+      "title": "劇情卡 1117",
+      "path": "story/1117.a221a47.mp3",
+      "sourcePath": "data/audio/story/1117.a221a47.mp3",
+      "bytes": 928539
+    },
+    "1118": {
+      "code": "1118",
+      "category": "story",
+      "title": "劇情卡 1118",
+      "path": "story/1118.afd08c8.mp3",
+      "sourcePath": "data/audio/story/1118.afd08c8.mp3",
+      "bytes": 757437
+    },
+    "1119": {
+      "code": "1119",
+      "category": "story",
+      "title": "劇情卡 1119",
+      "path": "story/1119.186239d.mp3",
+      "sourcePath": "data/audio/story/1119.186239d.mp3",
+      "bytes": 471867
+    },
+    "1120": {
+      "code": "1120",
+      "category": "story",
+      "title": "劇情卡 1120",
+      "path": "story/1120.a069605.mp3",
+      "sourcePath": "data/audio/story/1120.a069605.mp3",
+      "bytes": 873008
+    },
+    "1121": {
+      "code": "1121",
+      "category": "story",
+      "title": "劇情卡 1121",
+      "path": "story/1121.50e0fc3.mp3",
+      "sourcePath": "data/audio/story/1121.50e0fc3.mp3",
+      "bytes": 292734
+    },
+    "1122": {
+      "code": "1122",
+      "category": "story",
+      "title": "劇情卡 1122",
+      "path": "story/1122.cac1ba1.mp3",
+      "sourcePath": "data/audio/story/1122.cac1ba1.mp3",
+      "bytes": 462453
+    },
+    "1123": {
+      "code": "1123",
+      "category": "story",
+      "title": "劇情卡 1123",
+      "path": "story/1123.bd6a594.mp3",
+      "sourcePath": "data/audio/story/1123.bd6a594.mp3",
+      "bytes": 681452
+    },
+    "1124": {
+      "code": "1124",
+      "category": "story",
+      "title": "劇情卡 1124",
+      "path": "story/1124.150bd4e.mp3",
+      "sourcePath": "data/audio/story/1124.150bd4e.mp3",
+      "bytes": 327513
+    },
+    "1125": {
+      "code": "1125",
+      "category": "story",
+      "title": "劇情卡 1125",
+      "path": "story/1125.c81a0d1.mp3",
+      "sourcePath": "data/audio/story/1125.c81a0d1.mp3",
+      "bytes": 862773
+    },
+    "1126": {
+      "code": "1126",
+      "category": "story",
+      "title": "劇情卡 1126",
+      "path": "story/1126.e2fe1bf.mp3",
+      "sourcePath": "data/audio/story/1126.e2fe1bf.mp3",
+      "bytes": 437443
+    },
+    "1127": {
+      "code": "1127",
+      "category": "story",
+      "title": "劇情卡 1127",
+      "path": "story/1127.d7e2d10.mp3",
+      "sourcePath": "data/audio/story/1127.d7e2d10.mp3",
+      "bytes": 642744
+    },
+    "1128": {
+      "code": "1128",
+      "category": "story",
+      "title": "劇情卡 1128",
+      "path": "story/1128.eb77f00.mp3",
+      "sourcePath": "data/audio/story/1128.eb77f00.mp3",
+      "bytes": 990455
+    },
+    "1129": {
+      "code": "1129",
+      "category": "story",
+      "title": "劇情卡 1129",
+      "path": "story/1129.8971d6b.mp3",
+      "sourcePath": "data/audio/story/1129.8971d6b.mp3",
+      "bytes": 468708
+    },
+    "1130": {
+      "code": "1130",
+      "category": "story",
+      "title": "劇情卡 1130",
+      "path": "story/1130.d834946.mp3",
+      "sourcePath": "data/audio/story/1130.d834946.mp3",
+      "bytes": 537050
+    },
+    "1201": {
+      "code": "1201",
+      "category": "story",
+      "title": "劇情卡 1201",
+      "path": "story/1201.68fc57b.mp3",
+      "sourcePath": "data/audio/story/1201.68fc57b.mp3",
+      "bytes": 1755570
+    },
+    "1301": {
+      "code": "1301",
+      "category": "story",
+      "title": "劇情卡 1301",
+      "path": "story/1301.2980f15.mp3",
+      "sourcePath": "data/audio/story/1301.2980f15.mp3",
+      "bytes": 2161603
+    },
+    "1302": {
+      "code": "1302",
+      "category": "story",
+      "title": "劇情卡 1302",
+      "path": "story/1302.73805d2.mp3",
+      "sourcePath": "data/audio/story/1302.73805d2.mp3",
+      "bytes": 2692209
+    },
+    "1303": {
+      "code": "1303",
+      "category": "story",
+      "title": "劇情卡 1303",
+      "path": "story/1303.f5998d7.mp3",
+      "sourcePath": "data/audio/story/1303.f5998d7.mp3",
+      "bytes": 1452411
+    },
+    "1304": {
+      "code": "1304",
+      "category": "story",
+      "title": "劇情卡 1304",
+      "path": "story/1304.ef67d70.mp3",
+      "sourcePath": "data/audio/story/1304.ef67d70.mp3",
+      "bytes": 1027071
+    },
+    "1305": {
+      "code": "1305",
+      "category": "story",
+      "title": "劇情卡 1305",
+      "path": "story/1305.bbf0cb7.mp3",
+      "sourcePath": "data/audio/story/1305.bbf0cb7.mp3",
+      "bytes": 1359283
+    },
+    "1306": {
+      "code": "1306",
+      "category": "story",
+      "title": "劇情卡 1306",
+      "path": "story/1306.4cb9683.mp3",
+      "sourcePath": "data/audio/story/1306.4cb9683.mp3",
+      "bytes": 816903
+    },
+    "1307": {
+      "code": "1307",
+      "category": "story",
+      "title": "劇情卡 1307",
+      "path": "story/1307.b8eef20.mp3",
+      "sourcePath": "data/audio/story/1307.b8eef20.mp3",
+      "bytes": 543351
+    },
+    "1308": {
+      "code": "1308",
+      "category": "story",
+      "title": "劇情卡 1308",
+      "path": "story/1308.646ece2.mp3",
+      "sourcePath": "data/audio/story/1308.646ece2.mp3",
+      "bytes": 2049235
+    },
+    "1309": {
+      "code": "1309",
+      "category": "story",
+      "title": "劇情卡 1309",
+      "path": "story/1309.27924a8.mp3",
+      "sourcePath": "data/audio/story/1309.27924a8.mp3",
+      "bytes": 577965
+    },
+    "1401": {
+      "code": "1401",
+      "category": "story",
+      "title": "劇情卡 1401",
+      "path": "story/1401.c3b0b04.mp3",
+      "sourcePath": "data/audio/story/1401.c3b0b04.mp3",
+      "bytes": 1223061
+    },
+    "1501": {
+      "code": "1501",
+      "category": "story",
+      "title": "劇情卡 1501",
+      "path": "story/1501.dfd73b1.mp3",
+      "sourcePath": "data/audio/story/1501.dfd73b1.mp3",
+      "bytes": 3657445
+    },
+    "1502": {
+      "code": "1502",
+      "category": "story",
+      "title": "劇情卡 1502",
+      "path": "story/1502.0f2aa05.mp3",
+      "sourcePath": "data/audio/story/1502.0f2aa05.mp3",
+      "bytes": 712400
+    },
+    "1503": {
+      "code": "1503",
+      "category": "story",
+      "title": "劇情卡 1503",
+      "path": "story/1503.57aff56.mp3",
+      "sourcePath": "data/audio/story/1503.57aff56.mp3",
+      "bytes": 2964890
+    },
+    "1504": {
+      "code": "1504",
+      "category": "story",
+      "title": "劇情卡 1504",
+      "path": "story/1504.d791405.mp3",
+      "sourcePath": "data/audio/story/1504.d791405.mp3",
+      "bytes": 668034
+    },
+    "1507": {
+      "code": "1507",
+      "category": "story",
+      "title": "劇情卡 1507",
+      "path": "story/1507.c6c9476.mp3",
+      "sourcePath": "data/audio/story/1507.c6c9476.mp3",
+      "bytes": 1864596
+    },
+    "1508": {
+      "code": "1508",
+      "category": "story",
+      "title": "劇情卡 1508",
+      "path": "story/1508.75f10af.mp3",
+      "sourcePath": "data/audio/story/1508.75f10af.mp3",
+      "bytes": 1079093
+    },
+    "1509": {
+      "code": "1509",
+      "category": "story",
+      "title": "劇情卡 1509",
+      "path": "story/1509.fba2bc0.mp3",
+      "sourcePath": "data/audio/story/1509.fba2bc0.mp3",
+      "bytes": 1910810
+    },
+    "1510": {
+      "code": "1510",
+      "category": "story",
+      "title": "劇情卡 1510",
+      "path": "story/1510.0c2469b.mp3",
+      "sourcePath": "data/audio/story/1510.0c2469b.mp3",
+      "bytes": 1099155
+    },
+    "1511": {
+      "code": "1511",
+      "category": "story",
+      "title": "劇情卡 1511",
+      "path": "story/1511.b45cbcb.mp3",
+      "sourcePath": "data/audio/story/1511.b45cbcb.mp3",
+      "bytes": 2084074
+    },
+    "1512": {
+      "code": "1512",
+      "category": "story",
+      "title": "劇情卡 1512",
+      "path": "story/1512.342933f.mp3",
+      "sourcePath": "data/audio/story/1512.342933f.mp3",
+      "bytes": 2167965
+    },
+    "1601": {
+      "code": "1601",
+      "category": "story",
+      "title": "劇情卡 1601",
+      "path": "story/1601.ee646d4.mp3",
+      "sourcePath": "data/audio/story/1601.ee646d4.mp3",
+      "bytes": 2852002
+    },
+    "1602": {
+      "code": "1602",
+      "category": "story",
+      "title": "劇情卡 1602",
+      "path": "story/1602.cb37d1a.mp3",
+      "sourcePath": "data/audio/story/1602.cb37d1a.mp3",
+      "bytes": 1610860
+    },
+    "1603": {
+      "code": "1603",
+      "category": "story",
+      "title": "劇情卡 1603",
+      "path": "story/1603.99d64e8.mp3",
+      "sourcePath": "data/audio/story/1603.99d64e8.mp3",
+      "bytes": 2075955
+    },
+    "1604": {
+      "code": "1604",
+      "category": "story",
+      "title": "劇情卡 1604",
+      "path": "story/1604.3e8b18f.mp3",
+      "sourcePath": "data/audio/story/1604.3e8b18f.mp3",
+      "bytes": 1333640
+    },
+    "1605": {
+      "code": "1605",
+      "category": "story",
+      "title": "劇情卡 1605",
+      "path": "story/1605.4727491.mp3",
+      "sourcePath": "data/audio/story/1605.4727491.mp3",
+      "bytes": 2773263
+    },
+    "1606": {
+      "code": "1606",
+      "category": "story",
+      "title": "劇情卡 1606",
+      "path": "story/1606.a896d0b.mp3",
+      "sourcePath": "data/audio/story/1606.a896d0b.mp3",
+      "bytes": 1259355
+    },
+    "1701": {
+      "code": "1701",
+      "category": "story",
+      "title": "劇情卡 1701",
+      "path": "story/1701.174199c.mp3",
+      "sourcePath": "data/audio/story/1701.174199c.mp3",
+      "bytes": 5812814
+    },
+    "1702": {
+      "code": "1702",
+      "category": "story",
+      "title": "劇情卡 1702",
+      "path": "story/1702.5989b30.mp3",
+      "sourcePath": "data/audio/story/1702.5989b30.mp3",
+      "bytes": 603015
+    },
+    "1704": {
+      "code": "1704",
+      "category": "story",
+      "title": "劇情卡 1704",
+      "path": "story/1704.6737c96.mp3",
+      "sourcePath": "data/audio/story/1704.6737c96.mp3",
+      "bytes": 996300
+    },
+    "1705": {
+      "code": "1705",
+      "category": "story",
+      "title": "劇情卡 1705",
+      "path": "story/1705.9ffe847.mp3",
+      "sourcePath": "data/audio/story/1705.9ffe847.mp3",
+      "bytes": 676495
+    },
+    "1706": {
+      "code": "1706",
+      "category": "story",
+      "title": "劇情卡 1706",
+      "path": "story/1706.9e7e44a.mp3",
+      "sourcePath": "data/audio/story/1706.9e7e44a.mp3",
+      "bytes": 1772556
+    },
+    "1707": {
+      "code": "1707",
+      "category": "story",
+      "title": "劇情卡 1707",
+      "path": "story/1707.2a9c071.mp3",
+      "sourcePath": "data/audio/story/1707.2a9c071.mp3",
+      "bytes": 1252236
+    },
+    "1708": {
+      "code": "1708",
+      "category": "story",
+      "title": "劇情卡 1708",
+      "path": "story/1708.585698e.mp3",
+      "sourcePath": "data/audio/story/1708.585698e.mp3",
+      "bytes": 1153356
+    },
+    "1709": {
+      "code": "1709",
+      "category": "story",
+      "title": "劇情卡 1709",
+      "path": "story/1709.2cac209.mp3",
+      "sourcePath": "data/audio/story/1709.2cac209.mp3",
+      "bytes": 1248675
+    },
+    "1710": {
+      "code": "1710",
+      "category": "story",
+      "title": "劇情卡 1710",
+      "path": "story/1710.076633e.mp3",
+      "sourcePath": "data/audio/story/1710.076633e.mp3",
+      "bytes": 1241676
+    },
+    "1711": {
+      "code": "1711",
+      "category": "story",
+      "title": "劇情卡 1711",
+      "path": "story/1711.460770f.mp3",
+      "sourcePath": "data/audio/story/1711.460770f.mp3",
+      "bytes": 1069645
+    },
+    "1712": {
+      "code": "1712",
+      "category": "story",
+      "title": "劇情卡 1712",
+      "path": "story/1712.b2e9fe8.mp3",
+      "sourcePath": "data/audio/story/1712.b2e9fe8.mp3",
+      "bytes": 2764483
+    },
+    "1713": {
+      "code": "1713",
+      "category": "story",
+      "title": "劇情卡 1713",
+      "path": "story/1713.da3a097.mp3",
+      "sourcePath": "data/audio/story/1713.da3a097.mp3",
+      "bytes": 2119658
+    },
+    "1714": {
+      "code": "1714",
+      "category": "story",
+      "title": "劇情卡 1714",
+      "path": "story/1714.e8ed9be.mp3",
+      "sourcePath": "data/audio/story/1714.e8ed9be.mp3",
+      "bytes": 599435
+    },
+    "1715": {
+      "code": "1715",
+      "category": "story",
+      "title": "劇情卡 1715",
+      "path": "story/1715.24b8bca.mp3",
+      "sourcePath": "data/audio/story/1715.24b8bca.mp3",
+      "bytes": 1425036
+    },
+    "1716": {
+      "code": "1716",
+      "category": "story",
+      "title": "劇情卡 1716",
+      "path": "story/1716.81412ef.mp3",
+      "sourcePath": "data/audio/story/1716.81412ef.mp3",
+      "bytes": 848076
+    },
+    "1801": {
+      "code": "1801",
+      "category": "story",
+      "title": "劇情卡 1801",
+      "path": "story/1801.2ec9a34.mp3",
+      "sourcePath": "data/audio/story/1801.2ec9a34.mp3",
+      "bytes": 2573196
+    },
+    "1802": {
+      "code": "1802",
+      "category": "story",
+      "title": "劇情卡 1802",
+      "path": "story/1802.ac661fa.mp3",
+      "sourcePath": "data/audio/story/1802.ac661fa.mp3",
+      "bytes": 915276
+    },
+    "1803": {
+      "code": "1803",
+      "category": "story",
+      "title": "劇情卡 1803",
+      "path": "story/1803.c266b9b.mp3",
+      "sourcePath": "data/audio/story/1803.c266b9b.mp3",
+      "bytes": 412482
+    },
+    "1901": {
+      "code": "1901",
+      "category": "story",
+      "title": "劇情卡 1901",
+      "path": "story/1901.4bd5d56.mp3",
+      "sourcePath": "data/audio/story/1901.4bd5d56.mp3",
+      "bytes": 1189645
+    },
+    "1902": {
+      "code": "1902",
+      "category": "story",
+      "title": "劇情卡 1902",
+      "path": "story/1902.ac42d36.mp3",
+      "sourcePath": "data/audio/story/1902.ac42d36.mp3",
+      "bytes": 648662
+    },
+    "1903": {
+      "code": "1903",
+      "category": "story",
+      "title": "劇情卡 1903",
+      "path": "story/1903.399cb98.mp3",
+      "sourcePath": "data/audio/story/1903.399cb98.mp3",
+      "bytes": 970264
+    },
+    "1904": {
+      "code": "1904",
+      "category": "story",
+      "title": "劇情卡 1904",
+      "path": "story/1904.0b47dd9.mp3",
+      "sourcePath": "data/audio/story/1904.0b47dd9.mp3",
+      "bytes": 784982
+    },
+    "1905": {
+      "code": "1905",
+      "category": "story",
+      "title": "劇情卡 1905",
+      "path": "story/1905.c2c9d7f.mp3",
+      "sourcePath": "data/audio/story/1905.c2c9d7f.mp3",
+      "bytes": 1252504
+    },
+    "2001": {
+      "code": "2001",
+      "category": "story",
+      "title": "劇情卡 2001",
+      "path": "story/2001.e63280d.mp3",
+      "sourcePath": "data/audio/story/2001.e63280d.mp3",
+      "bytes": 3049165
+    },
+    "2002": {
+      "code": "2002",
+      "category": "story",
+      "title": "劇情卡 2002",
+      "path": "story/2002.f8e6246.mp3",
+      "sourcePath": "data/audio/story/2002.f8e6246.mp3",
+      "bytes": 2333364
+    },
+    "2003": {
+      "code": "2003",
+      "category": "story",
+      "title": "劇情卡 2003",
+      "path": "story/2003.462fbc4.mp3",
+      "sourcePath": "data/audio/story/2003.462fbc4.mp3",
+      "bytes": 178955
+    },
+    "2101": {
+      "code": "2101",
+      "category": "story",
+      "title": "劇情卡 2101",
+      "path": "story/2101.f0d0427.mp3",
+      "sourcePath": "data/audio/story/2101.f0d0427.mp3",
+      "bytes": 3292632
+    },
+    "2102": {
+      "code": "2102",
+      "category": "story",
+      "title": "劇情卡 2102",
+      "path": "story/2102.3d02adb.mp3",
+      "sourcePath": "data/audio/story/2102.3d02adb.mp3",
+      "bytes": 2184643
+    },
+    "2103": {
+      "code": "2103",
+      "category": "story",
+      "title": "劇情卡 2103",
+      "path": "story/2103.5b70b94.mp3",
+      "sourcePath": "data/audio/story/2103.5b70b94.mp3",
+      "bytes": 1544865
+    },
+    "2104": {
+      "code": "2104",
+      "category": "story",
+      "title": "劇情卡 2104",
+      "path": "story/2104.25ffd34.mp3",
+      "sourcePath": "data/audio/story/2104.25ffd34.mp3",
+      "bytes": 1241505
+    },
+    "2105": {
+      "code": "2105",
+      "category": "story",
+      "title": "劇情卡 2105",
+      "path": "story/2105.7537f0f.mp3",
+      "sourcePath": "data/audio/story/2105.7537f0f.mp3",
+      "bytes": 1373443
+    },
+    "2106": {
+      "code": "2106",
+      "category": "story",
+      "title": "劇情卡 2106",
+      "path": "story/2106.ee2764e.mp3",
+      "sourcePath": "data/audio/story/2106.ee2764e.mp3",
+      "bytes": 5062476
+    },
+    "2107": {
+      "code": "2107",
+      "category": "story",
+      "title": "劇情卡 2107",
+      "path": "story/2107.a52d8c2.mp3",
+      "sourcePath": "data/audio/story/2107.a52d8c2.mp3",
+      "bytes": 4497582
+    },
+    "2108": {
+      "code": "2108",
+      "category": "story",
+      "title": "劇情卡 2108",
+      "path": "story/2108.837441d.mp3",
+      "sourcePath": "data/audio/story/2108.837441d.mp3",
+      "bytes": 2998532
+    },
+    "2109": {
+      "code": "2109",
+      "category": "story",
+      "title": "劇情卡 2109",
+      "path": "story/2109.4ad6c8c.mp3",
+      "sourcePath": "data/audio/story/2109.4ad6c8c.mp3",
+      "bytes": 3240643
+    },
+    "2110": {
+      "code": "2110",
+      "category": "story",
+      "title": "劇情卡 2110",
+      "path": "story/2110.df16e3d.mp3",
+      "sourcePath": "data/audio/story/2110.df16e3d.mp3",
+      "bytes": 316482
+    },
+    "2111": {
+      "code": "2111",
+      "category": "story",
+      "title": "劇情卡 2111",
+      "path": "story/2111.095dd0b.mp3",
+      "sourcePath": "data/audio/story/2111.095dd0b.mp3",
+      "bytes": 3252163
+    },
+    "2201": {
+      "code": "2201",
+      "category": "story",
+      "title": "劇情卡 2201",
+      "path": "story/2201.f4c8abc.mp3",
+      "sourcePath": "data/audio/story/2201.f4c8abc.mp3",
+      "bytes": 781847
+    },
+    "2202": {
+      "code": "2202",
+      "category": "story",
+      "title": "劇情卡 2202",
+      "path": "story/2202.a132445.mp3",
+      "sourcePath": "data/audio/story/2202.a132445.mp3",
+      "bytes": 988236
+    },
+    "2203": {
+      "code": "2203",
+      "category": "story",
+      "title": "劇情卡 2203",
+      "path": "story/2203.43f29f3.mp3",
+      "sourcePath": "data/audio/story/2203.43f29f3.mp3",
+      "bytes": 1004570
+    },
+    "2204": {
+      "code": "2204",
+      "category": "story",
+      "title": "劇情卡 2204",
+      "path": "story/2204.4259824.mp3",
+      "sourcePath": "data/audio/story/2204.4259824.mp3",
+      "bytes": 487890
+    },
+    "2301": {
+      "code": "2301",
+      "category": "story",
+      "title": "劇情卡 2301",
+      "path": "story/2301.2793d5f.mp3",
+      "sourcePath": "data/audio/story/2301.2793d5f.mp3",
+      "bytes": 1688323
+    },
+    "2302": {
+      "code": "2302",
+      "category": "story",
+      "title": "劇情卡 2302",
+      "path": "story/2302.b357099.mp3",
+      "sourcePath": "data/audio/story/2302.b357099.mp3",
+      "bytes": 977923
+    },
+    "2303": {
+      "code": "2303",
+      "category": "story",
+      "title": "劇情卡 2303",
+      "path": "story/2303.1115264.mp3",
+      "sourcePath": "data/audio/story/2303.1115264.mp3",
+      "bytes": 885763
+    },
+    "2304": {
+      "code": "2304",
+      "category": "story",
+      "title": "劇情卡 2304",
+      "path": "story/2304.e4b4661.mp3",
+      "sourcePath": "data/audio/story/2304.e4b4661.mp3",
+      "bytes": 557442
+    },
+    "2305": {
+      "code": "2305",
+      "category": "story",
+      "title": "劇情卡 2305",
+      "path": "story/2305.dc42b43.mp3",
+      "sourcePath": "data/audio/story/2305.dc42b43.mp3",
+      "bytes": 498882
+    },
+    "2401": {
+      "code": "2401",
+      "category": "story",
+      "title": "劇情卡 2401",
+      "path": "story/2401.8b2a3a2.mp3",
+      "sourcePath": "data/audio/story/2401.8b2a3a2.mp3",
+      "bytes": 1436803
+    },
+    "2402": {
+      "code": "2402",
+      "category": "story",
+      "title": "劇情卡 2402",
+      "path": "story/2402.ce0c3bb.mp3",
+      "sourcePath": "data/audio/story/2402.ce0c3bb.mp3",
+      "bytes": 1127062
+    },
+    "2403": {
+      "code": "2403",
+      "category": "story",
+      "title": "劇情卡 2403",
+      "path": "story/2403.44875c5.mp3",
+      "sourcePath": "data/audio/story/2403.44875c5.mp3",
+      "bytes": 1238083
+    },
+    "2404": {
+      "code": "2404",
+      "category": "story",
+      "title": "劇情卡 2404",
+      "path": "story/2404.199af40.mp3",
+      "sourcePath": "data/audio/story/2404.199af40.mp3",
+      "bytes": 939523
+    },
+    "2501": {
+      "code": "2501",
+      "category": "story",
+      "title": "劇情卡 2501",
+      "path": "story/2501.d8ea44c.mp3",
+      "sourcePath": "data/audio/story/2501.d8ea44c.mp3",
+      "bytes": 545850
+    },
+    "2502": {
+      "code": "2502",
+      "category": "story",
+      "title": "劇情卡 2502",
+      "path": "story/2502.ec8aee0.mp3",
+      "sourcePath": "data/audio/story/2502.ec8aee0.mp3",
+      "bytes": 1340803
+    },
+    "2601": {
+      "code": "2601",
+      "category": "story",
+      "title": "劇情卡 2601",
+      "path": "story/2601.e8c0ef5.mp3",
+      "sourcePath": "data/audio/story/2601.e8c0ef5.mp3",
+      "bytes": 1092163
+    },
+    "2602": {
+      "code": "2602",
+      "category": "story",
+      "title": "劇情卡 2602",
+      "path": "story/2602.8ed532e.mp3",
+      "sourcePath": "data/audio/story/2602.8ed532e.mp3",
+      "bytes": 1756483
+    },
+    "2603": {
+      "code": "2603",
+      "category": "story",
+      "title": "劇情卡 2603",
+      "path": "story/2603.ab346a8.mp3",
+      "sourcePath": "data/audio/story/2603.ab346a8.mp3",
+      "bytes": 640002
+    },
+    "2701": {
+      "code": "2701",
+      "category": "story",
+      "title": "劇情卡 2701",
+      "path": "story/2701.f5bac7a.mp3",
+      "sourcePath": "data/audio/story/2701.f5bac7a.mp3",
+      "bytes": 1777603
+    },
+    "2702": {
+      "code": "2702",
+      "category": "story",
+      "title": "劇情卡 2702",
+      "path": "story/2702.ae21319.mp3",
+      "sourcePath": "data/audio/story/2702.ae21319.mp3",
+      "bytes": 653442
+    },
+    "2703": {
+      "code": "2703",
+      "category": "story",
+      "title": "劇情卡 2703",
+      "path": "story/2703.6235ca2.mp3",
+      "sourcePath": "data/audio/story/2703.6235ca2.mp3",
+      "bytes": 749442
+    },
+    "2704": {
+      "code": "2704",
+      "category": "story",
+      "title": "劇情卡 2704",
+      "path": "story/2704.e0c9d9c.mp3",
+      "sourcePath": "data/audio/story/2704.e0c9d9c.mp3",
+      "bytes": 1299332
+    },
+    "2801": {
+      "code": "2801",
+      "category": "story",
+      "title": "劇情卡 2801",
+      "path": "story/2801.e78b309.mp3",
+      "sourcePath": "data/audio/story/2801.e78b309.mp3",
+      "bytes": 1806403
+    },
+    "2802": {
+      "code": "2802",
+      "category": "story",
+      "title": "劇情卡 2802",
+      "path": "story/2802.b38a779.mp3",
+      "sourcePath": "data/audio/story/2802.b38a779.mp3",
+      "bytes": 960643
+    },
+    "2803": {
+      "code": "2803",
+      "category": "story",
+      "title": "劇情卡 2803",
+      "path": "story/2803.516f465.mp3",
+      "sourcePath": "data/audio/story/2803.516f465.mp3",
+      "bytes": 2231683
+    },
+    "2804": {
+      "code": "2804",
+      "category": "story",
+      "title": "劇情卡 2804",
+      "path": "story/2804.ebbfdb0.mp3",
+      "sourcePath": "data/audio/story/2804.ebbfdb0.mp3",
+      "bytes": 1351363
+    },
+    "2805": {
+      "code": "2805",
+      "category": "story",
+      "title": "劇情卡 2805",
+      "path": "story/2805.4aa70c5.mp3",
+      "sourcePath": "data/audio/story/2805.4aa70c5.mp3",
+      "bytes": 1237123
+    },
+    "2806": {
+      "code": "2806",
+      "category": "story",
+      "title": "劇情卡 2806",
+      "path": "story/2806.29925ba.mp3",
+      "sourcePath": "data/audio/story/2806.29925ba.mp3",
+      "bytes": 1713283
+    },
+    "2901": {
+      "code": "2901",
+      "category": "story",
+      "title": "劇情卡 2901",
+      "path": "story/2901.4ee8e89.mp3",
+      "sourcePath": "data/audio/story/2901.4ee8e89.mp3",
+      "bytes": 2266970
+    },
+    "3001": {
+      "code": "3001",
+      "category": "story",
+      "title": "劇情卡 3001",
+      "path": "story/3001.a056858.mp3",
+      "sourcePath": "data/audio/story/3001.a056858.mp3",
+      "bytes": 808962
+    },
+    "3002": {
+      "code": "3002",
+      "category": "story",
+      "title": "劇情卡 3002",
+      "path": "story/3002.4d5adbf.mp3",
+      "sourcePath": "data/audio/story/3002.4d5adbf.mp3",
+      "bytes": 2036803
+    },
+    "3003": {
+      "code": "3003",
+      "category": "story",
+      "title": "劇情卡 3003",
+      "path": "story/3003.8efb411.mp3",
+      "sourcePath": "data/audio/story/3003.8efb411.mp3",
+      "bytes": 2281603
+    },
+    "3101": {
+      "code": "3101",
+      "category": "story",
+      "title": "劇情卡 3101",
+      "path": "story/3101.bb64678.mp3",
+      "sourcePath": "data/audio/story/3101.bb64678.mp3",
+      "bytes": 1180483
+    },
+    "3102": {
+      "code": "3102",
+      "category": "story",
+      "title": "劇情卡 3102",
+      "path": "story/3102.41ec85e.mp3",
+      "sourcePath": "data/audio/story/3102.41ec85e.mp3",
+      "bytes": 886723
+    },
+    "3103": {
+      "code": "3103",
+      "category": "story",
+      "title": "劇情卡 3103",
+      "path": "story/3103.3773076.mp3",
+      "sourcePath": "data/audio/story/3103.3773076.mp3",
+      "bytes": 927043
+    },
+    "3104": {
+      "code": "3104",
+      "category": "story",
+      "title": "劇情卡 3104",
+      "path": "story/3104.b615a4a.mp3",
+      "sourcePath": "data/audio/story/3104.b615a4a.mp3",
+      "bytes": 7180070
+    },
+    "3201": {
+      "code": "3201",
+      "category": "story",
+      "title": "劇情卡 3201",
+      "path": "story/3201.7da827b.mp3",
+      "sourcePath": "data/audio/story/3201.7da827b.mp3",
+      "bytes": 946864
+    },
+    "3202": {
+      "code": "3202",
+      "category": "story",
+      "title": "劇情卡 3202",
+      "path": "story/3202.50115d3.mp3",
+      "sourcePath": "data/audio/story/3202.50115d3.mp3",
+      "bytes": 2318704
+    },
+    "3203": {
+      "code": "3203",
+      "category": "story",
+      "title": "劇情卡 3203",
+      "path": "story/3203.4c7e5ac.mp3",
+      "sourcePath": "data/audio/story/3203.4c7e5ac.mp3",
+      "bytes": 2169737
+    },
+    "3204": {
+      "code": "3204",
+      "category": "story",
+      "title": "劇情卡 3204",
+      "path": "story/3204.be97471.mp3",
+      "sourcePath": "data/audio/story/3204.be97471.mp3",
+      "bytes": 1571824
+    },
+    "3205": {
+      "code": "3205",
+      "category": "story",
+      "title": "劇情卡 3205",
+      "path": "story/3205.71dde32.mp3",
+      "sourcePath": "data/audio/story/3205.71dde32.mp3",
+      "bytes": 1609139
+    },
+    "3206": {
+      "code": "3206",
+      "category": "story",
+      "title": "劇情卡 3206",
+      "path": "story/3206.8d54c1c.mp3",
+      "sourcePath": "data/audio/story/3206.8d54c1c.mp3",
+      "bytes": 1569904
+    },
+    "3207": {
+      "code": "3207",
+      "category": "story",
+      "title": "劇情卡 3207",
+      "path": "story/3207.ce94ad2.mp3",
+      "sourcePath": "data/audio/story/3207.ce94ad2.mp3",
+      "bytes": 3142384
+    },
+    "3208": {
+      "code": "3208",
+      "category": "story",
+      "title": "劇情卡 3208",
+      "path": "story/3208.15419c5.mp3",
+      "sourcePath": "data/audio/story/3208.15419c5.mp3",
+      "bytes": 1218544
+    },
+    "3209": {
+      "code": "3209",
+      "category": "story",
+      "title": "劇情卡 3209",
+      "path": "story/3209.3b21f3c.mp3",
+      "sourcePath": "data/audio/story/3209.3b21f3c.mp3",
+      "bytes": 445437
+    },
+    "3210": {
+      "code": "3210",
+      "category": "story",
+      "title": "劇情卡 3210",
+      "path": "story/3210.ae9f7c6.mp3",
+      "sourcePath": "data/audio/story/3210.ae9f7c6.mp3",
+      "bytes": 1408003
+    },
+    "3211": {
+      "code": "3211",
+      "category": "story",
+      "title": "劇情卡 3211",
+      "path": "story/3211.ac34b09.mp3",
+      "sourcePath": "data/audio/story/3211.ac34b09.mp3",
+      "bytes": 837424
+    },
+    "3212": {
+      "code": "3212",
+      "category": "story",
+      "title": "劇情卡 3212",
+      "path": "story/3212.6b29337.mp3",
+      "sourcePath": "data/audio/story/3212.6b29337.mp3",
+      "bytes": 4534954
+    },
+    "3213": {
+      "code": "3213",
+      "category": "story",
+      "title": "劇情卡 3213",
+      "path": "story/3213.bd2c1dd.mp3",
+      "sourcePath": "data/audio/story/3213.bd2c1dd.mp3",
+      "bytes": 458224
+    },
+    "3214": {
+      "code": "3214",
+      "category": "story",
+      "title": "劇情卡 3214",
+      "path": "story/3214.0fa56d1.mp3",
+      "sourcePath": "data/audio/story/3214.0fa56d1.mp3",
+      "bytes": 434224
+    },
+    "3215": {
+      "code": "3215",
+      "category": "story",
+      "title": "劇情卡 3215",
+      "path": "story/3215.f4f73d2.mp3",
+      "sourcePath": "data/audio/story/3215.f4f73d2.mp3",
+      "bytes": 566704
+    },
+    "3216": {
+      "code": "3216",
+      "category": "story",
+      "title": "劇情卡 3216",
+      "path": "story/3216.0198d7e.mp3",
+      "sourcePath": "data/audio/story/3216.0198d7e.mp3",
+      "bytes": 2033584
+    },
+    "3301": {
+      "code": "3301",
+      "category": "story",
+      "title": "劇情卡 3301",
+      "path": "story/3301.c635429.mp3",
+      "sourcePath": "data/audio/story/3301.c635429.mp3",
+      "bytes": 1902794
+    },
+    "3302": {
+      "code": "3302",
+      "category": "story",
+      "title": "劇情卡 3302",
+      "path": "story/3302.417d376.mp3",
+      "sourcePath": "data/audio/story/3302.417d376.mp3",
+      "bytes": 2143911
+    },
+    "3303": {
+      "code": "3303",
+      "category": "story",
+      "title": "劇情卡 3303",
+      "path": "story/3303.e67b660.mp3",
+      "sourcePath": "data/audio/story/3303.e67b660.mp3",
+      "bytes": 1602151
+    },
+    "3304": {
+      "code": "3304",
+      "category": "story",
+      "title": "劇情卡 3304",
+      "path": "story/3304.a490a52.mp3",
+      "sourcePath": "data/audio/story/3304.a490a52.mp3",
+      "bytes": 1652488
+    },
+    "3305": {
+      "code": "3305",
+      "category": "story",
+      "title": "劇情卡 3305",
+      "path": "story/3305.86539f2.mp3",
+      "sourcePath": "data/audio/story/3305.86539f2.mp3",
+      "bytes": 1606426
+    },
+    "3306": {
+      "code": "3306",
+      "category": "story",
+      "title": "劇情卡 3306",
+      "path": "story/3306.38d0b2e.mp3",
+      "sourcePath": "data/audio/story/3306.38d0b2e.mp3",
+      "bytes": 727200
+    },
+    "3307": {
+      "code": "3307",
+      "category": "story",
+      "title": "劇情卡 3307",
+      "path": "story/3307.2fb5cee.mp3",
+      "sourcePath": "data/audio/story/3307.2fb5cee.mp3",
+      "bytes": 1038444
+    },
+    "3308": {
+      "code": "3308",
+      "category": "story",
+      "title": "劇情卡 3308",
+      "path": "story/3308.0c5c4b3.mp3",
+      "sourcePath": "data/audio/story/3308.0c5c4b3.mp3",
+      "bytes": 3250614
+    },
+    "3309": {
+      "code": "3309",
+      "category": "story",
+      "title": "劇情卡 3309",
+      "path": "story/3309.d3aa179.mp3",
+      "sourcePath": "data/audio/story/3309.d3aa179.mp3",
+      "bytes": 1388610
+    },
+    "3310": {
+      "code": "3310",
+      "category": "story",
+      "title": "劇情卡 3310",
+      "path": "story/3310.11b5623.mp3",
+      "sourcePath": "data/audio/story/3310.11b5623.mp3",
+      "bytes": 1097265
+    },
+    "3311": {
+      "code": "3311",
+      "category": "story",
+      "title": "劇情卡 3311",
+      "path": "story/3311.978f4bb.mp3",
+      "sourcePath": "data/audio/story/3311.978f4bb.mp3",
+      "bytes": 473295
+    },
+    "3312": {
+      "code": "3312",
+      "category": "story",
+      "title": "劇情卡 3312",
+      "path": "story/3312.a1d5c05.mp3",
+      "sourcePath": "data/audio/story/3312.a1d5c05.mp3",
+      "bytes": 1579504
+    },
+    "3313": {
+      "code": "3313",
+      "category": "story",
+      "title": "劇情卡 3313",
+      "path": "story/3313.67935d7.mp3",
+      "sourcePath": "data/audio/story/3313.67935d7.mp3",
+      "bytes": 1643824
+    },
+    "3314": {
+      "code": "3314",
+      "category": "story",
+      "title": "劇情卡 3314",
+      "path": "story/3314.6e2204e.mp3",
+      "sourcePath": "data/audio/story/3314.6e2204e.mp3",
+      "bytes": 622384
+    },
+    "3315": {
+      "code": "3315",
+      "category": "story",
+      "title": "劇情卡 3315",
+      "path": "story/3315.099eb73.mp3",
+      "sourcePath": "data/audio/story/3315.099eb73.mp3",
+      "bytes": 579184
+    },
+    "3316": {
+      "code": "3316",
+      "category": "story",
+      "title": "劇情卡 3316",
+      "path": "story/3316.796f9f6.mp3",
+      "sourcePath": "data/audio/story/3316.796f9f6.mp3",
+      "bytes": 602224
+    },
+    "3317": {
+      "code": "3317",
+      "category": "story",
+      "title": "劇情卡 3317",
+      "path": "story/3317.1d20c22.mp3",
+      "sourcePath": "data/audio/story/3317.1d20c22.mp3",
+      "bytes": 760624
+    },
+    "3318": {
+      "code": "3318",
+      "category": "story",
+      "title": "劇情卡 3318",
+      "path": "story/3318.6f74278.mp3",
+      "sourcePath": "data/audio/story/3318.6f74278.mp3",
+      "bytes": 216840
+    },
+    "3319": {
+      "code": "3319",
+      "category": "story",
+      "title": "劇情卡 3319",
+      "path": "story/3319.c11c006.mp3",
+      "sourcePath": "data/audio/story/3319.c11c006.mp3",
+      "bytes": 1896643
+    },
+    "3320": {
+      "code": "3320",
+      "category": "story",
+      "title": "劇情卡 3320",
+      "path": "story/3320.e048fb0.mp3",
+      "sourcePath": "data/audio/story/3320.e048fb0.mp3",
+      "bytes": 599648
+    },
+    "3321": {
+      "code": "3321",
+      "category": "story",
+      "title": "劇情卡 3321",
+      "path": "story/3321.a15cca3.mp3",
+      "sourcePath": "data/audio/story/3321.a15cca3.mp3",
+      "bytes": 239775
+    },
+    "3322": {
+      "code": "3322",
+      "category": "story",
+      "title": "劇情卡 3322",
+      "path": "story/3322.9d3df37.mp3",
+      "sourcePath": "data/audio/story/3322.9d3df37.mp3",
+      "bytes": 239775
+    },
+    "3323": {
+      "code": "3323",
+      "category": "story",
+      "title": "劇情卡 3323",
+      "path": "story/3323.8d96757.mp3",
+      "sourcePath": "data/audio/story/3323.8d96757.mp3",
+      "bytes": 2166250
+    },
+    "3401": {
+      "code": "3401",
+      "category": "story",
+      "title": "劇情卡 3401",
+      "path": "story/3401.7bb623e.mp3",
+      "sourcePath": "data/audio/story/3401.7bb623e.mp3",
+      "bytes": 3519543
+    },
+    "3402": {
+      "code": "3402",
+      "category": "story",
+      "title": "劇情卡 3402",
+      "path": "story/3402.cd4dd85.mp3",
+      "sourcePath": "data/audio/story/3402.cd4dd85.mp3",
+      "bytes": 479264
+    },
+    "3403": {
+      "code": "3403",
+      "category": "story",
+      "title": "劇情卡 3403",
+      "path": "story/3403.00e6df0.mp3",
+      "sourcePath": "data/audio/story/3403.00e6df0.mp3",
+      "bytes": 463904
+    },
+    "3404": {
+      "code": "3404",
+      "category": "story",
+      "title": "劇情卡 3404",
+      "path": "story/3404.75079cb.mp3",
+      "sourcePath": "data/audio/story/3404.75079cb.mp3",
+      "bytes": 1900023
+    },
+    "3405": {
+      "code": "3405",
+      "category": "story",
+      "title": "劇情卡 3405",
+      "path": "story/3405.bc5b95b.mp3",
+      "sourcePath": "data/audio/story/3405.bc5b95b.mp3",
+      "bytes": 1866423
+    },
+    "3406": {
+      "code": "3406",
+      "category": "story",
+      "title": "劇情卡 3406",
+      "path": "story/3406.09a3f86.mp3",
+      "sourcePath": "data/audio/story/3406.09a3f86.mp3",
+      "bytes": 1856944
+    },
+    "3407": {
+      "code": "3407",
+      "category": "story",
+      "title": "劇情卡 3407",
+      "path": "story/3407.a4d686f.mp3",
+      "sourcePath": "data/audio/story/3407.a4d686f.mp3",
+      "bytes": 1710676
+    },
+    "3408": {
+      "code": "3408",
+      "category": "story",
+      "title": "劇情卡 3408",
+      "path": "story/3408.3ba7fbd.mp3",
+      "sourcePath": "data/audio/story/3408.3ba7fbd.mp3",
+      "bytes": 1126384
+    },
+    "3409": {
+      "code": "3409",
+      "category": "story",
+      "title": "劇情卡 3409",
+      "path": "story/3409.df0f932.mp3",
+      "sourcePath": "data/audio/story/3409.df0f932.mp3",
+      "bytes": 1524163
+    },
+    "3501": {
+      "code": "3501",
+      "category": "story",
+      "title": "劇情卡 3501",
+      "path": "story/3501.c076aaa.mp3",
+      "sourcePath": "data/audio/story/3501.c076aaa.mp3",
+      "bytes": 970243
+    },
+    "3502": {
+      "code": "3502",
+      "category": "story",
+      "title": "劇情卡 3502",
+      "path": "story/3502.11dde61.mp3",
+      "sourcePath": "data/audio/story/3502.11dde61.mp3",
+      "bytes": 1302945
+    },
+    "3503": {
+      "code": "3503",
+      "category": "story",
+      "title": "劇情卡 3503",
+      "path": "story/3503.e9d4b59.mp3",
+      "sourcePath": "data/audio/story/3503.e9d4b59.mp3",
+      "bytes": 1071664
+    },
+    "3504": {
+      "code": "3504",
+      "category": "story",
+      "title": "劇情卡 3504",
+      "path": "story/3504.d2e1024.mp3",
+      "sourcePath": "data/audio/story/3504.d2e1024.mp3",
+      "bytes": 1826224
+    },
+    "3505": {
+      "code": "3505",
+      "category": "story",
+      "title": "劇情卡 3505",
+      "path": "story/3505.d00fb59.mp3",
+      "sourcePath": "data/audio/story/3505.d00fb59.mp3",
+      "bytes": 1602465
+    },
+    "3506": {
+      "code": "3506",
+      "category": "story",
+      "title": "劇情卡 3506",
+      "path": "story/3506.72ebad6.mp3",
+      "sourcePath": "data/audio/story/3506.72ebad6.mp3",
+      "bytes": 2191905
+    },
+    "3507": {
+      "code": "3507",
+      "category": "story",
+      "title": "劇情卡 3507",
+      "path": "story/3507.c35e926.mp3",
+      "sourcePath": "data/audio/story/3507.c35e926.mp3",
+      "bytes": 447584
+    },
+    "3508": {
+      "code": "3508",
+      "category": "story",
+      "title": "劇情卡 3508",
+      "path": "story/3508.9cf1049.mp3",
+      "sourcePath": "data/audio/story/3508.9cf1049.mp3",
+      "bytes": 744304
+    },
+    "3509": {
+      "code": "3509",
+      "category": "story",
+      "title": "劇情卡 3509",
+      "path": "story/3509.58d7ae3.mp3",
+      "sourcePath": "data/audio/story/3509.58d7ae3.mp3",
+      "bytes": 1282956
+    },
+    "3601": {
+      "code": "3601",
+      "category": "story",
+      "title": "劇情卡 3601",
+      "path": "story/3601.c869f8e.mp3",
+      "sourcePath": "data/audio/story/3601.c869f8e.mp3",
+      "bytes": 944076
+    },
+    "3602": {
+      "code": "3602",
+      "category": "story",
+      "title": "劇情卡 3602",
+      "path": "story/3602.47ed60e.mp3",
+      "sourcePath": "data/audio/story/3602.47ed60e.mp3",
+      "bytes": 1114956
+    },
+    "3603": {
+      "code": "3603",
+      "category": "story",
+      "title": "劇情卡 3603",
+      "path": "story/3603.a5ec1b0.mp3",
+      "sourcePath": "data/audio/story/3603.a5ec1b0.mp3",
+      "bytes": 1399116
+    },
+    "3604": {
+      "code": "3604",
+      "category": "story",
+      "title": "劇情卡 3604",
+      "path": "story/3604.4ada698.mp3",
+      "sourcePath": "data/audio/story/3604.4ada698.mp3",
+      "bytes": 3018636
+    },
+    "3605": {
+      "code": "3605",
+      "category": "story",
+      "title": "劇情卡 3605",
+      "path": "story/3605.a76e8ef.mp3",
+      "sourcePath": "data/audio/story/3605.a76e8ef.mp3",
+      "bytes": 1059276
+    },
+    "3606": {
+      "code": "3606",
+      "category": "story",
+      "title": "劇情卡 3606",
+      "path": "story/3606.652665d.mp3",
+      "sourcePath": "data/audio/story/3606.652665d.mp3",
+      "bytes": 711819
+    },
+    "3607": {
+      "code": "3607",
+      "category": "story",
+      "title": "劇情卡 3607",
+      "path": "story/3607.734a12b.mp3",
+      "sourcePath": "data/audio/story/3607.734a12b.mp3",
+      "bytes": 2429443
+    },
+    "3608": {
+      "code": "3608",
+      "category": "story",
+      "title": "劇情卡 3608",
+      "path": "story/3608.3872c9b.mp3",
+      "sourcePath": "data/audio/story/3608.3872c9b.mp3",
+      "bytes": 1703245
+    },
+    "3609": {
+      "code": "3609",
+      "category": "story",
+      "title": "劇情卡 3609",
+      "path": "story/3609.20fa1d4.mp3",
+      "sourcePath": "data/audio/story/3609.20fa1d4.mp3",
+      "bytes": 1283526
+    },
+    "3610": {
+      "code": "3610",
+      "category": "story",
+      "title": "劇情卡 3610",
+      "path": "story/3610.7d4d8f3.mp3",
+      "sourcePath": "data/audio/story/3610.7d4d8f3.mp3",
+      "bytes": 477882
+    },
+    "3611": {
+      "code": "3611",
+      "category": "story",
+      "title": "劇情卡 3611",
+      "path": "story/3611.c75aff5.mp3",
+      "sourcePath": "data/audio/story/3611.c75aff5.mp3",
+      "bytes": 1805196
+    },
+    "3612": {
+      "code": "3612",
+      "category": "story",
+      "title": "劇情卡 3612",
+      "path": "story/3612.bd46856.mp3",
+      "sourcePath": "data/audio/story/3612.bd46856.mp3",
+      "bytes": 762276
+    },
+    "3613": {
+      "code": "3613",
+      "category": "story",
+      "title": "劇情卡 3613",
+      "path": "story/3613.c25fbb7.mp3",
+      "sourcePath": "data/audio/story/3613.c25fbb7.mp3",
+      "bytes": 607115
+    },
+    "3701": {
+      "code": "3701",
+      "category": "story",
+      "title": "劇情卡 3701",
+      "path": "story/3701.45167a4.mp3",
+      "sourcePath": "data/audio/story/3701.45167a4.mp3",
+      "bytes": 1050636
+    },
+    "3702": {
+      "code": "3702",
+      "category": "story",
+      "title": "劇情卡 3702",
+      "path": "story/3702.cbee554.mp3",
+      "sourcePath": "data/audio/story/3702.cbee554.mp3",
+      "bytes": 3982890
+    },
+    "3703": {
+      "code": "3703",
+      "category": "story",
+      "title": "劇情卡 3703",
+      "path": "story/3703.29a211b.mp3",
+      "sourcePath": "data/audio/story/3703.29a211b.mp3",
+      "bytes": 5209379
+    },
+    "3704": {
+      "code": "3704",
+      "category": "story",
+      "title": "劇情卡 3704",
+      "path": "story/3704.3f3570c.mp3",
+      "sourcePath": "data/audio/story/3704.3f3570c.mp3",
+      "bytes": 1539276
+    },
+    "3705": {
+      "code": "3705",
+      "category": "story",
+      "title": "劇情卡 3705",
+      "path": "story/3705.737ff84.mp3",
+      "sourcePath": "data/audio/story/3705.737ff84.mp3",
+      "bytes": 3268446
+    },
+    "3706": {
+      "code": "3706",
+      "category": "story",
+      "title": "劇情卡 3706",
+      "path": "story/3706.aa8ee07.mp3",
+      "sourcePath": "data/audio/story/3706.aa8ee07.mp3",
+      "bytes": 2922636
+    },
+    "3801": {
+      "code": "3801",
+      "category": "story",
+      "title": "劇情卡 3801",
+      "path": "story/3801.709e88e.mp3",
+      "sourcePath": "data/audio/story/3801.709e88e.mp3",
+      "bytes": 3909610
+    },
+    "3802": {
+      "code": "3802",
+      "category": "story",
+      "title": "劇情卡 3802",
+      "path": "story/3802.ff8d602.mp3",
+      "sourcePath": "data/audio/story/3802.ff8d602.mp3",
+      "bytes": 2352666
+    },
+    "3803": {
+      "code": "3803",
+      "category": "story",
+      "title": "劇情卡 3803",
+      "path": "story/3803.04106a2.mp3",
+      "sourcePath": "data/audio/story/3803.04106a2.mp3",
+      "bytes": 495756
+    },
+    "3804": {
+      "code": "3804",
+      "category": "story",
+      "title": "劇情卡 3804",
+      "path": "story/3804.4c8c518.mp3",
+      "sourcePath": "data/audio/story/3804.4c8c518.mp3",
+      "bytes": 522084
+    },
+    "3805": {
+      "code": "3805",
+      "category": "story",
+      "title": "劇情卡 3805",
+      "path": "story/3805.8ab15d2.mp3",
+      "sourcePath": "data/audio/story/3805.8ab15d2.mp3",
+      "bytes": 1371096
+    },
+    "3806": {
+      "code": "3806",
+      "category": "story",
+      "title": "劇情卡 3806",
+      "path": "story/3806.5ccccb5.mp3",
+      "sourcePath": "data/audio/story/3806.5ccccb5.mp3",
+      "bytes": 833675
+    },
+    "3901": {
+      "code": "3901",
+      "category": "story",
+      "title": "劇情卡 3901",
+      "path": "story/3901.38a1b85.mp3",
+      "sourcePath": "data/audio/story/3901.38a1b85.mp3",
+      "bytes": 3282624
+    },
+    "3902": {
+      "code": "3902",
+      "category": "story",
+      "title": "劇情卡 3902",
+      "path": "story/3902.49cb8c9.mp3",
+      "sourcePath": "data/audio/story/3902.49cb8c9.mp3",
+      "bytes": 889878
+    },
+    "3903": {
+      "code": "3903",
+      "category": "story",
+      "title": "劇情卡 3903",
+      "path": "story/3903.f8173dc.mp3",
+      "sourcePath": "data/audio/story/3903.f8173dc.mp3",
+      "bytes": 321924
+    },
+    "3904": {
+      "code": "3904",
+      "category": "story",
+      "title": "劇情卡 3904",
+      "path": "story/3904.82e7151.mp3",
+      "sourcePath": "data/audio/story/3904.82e7151.mp3",
+      "bytes": 677195
+    },
+    "3905": {
+      "code": "3905",
+      "category": "story",
+      "title": "劇情卡 3905",
+      "path": "story/3905.67db9a2.mp3",
+      "sourcePath": "data/audio/story/3905.67db9a2.mp3",
+      "bytes": 2148913
+    },
+    "4001": {
+      "code": "4001",
+      "category": "story",
+      "title": "劇情卡 4001",
+      "path": "story/4001.5606b0c.mp3",
+      "sourcePath": "data/audio/story/4001.5606b0c.mp3",
+      "bytes": 2212236
+    },
+    "4002": {
+      "code": "4002",
+      "category": "story",
+      "title": "劇情卡 4002",
+      "path": "story/4002.e9e9cc1.mp3",
+      "sourcePath": "data/audio/story/4002.e9e9cc1.mp3",
+      "bytes": 1777164
+    },
+    "4003": {
+      "code": "4003",
+      "category": "story",
+      "title": "劇情卡 4003",
+      "path": "story/4003.4050b0e.mp3",
+      "sourcePath": "data/audio/story/4003.4050b0e.mp3",
+      "bytes": 1375266
+    },
+    "4004": {
+      "code": "4004",
+      "category": "story",
+      "title": "劇情卡 4004",
+      "path": "story/4004.a7d1a6c.mp3",
+      "sourcePath": "data/audio/story/4004.a7d1a6c.mp3",
+      "bytes": 3604875
+    },
+    "4005": {
+      "code": "4005",
+      "category": "story",
+      "title": "劇情卡 4005",
+      "path": "story/4005.4908aca.mp3",
+      "sourcePath": "data/audio/story/4005.4908aca.mp3",
+      "bytes": 1268504
+    },
+    "4006": {
+      "code": "4006",
+      "category": "story",
+      "title": "劇情卡 4006",
+      "path": "story/4006.b02c346.mp3",
+      "sourcePath": "data/audio/story/4006.b02c346.mp3",
+      "bytes": 930756
+    },
+    "4007": {
+      "code": "4007",
+      "category": "story",
+      "title": "劇情卡 4007",
+      "path": "story/4007.12ecb05.mp3",
+      "sourcePath": "data/audio/story/4007.12ecb05.mp3",
+      "bytes": 1010765
+    },
+    "4008": {
+      "code": "4008",
+      "category": "story",
+      "title": "劇情卡 4008",
+      "path": "story/4008.a150ae0.mp3",
+      "sourcePath": "data/audio/story/4008.a150ae0.mp3",
+      "bytes": 3594736
+    },
+    "4009": {
+      "code": "4009",
+      "category": "story",
+      "title": "劇情卡 4009",
+      "path": "story/4009.b3e5d76.mp3",
+      "sourcePath": "data/audio/story/4009.b3e5d76.mp3",
+      "bytes": 1160076
+    },
+    "4010": {
+      "code": "4010",
+      "category": "story",
+      "title": "劇情卡 4010",
+      "path": "story/4010.605688c.mp3",
+      "sourcePath": "data/audio/story/4010.605688c.mp3",
+      "bytes": 1047504
+    },
+    "4011": {
+      "code": "4011",
+      "category": "story",
+      "title": "劇情卡 4011",
+      "path": "story/4011.e96a248.mp3",
+      "sourcePath": "data/audio/story/4011.e96a248.mp3",
+      "bytes": 441035
+    },
+    "4012": {
+      "code": "4012",
+      "category": "story",
+      "title": "劇情卡 4012",
+      "path": "story/4012.d89b60e.mp3",
+      "sourcePath": "data/audio/story/4012.d89b60e.mp3",
+      "bytes": 115595
+    },
+    "4013": {
+      "code": "4013",
+      "category": "story",
+      "title": "劇情卡 4013",
+      "path": "story/4013.68ce5f7.mp3",
+      "sourcePath": "data/audio/story/4013.68ce5f7.mp3",
+      "bytes": 6267230
+    },
+    "4014": {
+      "code": "4014",
+      "category": "story",
+      "title": "劇情卡 4014",
+      "path": "story/4014.278b3c9.mp3",
+      "sourcePath": "data/audio/story/4014.278b3c9.mp3",
+      "bytes": 1928076
+    },
+    "4015": {
+      "code": "4015",
+      "category": "story",
+      "title": "劇情卡 4015",
+      "path": "story/4015.7f43828.mp3",
+      "sourcePath": "data/audio/story/4015.7f43828.mp3",
+      "bytes": 474635
+    },
+    "4016": {
+      "code": "4016",
+      "category": "story",
+      "title": "劇情卡 4016",
+      "path": "story/4016.254fbdf.mp3",
+      "sourcePath": "data/audio/story/4016.254fbdf.mp3",
+      "bytes": 461619
+    },
+    "4017": {
+      "code": "4017",
+      "category": "story",
+      "title": "劇情卡 4017",
+      "path": "story/4017.53ae103.mp3",
+      "sourcePath": "data/audio/story/4017.53ae103.mp3",
+      "bytes": 380721
+    },
+    "4018": {
+      "code": "4018",
+      "category": "story",
+      "title": "劇情卡 4018",
+      "path": "story/4018.bfb5f7c.mp3",
+      "sourcePath": "data/audio/story/4018.bfb5f7c.mp3",
+      "bytes": 428676
+    },
+    "4019": {
+      "code": "4019",
+      "category": "story",
+      "title": "劇情卡 4019",
+      "path": "story/4019.6c66cd4.mp3",
+      "sourcePath": "data/audio/story/4019.6c66cd4.mp3",
+      "bytes": 1109196
+    },
+    "4020": {
+      "code": "4020",
+      "category": "story",
+      "title": "劇情卡 4020",
+      "path": "story/4020.7b48bb1.mp3",
+      "sourcePath": "data/audio/story/4020.7b48bb1.mp3",
+      "bytes": 613835
+    },
+    "4021": {
+      "code": "4021",
+      "category": "story",
+      "title": "劇情卡 4021",
+      "path": "story/4021.205aeb9.mp3",
+      "sourcePath": "data/audio/story/4021.205aeb9.mp3",
+      "bytes": 590353
+    },
+    "4022": {
+      "code": "4022",
+      "category": "story",
+      "title": "劇情卡 4022",
+      "path": "story/4022.cb69c67.mp3",
+      "sourcePath": "data/audio/story/4022.cb69c67.mp3",
+      "bytes": 469835
+    },
+    "4101": {
+      "code": "4101",
+      "category": "story",
+      "title": "劇情卡 4101",
+      "path": "story/4101.07012c9.mp3",
+      "sourcePath": "data/audio/story/4101.07012c9.mp3",
+      "bytes": 4869447
+    },
+    "4102": {
+      "code": "4102",
+      "category": "story",
+      "title": "劇情卡 4102",
+      "path": "story/4102.3bde4fa.mp3",
+      "sourcePath": "data/audio/story/4102.3bde4fa.mp3",
+      "bytes": 4998636
+    },
+    "4201": {
+      "code": "4201",
+      "category": "story",
+      "title": "劇情卡 4201",
+      "path": "story/4201.246ae2a.mp3",
+      "sourcePath": "data/audio/story/4201.246ae2a.mp3",
+      "bytes": 5494922
+    },
+    "4202": {
+      "code": "4202",
+      "category": "story",
+      "title": "劇情卡 4202",
+      "path": "story/4202.e50d5a9.mp3",
+      "sourcePath": "data/audio/story/4202.e50d5a9.mp3",
+      "bytes": 1003203
+    },
+    "4203": {
+      "code": "4203",
+      "category": "story",
+      "title": "劇情卡 4203",
+      "path": "story/4203.0f6a461.mp3",
+      "sourcePath": "data/audio/story/4203.0f6a461.mp3",
+      "bytes": 2078545
+    },
+    "4204": {
+      "code": "4204",
+      "category": "story",
+      "title": "劇情卡 4204",
+      "path": "story/4204.a5a25ad.mp3",
+      "sourcePath": "data/audio/story/4204.a5a25ad.mp3",
+      "bytes": 1217510
+    },
+    "4205": {
+      "code": "4205",
+      "category": "story",
+      "title": "劇情卡 4205",
+      "path": "story/4205.22051d6.mp3",
+      "sourcePath": "data/audio/story/4205.22051d6.mp3",
+      "bytes": 2020236
+    },
+    "4206": {
+      "code": "4206",
+      "category": "story",
+      "title": "劇情卡 4206",
+      "path": "story/4206.f2662fa.mp3",
+      "sourcePath": "data/audio/story/4206.f2662fa.mp3",
+      "bytes": 583115
+    },
+    "4207": {
+      "code": "4207",
+      "category": "story",
+      "title": "劇情卡 4207",
+      "path": "story/4207.50c400c.mp3",
+      "sourcePath": "data/audio/story/4207.50c400c.mp3",
+      "bytes": 494795
+    },
+    "4208": {
+      "code": "4208",
+      "category": "story",
+      "title": "劇情卡 4208",
+      "path": "story/4208.58f73c7.mp3",
+      "sourcePath": "data/audio/story/4208.58f73c7.mp3",
+      "bytes": 1155276
+    },
+    "4209": {
+      "code": "4209",
+      "category": "story",
+      "title": "劇情卡 4209",
+      "path": "story/4209.9d6d062.mp3",
+      "sourcePath": "data/audio/story/4209.9d6d062.mp3",
+      "bytes": 904481
+    },
+    "4210": {
+      "code": "4210",
+      "category": "story",
+      "title": "劇情卡 4210",
+      "path": "story/4210.969470f.mp3",
+      "sourcePath": "data/audio/story/4210.969470f.mp3",
+      "bytes": 2189196
+    },
+    "4211": {
+      "code": "4211",
+      "category": "story",
+      "title": "劇情卡 4211",
+      "path": "story/4211.a081325.mp3",
+      "sourcePath": "data/audio/story/4211.a081325.mp3",
+      "bytes": 1187683
+    },
+    "4212": {
+      "code": "4212",
+      "category": "story",
+      "title": "劇情卡 4212",
+      "path": "story/4212.32d6445.mp3",
+      "sourcePath": "data/audio/story/4212.32d6445.mp3",
+      "bytes": 2728556
+    },
+    "4213": {
+      "code": "4213",
+      "category": "story",
+      "title": "劇情卡 4213",
+      "path": "story/4213.c1db402.mp3",
+      "sourcePath": "data/audio/story/4213.c1db402.mp3",
+      "bytes": 956181
+    },
+    "4214": {
+      "code": "4214",
+      "category": "story",
+      "title": "劇情卡 4214",
+      "path": "story/4214.aba7580.mp3",
+      "sourcePath": "data/audio/story/4214.aba7580.mp3",
+      "bytes": 1808076
+    },
+    "4215": {
+      "code": "4215",
+      "category": "story",
+      "title": "劇情卡 4215",
+      "path": "story/4215.0dcbaf3.mp3",
+      "sourcePath": "data/audio/story/4215.0dcbaf3.mp3",
+      "bytes": 4899753
+    },
+    "4216": {
+      "code": "4216",
+      "category": "story",
+      "title": "劇情卡 4216",
+      "path": "story/4216.cac6fd3.mp3",
+      "sourcePath": "data/audio/story/4216.cac6fd3.mp3",
+      "bytes": 5060776
+    },
+    "4217": {
+      "code": "4217",
+      "category": "story",
+      "title": "劇情卡 4217",
+      "path": "story/4217.3f6c7c0.mp3",
+      "sourcePath": "data/audio/story/4217.3f6c7c0.mp3",
+      "bytes": 2794249
+    },
+    "4218": {
+      "code": "4218",
+      "category": "story",
+      "title": "劇情卡 4218",
+      "path": "story/4218.defa62a.mp3",
+      "sourcePath": "data/audio/story/4218.defa62a.mp3",
+      "bytes": 1064645
+    },
+    "4219": {
+      "code": "4219",
+      "category": "story",
+      "title": "劇情卡 4219",
+      "path": "story/4219.641ea5e.mp3",
+      "sourcePath": "data/audio/story/4219.641ea5e.mp3",
+      "bytes": 877444
+    },
+    "4220": {
+      "code": "4220",
+      "category": "story",
+      "title": "劇情卡 4220",
+      "path": "story/4220.d032462.mp3",
+      "sourcePath": "data/audio/story/4220.d032462.mp3",
+      "bytes": 1721676
+    },
+    "4221": {
+      "code": "4221",
+      "category": "story",
+      "title": "劇情卡 4221",
+      "path": "story/4221.d859412.mp3",
+      "sourcePath": "data/audio/story/4221.d859412.mp3",
+      "bytes": 4386584
+    },
+    "4222": {
+      "code": "4222",
+      "category": "story",
+      "title": "劇情卡 4222",
+      "path": "story/4222.1521c1d.mp3",
+      "sourcePath": "data/audio/story/4222.1521c1d.mp3",
+      "bytes": 2834081
+    },
+    "4223": {
+      "code": "4223",
+      "category": "story",
+      "title": "劇情卡 4223",
+      "path": "story/4223.9ccac1e.mp3",
+      "sourcePath": "data/audio/story/4223.9ccac1e.mp3",
+      "bytes": 1543234
+    },
+    "4224": {
+      "code": "4224",
+      "category": "story",
+      "title": "劇情卡 4224",
+      "path": "story/4224.37f3157.mp3",
+      "sourcePath": "data/audio/story/4224.37f3157.mp3",
+      "bytes": 552108
+    },
+    "4301": {
+      "code": "4301",
+      "category": "story",
+      "title": "劇情卡 4301",
+      "path": "story/4301.ea27225.mp3",
+      "sourcePath": "data/audio/story/4301.ea27225.mp3",
+      "bytes": 1815043
+    },
+    "4302": {
+      "code": "4302",
+      "category": "story",
+      "title": "劇情卡 4302",
+      "path": "story/4302.4843a2b.mp3",
+      "sourcePath": "data/audio/story/4302.4843a2b.mp3",
+      "bytes": 1672963
+    },
+    "4303": {
+      "code": "4303",
+      "category": "story",
+      "title": "劇情卡 4303",
+      "path": "story/4303.3650b08.mp3",
+      "sourcePath": "data/audio/story/4303.3650b08.mp3",
+      "bytes": 833922
+    },
+    "4304": {
+      "code": "4304",
+      "category": "story",
+      "title": "劇情卡 4304",
+      "path": "story/4304.6030744.mp3",
+      "sourcePath": "data/audio/story/4304.6030744.mp3",
+      "bytes": 1231363
+    },
+    "4305": {
+      "code": "4305",
+      "category": "story",
+      "title": "劇情卡 4305",
+      "path": "story/4305.bba0764.mp3",
+      "sourcePath": "data/audio/story/4305.bba0764.mp3",
+      "bytes": 1181443
+    },
+    "4306": {
+      "code": "4306",
+      "category": "story",
+      "title": "劇情卡 4306",
+      "path": "story/4306.d9260e3.mp3",
+      "sourcePath": "data/audio/story/4306.d9260e3.mp3",
+      "bytes": 519042
+    },
+    "4307": {
+      "code": "4307",
+      "category": "story",
+      "title": "劇情卡 4307",
+      "path": "story/4307.d6528bc.mp3",
+      "sourcePath": "data/audio/story/4307.d6528bc.mp3",
+      "bytes": 502722
+    },
+    "4308": {
+      "code": "4308",
+      "category": "story",
+      "title": "劇情卡 4308",
+      "path": "story/4308.97adc99.mp3",
+      "sourcePath": "data/audio/story/4308.97adc99.mp3",
+      "bytes": 403842
+    },
+    "4309": {
+      "code": "4309",
+      "category": "story",
+      "title": "劇情卡 4309",
+      "path": "story/4309.5a9f2f5.mp3",
+      "sourcePath": "data/audio/story/4309.5a9f2f5.mp3",
+      "bytes": 1226372
+    },
+    "4310": {
+      "code": "4310",
+      "category": "story",
+      "title": "劇情卡 4310",
+      "path": "story/4310.ee80263.mp3",
+      "sourcePath": "data/audio/story/4310.ee80263.mp3",
+      "bytes": 1610563
+    },
+    "4311": {
+      "code": "4311",
+      "category": "story",
+      "title": "劇情卡 4311",
+      "path": "story/4311.d308961.mp3",
+      "sourcePath": "data/audio/story/4311.d308961.mp3",
+      "bytes": 5690563
+    },
+    "4312": {
+      "code": "4312",
+      "category": "story",
+      "title": "劇情卡 4312",
+      "path": "story/4312.023a5a8.mp3",
+      "sourcePath": "data/audio/story/4312.023a5a8.mp3",
+      "bytes": 1501123
+    },
+    "4313": {
+      "code": "4313",
+      "category": "story",
+      "title": "劇情卡 4313",
+      "path": "story/4313.9c5d5ef.mp3",
+      "sourcePath": "data/audio/story/4313.9c5d5ef.mp3",
+      "bytes": 1051843
+    },
+    "4314": {
+      "code": "4314",
+      "category": "story",
+      "title": "劇情卡 4314",
+      "path": "story/4314.76b8366.mp3",
+      "sourcePath": "data/audio/story/4314.76b8366.mp3",
+      "bytes": 2124163
+    },
+    "4315": {
+      "code": "4315",
+      "category": "story",
+      "title": "劇情卡 4315",
+      "path": "story/4315.f2c3402.mp3",
+      "sourcePath": "data/audio/story/4315.f2c3402.mp3",
+      "bytes": 2285443
+    },
+    "4316": {
+      "code": "4316",
+      "category": "story",
+      "title": "劇情卡 4316",
+      "path": "story/4316.6486646.mp3",
+      "sourcePath": "data/audio/story/4316.6486646.mp3",
+      "bytes": 1546243
+    },
+    "4317": {
+      "code": "4317",
+      "category": "story",
+      "title": "劇情卡 4317",
+      "path": "story/4317.86d4805.mp3",
+      "sourcePath": "data/audio/story/4317.86d4805.mp3",
+      "bytes": 865603
+    },
+    "4318": {
+      "code": "4318",
+      "category": "story",
+      "title": "劇情卡 4318",
+      "path": "story/4318.e11112f.mp3",
+      "sourcePath": "data/audio/story/4318.e11112f.mp3",
+      "bytes": 1927363
+    },
+    "4319": {
+      "code": "4319",
+      "category": "story",
+      "title": "劇情卡 4319",
+      "path": "story/4319.55bc88e.mp3",
+      "sourcePath": "data/audio/story/4319.55bc88e.mp3",
+      "bytes": 1520323
+    },
+    "4320": {
+      "code": "4320",
+      "category": "story",
+      "title": "劇情卡 4320",
+      "path": "story/4320.48f0163.mp3",
+      "sourcePath": "data/audio/story/4320.48f0163.mp3",
+      "bytes": 1776643
+    },
+    "4321": {
+      "code": "4321",
+      "category": "story",
+      "title": "劇情卡 4321",
+      "path": "story/4321.40ac4eb.mp3",
+      "sourcePath": "data/audio/story/4321.40ac4eb.mp3",
+      "bytes": 739842
+    },
+    "4322": {
+      "code": "4322",
+      "category": "story",
+      "title": "劇情卡 4322",
+      "path": "story/4322.8e8c9b4.mp3",
+      "sourcePath": "data/audio/story/4322.8e8c9b4.mp3",
+      "bytes": 468162
+    },
+    "4323": {
+      "code": "4323",
+      "category": "story",
+      "title": "劇情卡 4323",
+      "path": "story/4323.7c7e565.mp3",
+      "sourcePath": "data/audio/story/4323.7c7e565.mp3",
+      "bytes": 615767
+    },
+    "4324": {
+      "code": "4324",
+      "category": "story",
+      "title": "劇情卡 4324",
+      "path": "story/4324.deed73b.mp3",
+      "sourcePath": "data/audio/story/4324.deed73b.mp3",
+      "bytes": 587202
+    },
+    "4325": {
+      "code": "4325",
+      "category": "story",
+      "title": "劇情卡 4325",
+      "path": "story/4325.acb2cae.mp3",
+      "sourcePath": "data/audio/story/4325.acb2cae.mp3",
+      "bytes": 584322
+    },
+    "4326": {
+      "code": "4326",
+      "category": "story",
+      "title": "劇情卡 4326",
+      "path": "story/4326.44cbc47.mp3",
+      "sourcePath": "data/audio/story/4326.44cbc47.mp3",
+      "bytes": 487362
+    },
+    "4330": {
+      "code": "4330",
+      "category": "story",
+      "title": "劇情卡 4330",
+      "path": "story/4330.9649d93.mp3",
+      "sourcePath": "data/audio/story/4330.9649d93.mp3",
+      "bytes": 497675
+    },
+    "4401": {
+      "code": "4401",
+      "category": "story",
+      "title": "劇情卡 4401",
+      "path": "story/4401.083f93c.mp3",
+      "sourcePath": "data/audio/story/4401.083f93c.mp3",
+      "bytes": 6212803
+    },
+    "4402": {
+      "code": "4402",
+      "category": "story",
+      "title": "劇情卡 4402",
+      "path": "story/4402.bed6656.mp3",
+      "sourcePath": "data/audio/story/4402.bed6656.mp3",
+      "bytes": 1253041
+    },
+    "4403": {
+      "code": "4403",
+      "category": "story",
+      "title": "劇情卡 4403",
+      "path": "story/4403.dd5120a.mp3",
+      "sourcePath": "data/audio/story/4403.dd5120a.mp3",
+      "bytes": 408378
+    },
+    "4404": {
+      "code": "4404",
+      "category": "story",
+      "title": "劇情卡 4404",
+      "path": "story/4404.2f34b8b.mp3",
+      "sourcePath": "data/audio/story/4404.2f34b8b.mp3",
+      "bytes": 1431043
+    },
+    "4405": {
+      "code": "4405",
+      "category": "story",
+      "title": "劇情卡 4405",
+      "path": "story/4405.2ae484e.mp3",
+      "sourcePath": "data/audio/story/4405.2ae484e.mp3",
+      "bytes": 1581530
+    },
+    "4406": {
+      "code": "4406",
+      "category": "story",
+      "title": "劇情卡 4406",
+      "path": "story/4406.8d0dbe8.mp3",
+      "sourcePath": "data/audio/story/4406.8d0dbe8.mp3",
+      "bytes": 710082
+    },
+    "4407": {
+      "code": "4407",
+      "category": "story",
+      "title": "劇情卡 4407",
+      "path": "story/4407.99e8391.mp3",
+      "sourcePath": "data/audio/story/4407.99e8391.mp3",
+      "bytes": 2891683
+    },
+    "4408": {
+      "code": "4408",
+      "category": "story",
+      "title": "劇情卡 4408",
+      "path": "story/4408.5434975.mp3",
+      "sourcePath": "data/audio/story/4408.5434975.mp3",
+      "bytes": 1576963
+    },
+    "4409": {
+      "code": "4409",
+      "category": "story",
+      "title": "劇情卡 4409",
+      "path": "story/4409.576fbed.mp3",
+      "sourcePath": "data/audio/story/4409.576fbed.mp3",
+      "bytes": 1489912
+    },
+    "4410": {
+      "code": "4410",
+      "category": "story",
+      "title": "劇情卡 4410",
+      "path": "story/4410.45ffbd6.mp3",
+      "sourcePath": "data/audio/story/4410.45ffbd6.mp3",
+      "bytes": 1966975
+    },
+    "4411": {
+      "code": "4411",
+      "category": "story",
+      "title": "劇情卡 4411",
+      "path": "story/4411.10e413f.mp3",
+      "sourcePath": "data/audio/story/4411.10e413f.mp3",
+      "bytes": 715595
+    },
+    "4412": {
+      "code": "4412",
+      "category": "story",
+      "title": "劇情卡 4412",
+      "path": "story/4412.a4ba887.mp3",
+      "sourcePath": "data/audio/story/4412.a4ba887.mp3",
+      "bytes": 890316
+    },
+    "4413": {
+      "code": "4413",
+      "category": "story",
+      "title": "劇情卡 4413",
+      "path": "story/4413.2ef3708.mp3",
+      "sourcePath": "data/audio/story/4413.2ef3708.mp3",
+      "bytes": 3532003
+    },
+    "4414": {
+      "code": "4414",
+      "category": "story",
+      "title": "劇情卡 4414",
+      "path": "story/4414.e4a079f.mp3",
+      "sourcePath": "data/audio/story/4414.e4a079f.mp3",
+      "bytes": 921036
+    },
+    "4415": {
+      "code": "4415",
+      "category": "story",
+      "title": "劇情卡 4415",
+      "path": "story/4415.fe5b709.mp3",
+      "sourcePath": "data/audio/story/4415.fe5b709.mp3",
+      "bytes": 2939916
+    },
+    "4416": {
+      "code": "4416",
+      "category": "story",
+      "title": "劇情卡 4416",
+      "path": "story/4416.f49966a.mp3",
+      "sourcePath": "data/audio/story/4416.f49966a.mp3",
+      "bytes": 980556
+    },
+    "4417": {
+      "code": "4417",
+      "category": "story",
+      "title": "劇情卡 4417",
+      "path": "story/4417.471037d.mp3",
+      "sourcePath": "data/audio/story/4417.471037d.mp3",
+      "bytes": 1718796
+    },
+    "4418": {
+      "code": "4418",
+      "category": "story",
+      "title": "劇情卡 4418",
+      "path": "story/4418.15b3f1e.mp3",
+      "sourcePath": "data/audio/story/4418.15b3f1e.mp3",
+      "bytes": 1797325
+    },
+    "4419": {
+      "code": "4419",
+      "category": "story",
+      "title": "劇情卡 4419",
+      "path": "story/4419.a0571ef.mp3",
+      "sourcePath": "data/audio/story/4419.a0571ef.mp3",
+      "bytes": 1543799
+    },
+    "4420": {
+      "code": "4420",
+      "category": "story",
+      "title": "劇情卡 4420",
+      "path": "story/4420.fb12afb.mp3",
+      "sourcePath": "data/audio/story/4420.fb12afb.mp3",
+      "bytes": 1539732
+    },
+    "4421": {
+      "code": "4421",
+      "category": "story",
+      "title": "劇情卡 4421",
+      "path": "story/4421.64f0ff6.mp3",
+      "sourcePath": "data/audio/story/4421.64f0ff6.mp3",
+      "bytes": 929676
+    },
+    "4422": {
+      "code": "4422",
+      "category": "story",
+      "title": "劇情卡 4422",
+      "path": "story/4422.0c17b33.mp3",
+      "sourcePath": "data/audio/story/4422.0c17b33.mp3",
+      "bytes": 2601036
+    },
+    "4423": {
+      "code": "4423",
+      "category": "story",
+      "title": "劇情卡 4423",
+      "path": "story/4423.1e46e6d.mp3",
+      "sourcePath": "data/audio/story/4423.1e46e6d.mp3",
+      "bytes": 2114083
+    },
+    "4424": {
+      "code": "4424",
+      "category": "story",
+      "title": "劇情卡 4424",
+      "path": "story/4424.c9a41f8.mp3",
+      "sourcePath": "data/audio/story/4424.c9a41f8.mp3",
+      "bytes": 2836003
+    },
+    "4425": {
+      "code": "4425",
+      "category": "story",
+      "title": "劇情卡 4425",
+      "path": "story/4425.87faf8b.mp3",
+      "sourcePath": "data/audio/story/4425.87faf8b.mp3",
+      "bytes": 769355
+    },
+    "4426": {
+      "code": "4426",
+      "category": "story",
+      "title": "劇情卡 4426",
+      "path": "story/4426.9887d54.mp3",
+      "sourcePath": "data/audio/story/4426.9887d54.mp3",
+      "bytes": 711755
+    },
+    "4427": {
+      "code": "4427",
+      "category": "story",
+      "title": "劇情卡 4427",
+      "path": "story/4427.e87e528.mp3",
+      "sourcePath": "data/audio/story/4427.e87e528.mp3",
+      "bytes": 2995662
+    },
+    "4428": {
+      "code": "4428",
+      "category": "story",
+      "title": "劇情卡 4428",
+      "path": "story/4428.40597e9.mp3",
+      "sourcePath": "data/audio/story/4428.40597e9.mp3",
+      "bytes": 1137036
+    },
+    "4429": {
+      "code": "4429",
+      "category": "story",
+      "title": "劇情卡 4429",
+      "path": "story/4429.c7b0c8b.mp3",
+      "sourcePath": "data/audio/story/4429.c7b0c8b.mp3",
+      "bytes": 816395
+    },
+    "4501": {
+      "code": "4501",
+      "category": "story",
+      "title": "劇情卡 4501",
+      "path": "story/4501.1fdf9cf.mp3",
+      "sourcePath": "data/audio/story/4501.1fdf9cf.mp3",
+      "bytes": 1506790
+    },
+    "4502": {
+      "code": "4502",
+      "category": "story",
+      "title": "劇情卡 4502",
+      "path": "story/4502.f3a48da.mp3",
+      "sourcePath": "data/audio/story/4502.f3a48da.mp3",
+      "bytes": 1258290
+    },
+    "4503": {
+      "code": "4503",
+      "category": "story",
+      "title": "劇情卡 4503",
+      "path": "story/4503.9fc9cf9.mp3",
+      "sourcePath": "data/audio/story/4503.9fc9cf9.mp3",
+      "bytes": 1381336
+    },
+    "4504": {
+      "code": "4504",
+      "category": "story",
+      "title": "劇情卡 4504",
+      "path": "story/4504.5b8fff0.mp3",
+      "sourcePath": "data/audio/story/4504.5b8fff0.mp3",
+      "bytes": 1770870
+    },
+    "4505": {
+      "code": "4505",
+      "category": "story",
+      "title": "劇情卡 4505",
+      "path": "story/4505.7eea58e.mp3",
+      "sourcePath": "data/audio/story/4505.7eea58e.mp3",
+      "bytes": 3309882
+    },
+    "4506": {
+      "code": "4506",
+      "category": "story",
+      "title": "劇情卡 4506",
+      "path": "story/4506.bfb39ff.mp3",
+      "sourcePath": "data/audio/story/4506.bfb39ff.mp3",
+      "bytes": 1952580
+    },
+    "4507": {
+      "code": "4507",
+      "category": "story",
+      "title": "劇情卡 4507",
+      "path": "story/4507.be8594e.mp3",
+      "sourcePath": "data/audio/story/4507.be8594e.mp3",
+      "bytes": 1557792
+    },
+    "4508": {
+      "code": "4508",
+      "category": "story",
+      "title": "劇情卡 4508",
+      "path": "story/4508.b202768.mp3",
+      "sourcePath": "data/audio/story/4508.b202768.mp3",
+      "bytes": 2008716
+    },
+    "4509": {
+      "code": "4509",
+      "category": "story",
+      "title": "劇情卡 4509",
+      "path": "story/4509.e20e903.mp3",
+      "sourcePath": "data/audio/story/4509.e20e903.mp3",
+      "bytes": 1813836
+    },
+    "4601": {
+      "code": "4601",
+      "category": "story",
+      "title": "劇情卡 4601",
+      "path": "story/4601.fc0638e.mp3",
+      "sourcePath": "data/audio/story/4601.fc0638e.mp3",
+      "bytes": 852348
+    },
+    "4602": {
+      "code": "4602",
+      "category": "story",
+      "title": "劇情卡 4602",
+      "path": "story/4602.7c1b8a6.mp3",
+      "sourcePath": "data/audio/story/4602.7c1b8a6.mp3",
+      "bytes": 712653
+    },
+    "4603": {
+      "code": "4603",
+      "category": "story",
+      "title": "劇情卡 4603",
+      "path": "story/4603.1625a77.mp3",
+      "sourcePath": "data/audio/story/4603.1625a77.mp3",
+      "bytes": 483720
+    },
+    "4701": {
+      "code": "4701",
+      "category": "story",
+      "title": "劇情卡 4701",
+      "path": "story/4701.c15d02f.mp3",
+      "sourcePath": "data/audio/story/4701.c15d02f.mp3",
+      "bytes": 1518714
+    },
+    "4702": {
+      "code": "4702",
+      "category": "story",
+      "title": "劇情卡 4702",
+      "path": "story/4702.1ad3cec.mp3",
+      "sourcePath": "data/audio/story/4702.1ad3cec.mp3",
+      "bytes": 376649
+    },
+    "4703": {
+      "code": "4703",
+      "category": "story",
+      "title": "劇情卡 4703",
+      "path": "story/4703.574d54d.mp3",
+      "sourcePath": "data/audio/story/4703.574d54d.mp3",
+      "bytes": 1325615
+    },
+    "4704": {
+      "code": "4704",
+      "category": "story",
+      "title": "劇情卡 4704",
+      "path": "story/4704.7fbc79f.mp3",
+      "sourcePath": "data/audio/story/4704.7fbc79f.mp3",
+      "bytes": 382421
+    },
+    "4705": {
+      "code": "4705",
+      "category": "story",
+      "title": "劇情卡 4705",
+      "path": "story/4705.3387367.mp3",
+      "sourcePath": "data/audio/story/4705.3387367.mp3",
+      "bytes": 1130316
+    },
+    "4706": {
+      "code": "4706",
+      "category": "story",
+      "title": "劇情卡 4706",
+      "path": "story/4706.5247276.mp3",
+      "sourcePath": "data/audio/story/4706.5247276.mp3",
+      "bytes": 3202956
+    },
+    "4707": {
+      "code": "4707",
+      "category": "story",
+      "title": "劇情卡 4707",
+      "path": "story/4707.a7f3c99.mp3",
+      "sourcePath": "data/audio/story/4707.a7f3c99.mp3",
+      "bytes": 2436163
+    },
+    "4708": {
+      "code": "4708",
+      "category": "story",
+      "title": "劇情卡 4708",
+      "path": "story/4708.63f86f3.mp3",
+      "sourcePath": "data/audio/story/4708.63f86f3.mp3",
+      "bytes": 543042
+    },
+    "4709": {
+      "code": "4709",
+      "category": "story",
+      "title": "劇情卡 4709",
+      "path": "story/4709.6bcd218.mp3",
+      "sourcePath": "data/audio/story/4709.6bcd218.mp3",
+      "bytes": 1577658
+    },
+    "4710": {
+      "code": "4710",
+      "category": "story",
+      "title": "劇情卡 4710",
+      "path": "story/4710.e29d334.mp3",
+      "sourcePath": "data/audio/story/4710.e29d334.mp3",
+      "bytes": 1213426
+    },
+    "4711": {
+      "code": "4711",
+      "category": "story",
+      "title": "劇情卡 4711",
+      "path": "story/4711.43f1e9d.mp3",
+      "sourcePath": "data/audio/story/4711.43f1e9d.mp3",
+      "bytes": 5658420
+    },
+    "4712": {
+      "code": "4712",
+      "category": "story",
+      "title": "劇情卡 4712",
+      "path": "story/4712.0d3f41e.mp3",
+      "sourcePath": "data/audio/story/4712.0d3f41e.mp3",
+      "bytes": 5339994
+    },
+    "4713": {
+      "code": "4713",
+      "category": "story",
+      "title": "劇情卡 4713",
+      "path": "story/4713.11b0036.mp3",
+      "sourcePath": "data/audio/story/4713.11b0036.mp3",
+      "bytes": 2561923
+    },
+    "4714": {
+      "code": "4714",
+      "category": "story",
+      "title": "劇情卡 4714",
+      "path": "story/4714.8e36705.mp3",
+      "sourcePath": "data/audio/story/4714.8e36705.mp3",
+      "bytes": 1210968
+    },
+    "4801": {
+      "code": "4801",
+      "category": "story",
+      "title": "劇情卡 4801",
+      "path": "story/4801.39f2269.mp3",
+      "sourcePath": "data/audio/story/4801.39f2269.mp3",
+      "bytes": 270633
+    },
+    "4802": {
+      "code": "4802",
+      "category": "story",
+      "title": "劇情卡 4802",
+      "path": "story/4802.d59fc8b.mp3",
+      "sourcePath": "data/audio/story/4802.d59fc8b.mp3",
+      "bytes": 2226155
+    },
+    "4803": {
+      "code": "4803",
+      "category": "story",
+      "title": "劇情卡 4803",
+      "path": "story/4803.c862f2c.mp3",
+      "sourcePath": "data/audio/story/4803.c862f2c.mp3",
+      "bytes": 978470
+    },
+    "4804": {
+      "code": "4804",
+      "category": "story",
+      "title": "劇情卡 4804",
+      "path": "story/4804.46443e3.mp3",
+      "sourcePath": "data/audio/story/4804.46443e3.mp3",
+      "bytes": 1009923
+    },
+    "4805": {
+      "code": "4805",
+      "category": "story",
+      "title": "劇情卡 4805",
+      "path": "story/4805.692ec0e.mp3",
+      "sourcePath": "data/audio/story/4805.692ec0e.mp3",
+      "bytes": 1904833
+    },
+    "4806": {
+      "code": "4806",
+      "category": "story",
+      "title": "劇情卡 4806",
+      "path": "story/4806.c18af71.mp3",
+      "sourcePath": "data/audio/story/4806.c18af71.mp3",
+      "bytes": 2312323
+    },
+    "4807": {
+      "code": "4807",
+      "category": "story",
+      "title": "劇情卡 4807",
+      "path": "story/4807.a8d5a2f.mp3",
+      "sourcePath": "data/audio/story/4807.a8d5a2f.mp3",
+      "bytes": 3027290
+    },
+    "4808": {
+      "code": "4808",
+      "category": "story",
+      "title": "劇情卡 4808",
+      "path": "story/4808.cdb320b.mp3",
+      "sourcePath": "data/audio/story/4808.cdb320b.mp3",
+      "bytes": 3472963
+    },
+    "4809": {
+      "code": "4809",
+      "category": "story",
+      "title": "劇情卡 4809",
+      "path": "story/4809.30e6fca.mp3",
+      "sourcePath": "data/audio/story/4809.30e6fca.mp3",
+      "bytes": 1189123
+    },
+    "4810": {
+      "code": "4810",
+      "category": "story",
+      "title": "劇情卡 4810",
+      "path": "story/4810.8a3da82.mp3",
+      "sourcePath": "data/audio/story/4810.8a3da82.mp3",
+      "bytes": 1455043
+    },
+    "4811": {
+      "code": "4811",
+      "category": "story",
+      "title": "劇情卡 4811",
+      "path": "story/4811.6d2e59b.mp3",
+      "sourcePath": "data/audio/story/4811.6d2e59b.mp3",
+      "bytes": 1498243
+    },
+    "4812": {
+      "code": "4812",
+      "category": "story",
+      "title": "劇情卡 4812",
+      "path": "story/4812.e109d16.mp3",
+      "sourcePath": "data/audio/story/4812.e109d16.mp3",
+      "bytes": 5316449
+    },
+    "4813": {
+      "code": "4813",
+      "category": "story",
+      "title": "劇情卡 4813",
+      "path": "story/4813.2bbd6d0.mp3",
+      "sourcePath": "data/audio/story/4813.2bbd6d0.mp3",
+      "bytes": 810635
+    },
+    "4814": {
+      "code": "4814",
+      "category": "story",
+      "title": "劇情卡 4814",
+      "path": "story/4814.f4859b6.mp3",
+      "sourcePath": "data/audio/story/4814.f4859b6.mp3",
+      "bytes": 897036
+    },
+    "4815": {
+      "code": "4815",
+      "category": "story",
+      "title": "劇情卡 4815",
+      "path": "story/4815.c734d48.mp3",
+      "sourcePath": "data/audio/story/4815.c734d48.mp3",
+      "bytes": 2376467
+    },
+    "4816": {
+      "code": "4816",
+      "category": "story",
+      "title": "劇情卡 4816",
+      "path": "story/4816.28e3712.mp3",
+      "sourcePath": "data/audio/story/4816.28e3712.mp3",
+      "bytes": 2538982
+    },
+    "4817": {
+      "code": "4817",
+      "category": "story",
+      "title": "劇情卡 4817",
+      "path": "story/4817.99b5a30.mp3",
+      "sourcePath": "data/audio/story/4817.99b5a30.mp3",
+      "bytes": 2424660
+    },
+    "4818": {
+      "code": "4818",
+      "category": "story",
+      "title": "劇情卡 4818",
+      "path": "story/4818.89ba255.mp3",
+      "sourcePath": "data/audio/story/4818.89ba255.mp3",
+      "bytes": 5924803
+    },
+    "4819": {
+      "code": "4819",
+      "category": "story",
+      "title": "劇情卡 4819",
+      "path": "story/4819.d1150bb.mp3",
+      "sourcePath": "data/audio/story/4819.d1150bb.mp3",
+      "bytes": 1037443
+    },
+    "4820": {
+      "code": "4820",
+      "category": "story",
+      "title": "劇情卡 4820",
+      "path": "story/4820.34f398d.mp3",
+      "sourcePath": "data/audio/story/4820.34f398d.mp3",
+      "bytes": 1117123
+    },
+    "4821": {
+      "code": "4821",
+      "category": "story",
+      "title": "劇情卡 4821",
+      "path": "story/4821.c82ee8a.mp3",
+      "sourcePath": "data/audio/story/4821.c82ee8a.mp3",
+      "bytes": 1062168
+    },
+    "4901": {
+      "code": "4901",
+      "category": "story",
+      "title": "劇情卡 4901",
+      "path": "story/4901.0804f66.mp3",
+      "sourcePath": "data/audio/story/4901.0804f66.mp3",
+      "bytes": 3618883
+    },
+    "4902": {
+      "code": "4902",
+      "category": "story",
+      "title": "劇情卡 4902",
+      "path": "story/4902.12ee55c.mp3",
+      "sourcePath": "data/audio/story/4902.12ee55c.mp3",
+      "bytes": 931578
+    },
+    "4903": {
+      "code": "4903",
+      "category": "story",
+      "title": "劇情卡 4903",
+      "path": "story/4903.0842dc0.mp3",
+      "sourcePath": "data/audio/story/4903.0842dc0.mp3",
+      "bytes": 790722
+    },
+    "4904": {
+      "code": "4904",
+      "category": "story",
+      "title": "劇情卡 4904",
+      "path": "story/4904.c1acfed.mp3",
+      "sourcePath": "data/audio/story/4904.c1acfed.mp3",
+      "bytes": 638427
+    },
+    "4905": {
+      "code": "4905",
+      "category": "story",
+      "title": "劇情卡 4905",
+      "path": "story/4905.3ca3d61.mp3",
+      "sourcePath": "data/audio/story/4905.3ca3d61.mp3",
+      "bytes": 549762
+    },
+    "5001": {
+      "code": "5001",
+      "category": "story",
+      "title": "劇情卡 5001",
+      "path": "story/5001.738c6da.mp3",
+      "sourcePath": "data/audio/story/5001.738c6da.mp3",
+      "bytes": 5877295
+    },
+    "5002": {
+      "code": "5002",
+      "category": "story",
+      "title": "劇情卡 5002",
+      "path": "story/5002.7b5fce9.mp3",
+      "sourcePath": "data/audio/story/5002.7b5fce9.mp3",
+      "bytes": 2030391
+    },
+    "5101": {
+      "code": "5101",
+      "category": "story",
+      "title": "劇情卡 5101",
+      "path": "story/5101.1e5ad34.mp3",
+      "sourcePath": "data/audio/story/5101.1e5ad34.mp3",
+      "bytes": 1625732
+    },
+    "5102": {
+      "code": "5102",
+      "category": "story",
+      "title": "劇情卡 5102",
+      "path": "story/5102.66c5762.mp3",
+      "sourcePath": "data/audio/story/5102.66c5762.mp3",
+      "bytes": 4405123
+    },
+    "5103": {
+      "code": "5103",
+      "category": "story",
+      "title": "劇情卡 5103",
+      "path": "story/5103.6b575e7.mp3",
+      "sourcePath": "data/audio/story/5103.6b575e7.mp3",
+      "bytes": 968323
+    },
+    "5104": {
+      "code": "5104",
+      "category": "story",
+      "title": "劇情卡 5104",
+      "path": "story/5104.047217f.mp3",
+      "sourcePath": "data/audio/story/5104.047217f.mp3",
+      "bytes": 1210243
+    },
+    "5105": {
+      "code": "5105",
+      "category": "story",
+      "title": "劇情卡 5105",
+      "path": "story/5105.47812a1.mp3",
+      "sourcePath": "data/audio/story/5105.47812a1.mp3",
+      "bytes": 1893763
+    },
+    "5106": {
+      "code": "5106",
+      "category": "story",
+      "title": "劇情卡 5106",
+      "path": "story/5106.05a37ce.mp3",
+      "sourcePath": "data/audio/story/5106.05a37ce.mp3",
+      "bytes": 253122
+    },
+    "5107": {
+      "code": "5107",
+      "category": "story",
+      "title": "劇情卡 5107",
+      "path": "story/5107.40ba7ce.mp3",
+      "sourcePath": "data/audio/story/5107.40ba7ce.mp3",
+      "bytes": 1211203
+    },
+    "5201": {
+      "code": "5201",
+      "category": "story",
+      "title": "劇情卡 5201",
+      "path": "story/5201.9cc51a1.mp3",
+      "sourcePath": "data/audio/story/5201.9cc51a1.mp3",
+      "bytes": 489141
+    },
+    "5202": {
+      "code": "5202",
+      "category": "story",
+      "title": "劇情卡 5202",
+      "path": "story/5202.64d839a.mp3",
+      "sourcePath": "data/audio/story/5202.64d839a.mp3",
+      "bytes": 400320
+    },
+    "5203": {
+      "code": "5203",
+      "category": "story",
+      "title": "劇情卡 5203",
+      "path": "story/5203.c42af20.mp3",
+      "sourcePath": "data/audio/story/5203.c42af20.mp3",
+      "bytes": 827745
+    },
+    "5301": {
+      "code": "5301",
+      "category": "story",
+      "title": "劇情卡 5301",
+      "path": "story/5301.b318d39.mp3",
+      "sourcePath": "data/audio/story/5301.b318d39.mp3",
+      "bytes": 1405123
+    },
+    "5302": {
+      "code": "5302",
+      "category": "story",
+      "title": "劇情卡 5302",
+      "path": "story/5302.a3b8d7c.mp3",
+      "sourcePath": "data/audio/story/5302.a3b8d7c.mp3",
+      "bytes": 570882
+    },
+    "5303": {
+      "code": "5303",
+      "category": "story",
+      "title": "劇情卡 5303",
+      "path": "story/5303.f86e4fb.mp3",
+      "sourcePath": "data/audio/story/5303.f86e4fb.mp3",
+      "bytes": 4008643
+    },
+    "5401": {
+      "code": "5401",
+      "category": "story",
+      "title": "劇情卡 5401",
+      "path": "story/5401.cf1f73e.mp3",
+      "sourcePath": "data/audio/story/5401.cf1f73e.mp3",
+      "bytes": 1089283
+    },
+    "5402": {
+      "code": "5402",
+      "category": "story",
+      "title": "劇情卡 5402",
+      "path": "story/5402.7bb0dc3.mp3",
+      "sourcePath": "data/audio/story/5402.7bb0dc3.mp3",
+      "bytes": 617994
+    },
+    "5501": {
+      "code": "5501",
+      "category": "story",
+      "title": "劇情卡 5501",
+      "path": "story/5501.dc3e2de.mp3",
+      "sourcePath": "data/audio/story/5501.dc3e2de.mp3",
+      "bytes": 2363203
+    },
+    "5502": {
+      "code": "5502",
+      "category": "story",
+      "title": "劇情卡 5502",
+      "path": "story/5502.c0a0061.mp3",
+      "sourcePath": "data/audio/story/5502.c0a0061.mp3",
+      "bytes": 739842
+    },
+    "5503": {
+      "code": "5503",
+      "category": "story",
+      "title": "劇情卡 5503",
+      "path": "story/5503.c1892cd.mp3",
+      "sourcePath": "data/audio/story/5503.c1892cd.mp3",
+      "bytes": 512076
+    },
+    "5504": {
+      "code": "5504",
+      "category": "story",
+      "title": "劇情卡 5504",
+      "path": "story/5504.398580c.mp3",
+      "sourcePath": "data/audio/story/5504.398580c.mp3",
+      "bytes": 1193923
+    },
+    "5601": {
+      "code": "5601",
+      "category": "story",
+      "title": "劇情卡 5601",
+      "path": "story/5601.2fe4a92.mp3",
+      "sourcePath": "data/audio/story/5601.2fe4a92.mp3",
+      "bytes": 832962
+    },
+    "5602": {
+      "code": "5602",
+      "category": "story",
+      "title": "劇情卡 5602",
+      "path": "story/5602.bdf79d9.mp3",
+      "sourcePath": "data/audio/story/5602.bdf79d9.mp3",
+      "bytes": 721602
+    },
+    "5603": {
+      "code": "5603",
+      "category": "story",
+      "title": "劇情卡 5603",
+      "path": "story/5603.6a414bd.mp3",
+      "sourcePath": "data/audio/story/5603.6a414bd.mp3",
+      "bytes": 646722
+    },
+    "5701": {
+      "code": "5701",
+      "category": "story",
+      "title": "劇情卡 5701",
+      "path": "story/5701.ffcb60c.mp3",
+      "sourcePath": "data/audio/story/5701.ffcb60c.mp3",
+      "bytes": 1430083
+    },
+    "5702": {
+      "code": "5702",
+      "category": "story",
+      "title": "劇情卡 5702",
+      "path": "story/5702.e93b726.mp3",
+      "sourcePath": "data/audio/story/5702.e93b726.mp3",
+      "bytes": 1835661
+    },
+    "5703": {
+      "code": "5703",
+      "category": "story",
+      "title": "劇情卡 5703",
+      "path": "story/5703.958f657.mp3",
+      "sourcePath": "data/audio/story/5703.958f657.mp3",
+      "bytes": 2631804
+    },
+    "5704": {
+      "code": "5704",
+      "category": "story",
+      "title": "劇情卡 5704",
+      "path": "story/5704.80f5327.mp3",
+      "sourcePath": "data/audio/story/5704.80f5327.mp3",
+      "bytes": 1424064
+    },
+    "5801": {
+      "code": "5801",
+      "category": "story",
+      "title": "劇情卡 5801",
+      "path": "story/5801.9d20505.mp3",
+      "sourcePath": "data/audio/story/5801.9d20505.mp3",
+      "bytes": 1373711
+    },
+    "5802": {
+      "code": "5802",
+      "category": "story",
+      "title": "劇情卡 5802",
+      "path": "story/5802.762e6a2.mp3",
+      "sourcePath": "data/audio/story/5802.762e6a2.mp3",
+      "bytes": 356567
+    },
+    "5803": {
+      "code": "5803",
+      "category": "story",
+      "title": "劇情卡 5803",
+      "path": "story/5803.4a9832e.mp3",
+      "sourcePath": "data/audio/story/5803.4a9832e.mp3",
+      "bytes": 2412163
+    },
+    "5901": {
+      "code": "5901",
+      "category": "story",
+      "title": "劇情卡 5901",
+      "path": "story/5901.af34a64.mp3",
+      "sourcePath": "data/audio/story/5901.af34a64.mp3",
+      "bytes": 3226243
+    },
+    "5902": {
+      "code": "5902",
+      "category": "story",
+      "title": "劇情卡 5902",
+      "path": "story/5902.72e22db.mp3",
+      "sourcePath": "data/audio/story/5902.72e22db.mp3",
+      "bytes": 1511208
+    },
+    "6001": {
+      "code": "6001",
+      "category": "story",
+      "title": "劇情卡 6001",
+      "path": "story/6001.e0cf7aa.mp3",
+      "sourcePath": "data/audio/story/6001.e0cf7aa.mp3",
+      "bytes": 7034563
+    },
+    "6002": {
+      "code": "6002",
+      "category": "story",
+      "title": "劇情卡 6002",
+      "path": "story/6002.415772f.mp3",
+      "sourcePath": "data/audio/story/6002.415772f.mp3",
+      "bytes": 2199499
+    },
+    "6003": {
+      "code": "6003",
+      "category": "story",
+      "title": "劇情卡 6003",
+      "path": "story/6003.3d57257.mp3",
+      "sourcePath": "data/audio/story/6003.3d57257.mp3",
+      "bytes": 1623768
+    },
+    "6004": {
+      "code": "6004",
+      "category": "story",
+      "title": "劇情卡 6004",
+      "path": "story/6004.7c9bfb9.mp3",
+      "sourcePath": "data/audio/story/6004.7c9bfb9.mp3",
+      "bytes": 587737
+    },
+    "6005": {
+      "code": "6005",
+      "category": "story",
+      "title": "劇情卡 6005",
+      "path": "story/6005.73ded84.mp3",
+      "sourcePath": "data/audio/story/6005.73ded84.mp3",
+      "bytes": 1535531
+    },
+    "6101": {
+      "code": "6101",
+      "category": "story",
+      "title": "劇情卡 6101",
+      "path": "story/6101.aefe13a.mp3",
+      "sourcePath": "data/audio/story/6101.aefe13a.mp3",
+      "bytes": 793551
+    },
+    "6102": {
+      "code": "6102",
+      "category": "story",
+      "title": "劇情卡 6102",
+      "path": "story/6102.7818806.mp3",
+      "sourcePath": "data/audio/story/6102.7818806.mp3",
+      "bytes": 1736323
+    },
+    "6103": {
+      "code": "6103",
+      "category": "story",
+      "title": "劇情卡 6103",
+      "path": "story/6103.cb33d9f.mp3",
+      "sourcePath": "data/audio/story/6103.cb33d9f.mp3",
+      "bytes": 1524163
+    },
+    "6201": {
+      "code": "6201",
+      "category": "story",
+      "title": "劇情卡 6201",
+      "path": "story/6201.34f001b.mp3",
+      "sourcePath": "data/audio/story/6201.34f001b.mp3",
+      "bytes": 992460
+    },
+    "6202": {
+      "code": "6202",
+      "category": "story",
+      "title": "劇情卡 6202",
+      "path": "story/6202.bef2819.mp3",
+      "sourcePath": "data/audio/story/6202.bef2819.mp3",
+      "bytes": 1052508
+    },
+    "6203": {
+      "code": "6203",
+      "category": "story",
+      "title": "劇情卡 6203",
+      "path": "story/6203.0d5bf12.mp3",
+      "sourcePath": "data/audio/story/6203.0d5bf12.mp3",
+      "bytes": 857352
+    },
+    "6301": {
+      "code": "6301",
+      "category": "story",
+      "title": "劇情卡 6301",
+      "path": "story/6301.9ceae17.mp3",
+      "sourcePath": "data/audio/story/6301.9ceae17.mp3",
+      "bytes": 789762
+    },
+    "6302": {
+      "code": "6302",
+      "category": "story",
+      "title": "劇情卡 6302",
+      "path": "story/6302.d745b9f.mp3",
+      "sourcePath": "data/audio/story/6302.d745b9f.mp3",
+      "bytes": 690969
+    },
+    "6303": {
+      "code": "6303",
+      "category": "story",
+      "title": "劇情卡 6303",
+      "path": "story/6303.8270767.mp3",
+      "sourcePath": "data/audio/story/6303.8270767.mp3",
+      "bytes": 1626423
+    },
+    "6304": {
+      "code": "6304",
+      "category": "story",
+      "title": "劇情卡 6304",
+      "path": "story/6304.6ac824f.mp3",
+      "sourcePath": "data/audio/story/6304.6ac824f.mp3",
+      "bytes": 931652
+    },
+    "6305": {
+      "code": "6305",
+      "category": "story",
+      "title": "劇情卡 6305",
+      "path": "story/6305.beef19c.mp3",
+      "sourcePath": "data/audio/story/6305.beef19c.mp3",
+      "bytes": 894403
+    },
+    "6401": {
+      "code": "6401",
+      "category": "story",
+      "title": "劇情卡 6401",
+      "path": "story/6401.ee55dd1.mp3",
+      "sourcePath": "data/audio/story/6401.ee55dd1.mp3",
+      "bytes": 1111363
+    },
+    "6402": {
+      "code": "6402",
+      "category": "story",
+      "title": "劇情卡 6402",
+      "path": "story/6402.8861382.mp3",
+      "sourcePath": "data/audio/story/6402.8861382.mp3",
+      "bytes": 558363
+    },
+    "6403": {
+      "code": "6403",
+      "category": "story",
+      "title": "劇情卡 6403",
+      "path": "story/6403.bd87023.mp3",
+      "sourcePath": "data/audio/story/6403.bd87023.mp3",
+      "bytes": 1275523
+    },
+    "6404": {
+      "code": "6404",
+      "category": "story",
+      "title": "劇情卡 6404",
+      "path": "story/6404.e215177.mp3",
+      "sourcePath": "data/audio/story/6404.e215177.mp3",
+      "bytes": 1462723
+    },
+    "6405": {
+      "code": "6405",
+      "category": "story",
+      "title": "劇情卡 6405",
+      "path": "story/6405.3e3ab94.mp3",
+      "sourcePath": "data/audio/story/6405.3e3ab94.mp3",
+      "bytes": 547521
+    },
+    "6406": {
+      "code": "6406",
+      "category": "story",
+      "title": "劇情卡 6406",
+      "path": "story/6406.ab410df.mp3",
+      "sourcePath": "data/audio/story/6406.ab410df.mp3",
+      "bytes": 584322
+    },
+    "6501": {
+      "code": "6501",
+      "category": "story",
+      "title": "劇情卡 6501",
+      "path": "story/6501.f89571f.mp3",
+      "sourcePath": "data/audio/story/6501.f89571f.mp3",
+      "bytes": 6261117
+    },
+    "6502": {
+      "code": "6502",
+      "category": "story",
+      "title": "劇情卡 6502",
+      "path": "story/6502.9756cdc.mp3",
+      "sourcePath": "data/audio/story/6502.9756cdc.mp3",
+      "bytes": 1058563
+    },
+    "6503": {
+      "code": "6503",
+      "category": "story",
+      "title": "劇情卡 6503",
+      "path": "story/6503.1701998.mp3",
+      "sourcePath": "data/audio/story/6503.1701998.mp3",
+      "bytes": 546882
+    },
+    "6504": {
+      "code": "6504",
+      "category": "story",
+      "title": "劇情卡 6504",
+      "path": "story/6504.a3caea8.mp3",
+      "sourcePath": "data/audio/story/6504.a3caea8.mp3",
+      "bytes": 1229443
+    },
+    "6505": {
+      "code": "6505",
+      "category": "story",
+      "title": "劇情卡 6505",
+      "path": "story/6505.faecbbe.mp3",
+      "sourcePath": "data/audio/story/6505.faecbbe.mp3",
+      "bytes": 2100890
+    },
+    "6506": {
+      "code": "6506",
+      "category": "story",
+      "title": "劇情卡 6506",
+      "path": "story/6506.5079dfe.mp3",
+      "sourcePath": "data/audio/story/6506.5079dfe.mp3",
+      "bytes": 1408003
+    },
+    "7001": {
+      "code": "7001",
+      "category": "story",
+      "title": "劇情卡 7001",
+      "path": "story/7001.40f6300.mp3",
+      "sourcePath": "data/audio/story/7001.40f6300.mp3",
+      "bytes": 3569937
+    },
+    "7002": {
+      "code": "7002",
+      "category": "story",
+      "title": "劇情卡 7002",
+      "path": "story/7002.9ce2c41.mp3",
+      "sourcePath": "data/audio/story/7002.9ce2c41.mp3",
+      "bytes": 5008253
+    },
+    "7003": {
+      "code": "7003",
+      "category": "story",
+      "title": "劇情卡 7003",
+      "path": "story/7003.40ebaa4.mp3",
+      "sourcePath": "data/audio/story/7003.40ebaa4.mp3",
+      "bytes": 3520713
+    },
+    "7004": {
+      "code": "7004",
+      "category": "story",
+      "title": "劇情卡 7004",
+      "path": "story/7004.c95cb00.mp3",
+      "sourcePath": "data/audio/story/7004.c95cb00.mp3",
+      "bytes": 1803273
+    },
+    "7007": {
+      "code": "7007",
+      "category": "story",
+      "title": "劇情卡 7007",
+      "path": "story/7007.5212e88.mp3",
+      "sourcePath": "data/audio/story/7007.5212e88.mp3",
+      "bytes": 2070799
+    },
+    "7008": {
+      "code": "7008",
+      "category": "story",
+      "title": "劇情卡 7008",
+      "path": "story/7008.3037101.mp3",
+      "sourcePath": "data/audio/story/7008.3037101.mp3",
+      "bytes": 2555641
+    },
+    "7009": {
+      "code": "7009",
+      "category": "story",
+      "title": "劇情卡 7009",
+      "path": "story/7009.bd34998.mp3",
+      "sourcePath": "data/audio/story/7009.bd34998.mp3",
+      "bytes": 2507599
+    },
+    "7010": {
+      "code": "7010",
+      "category": "story",
+      "title": "劇情卡 7010",
+      "path": "story/7010.bc73e99.mp3",
+      "sourcePath": "data/audio/story/7010.bc73e99.mp3",
+      "bytes": 1913401
+    },
+    "7011": {
+      "code": "7011",
+      "category": "story",
+      "title": "劇情卡 7011",
+      "path": "story/7011.e2efbf3.mp3",
+      "sourcePath": "data/audio/story/7011.e2efbf3.mp3",
+      "bytes": 496647
+    },
+    "7012": {
+      "code": "7012",
+      "category": "story",
+      "title": "劇情卡 7012",
+      "path": "story/7012.5f5bf56.mp3",
+      "sourcePath": "data/audio/story/7012.5f5bf56.mp3",
+      "bytes": 862356
+    },
+    "7013": {
+      "code": "7013",
+      "category": "story",
+      "title": "劇情卡 7013",
+      "path": "story/7013.f501724.mp3",
+      "sourcePath": "data/audio/story/7013.f501724.mp3",
+      "bytes": 463287
+    },
+    "7014": {
+      "code": "7014",
+      "category": "story",
+      "title": "劇情卡 7014",
+      "path": "story/7014.369c39b.mp3",
+      "sourcePath": "data/audio/story/7014.369c39b.mp3",
+      "bytes": 336102
+    },
+    "7015": {
+      "code": "7015",
+      "category": "story",
+      "title": "劇情卡 7015",
+      "path": "story/7015.a78151f.mp3",
+      "sourcePath": "data/audio/story/7015.a78151f.mp3",
+      "bytes": 1003596
+    },
+    "7016": {
+      "code": "7016",
+      "category": "story",
+      "title": "劇情卡 7016",
+      "path": "story/7016.c43abc3.mp3",
+      "sourcePath": "data/audio/story/7016.c43abc3.mp3",
+      "bytes": 2273676
+    },
+    "7017": {
+      "code": "7017",
+      "category": "story",
+      "title": "劇情卡 7017",
+      "path": "story/7017.2d1ba23.mp3",
+      "sourcePath": "data/audio/story/7017.2d1ba23.mp3",
+      "bytes": 4651596
+    },
+    "7018": {
+      "code": "7018",
+      "category": "story",
+      "title": "劇情卡 7018",
+      "path": "story/7018.64a386f.mp3",
+      "sourcePath": "data/audio/story/7018.64a386f.mp3",
+      "bytes": 1393356
+    },
+    "7019": {
+      "code": "7019",
+      "category": "story",
+      "title": "劇情卡 7019",
+      "path": "story/7019.a4b3028.mp3",
+      "sourcePath": "data/audio/story/7019.a4b3028.mp3",
+      "bytes": 390155
+    },
+    "7020": {
+      "code": "7020",
+      "category": "story",
+      "title": "劇情卡 7020",
+      "path": "story/7020.f8fdd6b.mp3",
+      "sourcePath": "data/audio/story/7020.f8fdd6b.mp3",
+      "bytes": 2820876
+    },
+    "7021": {
+      "code": "7021",
+      "category": "story",
+      "title": "劇情卡 7021",
+      "path": "story/7021.24adb09.mp3",
+      "sourcePath": "data/audio/story/7021.24adb09.mp3",
+      "bytes": 2510796
+    },
+    "7022": {
+      "code": "7022",
+      "category": "story",
+      "title": "劇情卡 7022",
+      "path": "story/7022.258f3c6.mp3",
+      "sourcePath": "data/audio/story/7022.258f3c6.mp3",
+      "bytes": 2332003
+    },
+    "7023": {
+      "code": "7023",
+      "category": "story",
+      "title": "劇情卡 7023",
+      "path": "story/7023.1df6b8d.mp3",
+      "sourcePath": "data/audio/story/7023.1df6b8d.mp3",
+      "bytes": 678876
+    },
+    "7024": {
+      "code": "7024",
+      "category": "story",
+      "title": "劇情卡 7024",
+      "path": "story/7024.9c37718.mp3",
+      "sourcePath": "data/audio/story/7024.9c37718.mp3",
+      "bytes": 1881504
+    },
+    "7025": {
+      "code": "7025",
+      "category": "story",
+      "title": "劇情卡 7025",
+      "path": "story/7025.0a44ce8.mp3",
+      "sourcePath": "data/audio/story/7025.0a44ce8.mp3",
+      "bytes": 1207632
+    },
+    "7026": {
+      "code": "7026",
+      "category": "story",
+      "title": "劇情卡 7026",
+      "path": "story/7026.894c4d9.mp3",
+      "sourcePath": "data/audio/story/7026.894c4d9.mp3",
+      "bytes": 656775
+    },
+    "7027": {
+      "code": "7027",
+      "category": "story",
+      "title": "劇情卡 7027",
+      "path": "story/7027.787212f.mp3",
+      "sourcePath": "data/audio/story/7027.787212f.mp3",
+      "bytes": 2536716
+    },
+    "7028": {
+      "code": "7028",
+      "category": "story",
+      "title": "劇情卡 7028",
+      "path": "story/7028.661a0e4.mp3",
+      "sourcePath": "data/audio/story/7028.661a0e4.mp3",
+      "bytes": 1908876
+    },
+    "7029": {
+      "code": "7029",
+      "category": "story",
+      "title": "劇情卡 7029",
+      "path": "story/7029.1daceb5.mp3",
+      "sourcePath": "data/audio/story/7029.1daceb5.mp3",
+      "bytes": 1880076
+    },
+    "7030": {
+      "code": "7030",
+      "category": "story",
+      "title": "劇情卡 7030",
+      "path": "story/7030.e35f44e.mp3",
+      "sourcePath": "data/audio/story/7030.e35f44e.mp3",
+      "bytes": 419919
+    },
+    "7031": {
+      "code": "7031",
+      "category": "story",
+      "title": "劇情卡 7031",
+      "path": "story/7031.b805fd1.mp3",
+      "sourcePath": "data/audio/story/7031.b805fd1.mp3",
+      "bytes": 419919
+    },
+    "7032": {
+      "code": "7032",
+      "category": "story",
+      "title": "劇情卡 7032",
+      "path": "story/7032.d2d13b9.mp3",
+      "sourcePath": "data/audio/story/7032.d2d13b9.mp3",
+      "bytes": 867360
+    },
+    "7033": {
+      "code": "7033",
+      "category": "story",
+      "title": "劇情卡 7033",
+      "path": "story/7033.9cbcc7e.mp3",
+      "sourcePath": "data/audio/story/7033.9cbcc7e.mp3",
+      "bytes": 2126796
+    },
+    "7034": {
+      "code": "7034",
+      "category": "story",
+      "title": "劇情卡 7034",
+      "path": "story/7034.174101a.mp3",
+      "sourcePath": "data/audio/story/7034.174101a.mp3",
+      "bytes": 489558
+    },
+    "7035": {
+      "code": "7035",
+      "category": "story",
+      "title": "劇情卡 7035",
+      "path": "story/7035.bccfde2.mp3",
+      "sourcePath": "data/audio/story/7035.bccfde2.mp3",
+      "bytes": 656775
+    },
+    "7036": {
+      "code": "7036",
+      "category": "story",
+      "title": "劇情卡 7036",
+      "path": "story/7036.3c3531c.mp3",
+      "sourcePath": "data/audio/story/7036.3c3531c.mp3",
+      "bytes": 874956
+    },
+    "7101": {
+      "code": "7101",
+      "category": "story",
+      "title": "劇情卡 7101",
+      "path": "story/7101.24e0f37.mp3",
+      "sourcePath": "data/audio/story/7101.24e0f37.mp3",
+      "bytes": 1727436
+    },
+    "7102": {
+      "code": "7102",
+      "category": "story",
+      "title": "劇情卡 7102",
+      "path": "story/7102.a78189a.mp3",
+      "sourcePath": "data/audio/story/7102.a78189a.mp3",
+      "bytes": 1019683
+    },
+    "7104": {
+      "code": "7104",
+      "category": "story",
+      "title": "劇情卡 7104",
+      "path": "story/7104.fa43a94.mp3",
+      "sourcePath": "data/audio/story/7104.fa43a94.mp3",
+      "bytes": 672231
+    },
+    "7105": {
+      "code": "7105",
+      "category": "story",
+      "title": "劇情卡 7105",
+      "path": "story/7105.b286a31.mp3",
+      "sourcePath": "data/audio/story/7105.b286a31.mp3",
+      "bytes": 711755
+    },
+    "7106": {
+      "code": "7106",
+      "category": "story",
+      "title": "劇情卡 7106",
+      "path": "story/7106.c9c1764.mp3",
+      "sourcePath": "data/audio/story/7106.c9c1764.mp3",
+      "bytes": 780934
+    },
+    "7107": {
+      "code": "7107",
+      "category": "story",
+      "title": "劇情卡 7107",
+      "path": "story/7107.017b24a.mp3",
+      "sourcePath": "data/audio/story/7107.017b24a.mp3",
+      "bytes": 869196
+    },
+    "7108": {
+      "code": "7108",
+      "category": "story",
+      "title": "劇情卡 7108",
+      "path": "story/7108.275f13d.mp3",
+      "sourcePath": "data/audio/story/7108.275f13d.mp3",
+      "bytes": 483275
+    },
+    "7109": {
+      "code": "7109",
+      "category": "story",
+      "title": "劇情卡 7109",
+      "path": "story/7109.292e822.mp3",
+      "sourcePath": "data/audio/story/7109.292e822.mp3",
+      "bytes": 671435
+    },
+    "7110": {
+      "code": "7110",
+      "category": "story",
+      "title": "劇情卡 7110",
+      "path": "story/7110.c5d2b71.mp3",
+      "sourcePath": "data/audio/story/7110.c5d2b71.mp3",
+      "bytes": 1387405
+    },
+    "7111": {
+      "code": "7111",
+      "category": "story",
+      "title": "劇情卡 7111",
+      "path": "story/7111.7f23510.mp3",
+      "sourcePath": "data/audio/story/7111.7f23510.mp3",
+      "bytes": 598475
+    },
+    "7112": {
+      "code": "7112",
+      "category": "story",
+      "title": "劇情卡 7112",
+      "path": "story/7112.fa694fa.mp3",
+      "sourcePath": "data/audio/story/7112.fa694fa.mp3",
+      "bytes": 973836
+    },
+    "7113": {
+      "code": "7113",
+      "category": "story",
+      "title": "劇情卡 7113",
+      "path": "story/7113.82a6ac9.mp3",
+      "sourcePath": "data/audio/story/7113.82a6ac9.mp3",
+      "bytes": 706720
+    },
+    "7114": {
+      "code": "7114",
+      "category": "story",
+      "title": "劇情卡 7114",
+      "path": "story/7114.fff77df.mp3",
+      "sourcePath": "data/audio/story/7114.fff77df.mp3",
+      "bytes": 516875
+    },
+    "7115": {
+      "code": "7115",
+      "category": "story",
+      "title": "劇情卡 7115",
+      "path": "story/7115.8ec4f7a.mp3",
+      "sourcePath": "data/audio/story/7115.8ec4f7a.mp3",
+      "bytes": 710795
+    },
+    "7116": {
+      "code": "7116",
+      "category": "story",
+      "title": "劇情卡 7116",
+      "path": "story/7116.9ac9611.mp3",
+      "sourcePath": "data/audio/story/7116.9ac9611.mp3",
+      "bytes": 580235
+    },
+    "7117": {
+      "code": "7117",
+      "category": "story",
+      "title": "劇情卡 7117",
+      "path": "story/7117.aee153c.mp3",
+      "sourcePath": "data/audio/story/7117.aee153c.mp3",
+      "bytes": 780875
+    },
+    "7118": {
+      "code": "7118",
+      "category": "story",
+      "title": "劇情卡 7118",
+      "path": "story/7118.76b66b9.mp3",
+      "sourcePath": "data/audio/story/7118.76b66b9.mp3",
+      "bytes": 936396
+    },
+    "7119": {
+      "code": "7119",
+      "category": "story",
+      "title": "劇情卡 7119",
+      "path": "story/7119.310b491.mp3",
+      "sourcePath": "data/audio/story/7119.310b491.mp3",
+      "bytes": 1499916
+    },
+    "7120": {
+      "code": "7120",
+      "category": "story",
+      "title": "劇情卡 7120",
+      "path": "story/7120.7dcef31.mp3",
+      "sourcePath": "data/audio/story/7120.7dcef31.mp3",
+      "bytes": 779373
+    },
+    "7121": {
+      "code": "7121",
+      "category": "story",
+      "title": "劇情卡 7121",
+      "path": "story/7121.dc6346d.mp3",
+      "sourcePath": "data/audio/story/7121.dc6346d.mp3",
+      "bytes": 788364
+    },
+    "7122": {
+      "code": "7122",
+      "category": "story",
+      "title": "劇情卡 7122",
+      "path": "story/7122.6463d14.mp3",
+      "sourcePath": "data/audio/story/7122.6463d14.mp3",
+      "bytes": 1968163
+    },
+    "7123": {
+      "code": "7123",
+      "category": "story",
+      "title": "劇情卡 7123",
+      "path": "story/7123.f2d5445.mp3",
+      "sourcePath": "data/audio/story/7123.f2d5445.mp3",
+      "bytes": 681995
+    },
+    "7124": {
+      "code": "7124",
+      "category": "story",
+      "title": "劇情卡 7124",
+      "path": "story/7124.c1a3dc2.mp3",
+      "sourcePath": "data/audio/story/7124.c1a3dc2.mp3",
+      "bytes": 760715
+    },
+    "7125": {
+      "code": "7125",
+      "category": "story",
+      "title": "劇情卡 7125",
+      "path": "story/7125.86dc9b8.mp3",
+      "sourcePath": "data/audio/story/7125.86dc9b8.mp3",
+      "bytes": 698080
+    },
+    "7126": {
+      "code": "7126",
+      "category": "story",
+      "title": "劇情卡 7126",
+      "path": "story/7126.4e84a57.mp3",
+      "sourcePath": "data/audio/story/7126.4e84a57.mp3",
+      "bytes": 604000
+    },
+    "7127": {
+      "code": "7127",
+      "category": "story",
+      "title": "劇情卡 7127",
+      "path": "story/7127.b86d878.mp3",
+      "sourcePath": "data/audio/story/7127.b86d878.mp3",
+      "bytes": 809440
+    },
+    "7128": {
+      "code": "7128",
+      "category": "story",
+      "title": "劇情卡 7128",
+      "path": "story/7128.a398a8c.mp3",
+      "sourcePath": "data/audio/story/7128.a398a8c.mp3",
+      "bytes": 579275
+    },
+    "7129": {
+      "code": "7129",
+      "category": "story",
+      "title": "劇情卡 7129",
+      "path": "story/7129.a73cf95.mp3",
+      "sourcePath": "data/audio/story/7129.a73cf95.mp3",
+      "bytes": 2403332
+    },
+    "7130": {
+      "code": "7130",
+      "category": "story",
+      "title": "劇情卡 7130",
+      "path": "story/7130.302d1ca.mp3",
+      "sourcePath": "data/audio/story/7130.302d1ca.mp3",
+      "bytes": 1496618
+    },
+    "7131": {
+      "code": "7131",
+      "category": "story",
+      "title": "劇情卡 7131",
+      "path": "story/7131.faeef81.mp3",
+      "sourcePath": "data/audio/story/7131.faeef81.mp3",
+      "bytes": 1316365
+    },
+    "7132": {
+      "code": "7132",
+      "category": "story",
+      "title": "劇情卡 7132",
+      "path": "story/7132.b6a10f5.mp3",
+      "sourcePath": "data/audio/story/7132.b6a10f5.mp3",
+      "bytes": 1687116
+    },
+    "7133": {
+      "code": "7133",
+      "category": "story",
+      "title": "劇情卡 7133",
+      "path": "story/7133.1725e8b.mp3",
+      "sourcePath": "data/audio/story/7133.1725e8b.mp3",
+      "bytes": 962316
+    },
+    "7134": {
+      "code": "7134",
+      "category": "story",
+      "title": "劇情卡 7134",
+      "path": "story/7134.f3a2d85.mp3",
+      "sourcePath": "data/audio/story/7134.f3a2d85.mp3",
+      "bytes": 1524876
+    },
+    "7135": {
+      "code": "7135",
+      "category": "story",
+      "title": "劇情卡 7135",
+      "path": "story/7135.465dbd0.mp3",
+      "sourcePath": "data/audio/story/7135.465dbd0.mp3",
+      "bytes": 832715
+    },
+    "7136": {
+      "code": "7136",
+      "category": "story",
+      "title": "劇情卡 7136",
+      "path": "story/7136.eecd965.mp3",
+      "sourcePath": "data/audio/story/7136.eecd965.mp3",
+      "bytes": 703115
+    },
+    "7137": {
+      "code": "7137",
+      "category": "story",
+      "title": "劇情卡 7137",
+      "path": "story/7137.7b2b7e4.mp3",
+      "sourcePath": "data/audio/story/7137.7b2b7e4.mp3",
+      "bytes": 195275
+    },
+    "7201": {
+      "code": "7201",
+      "category": "story",
+      "title": "劇情卡 7201",
+      "path": "story/7201.5b177ef.mp3",
+      "sourcePath": "data/audio/story/7201.5b177ef.mp3",
+      "bytes": 1236405
+    },
+    "7202": {
+      "code": "7202",
+      "category": "story",
+      "title": "劇情卡 7202",
+      "path": "story/7202.3d39d6e.mp3",
+      "sourcePath": "data/audio/story/7202.3d39d6e.mp3",
+      "bytes": 905676
+    },
+    "7203": {
+      "code": "7203",
+      "category": "story",
+      "title": "劇情卡 7203",
+      "path": "story/7203.d92570c.mp3",
+      "sourcePath": "data/audio/story/7203.d92570c.mp3",
+      "bytes": 714635
+    },
+    "7204": {
+      "code": "7204",
+      "category": "story",
+      "title": "劇情卡 7204",
+      "path": "story/7204.5f6098d.mp3",
+      "sourcePath": "data/audio/story/7204.5f6098d.mp3",
+      "bytes": 752075
+    },
+    "7205": {
+      "code": "7205",
+      "category": "story",
+      "title": "劇情卡 7205",
+      "path": "story/7205.1666222.mp3",
+      "sourcePath": "data/audio/story/7205.1666222.mp3",
+      "bytes": 1060236
+    },
+    "7206": {
+      "code": "7206",
+      "category": "story",
+      "title": "劇情卡 7206",
+      "path": "story/7206.ef7493f.mp3",
+      "sourcePath": "data/audio/story/7206.ef7493f.mp3",
+      "bytes": 848076
+    },
+    "F001": {
+      "code": "F001",
+      "category": "character",
+      "title": "角色卡 F001",
+      "path": "character/F001.71700c5.mp3",
+      "sourcePath": "data/audio/character/F001.71700c5.mp3",
+      "bytes": 3092150
+    },
+    "F002": {
+      "code": "F002",
+      "category": "character",
+      "title": "角色卡 F002",
+      "path": "character/F002.945da03.mp3",
+      "sourcePath": "data/audio/character/F002.945da03.mp3",
+      "bytes": 1927363
+    },
+    "F003": {
+      "code": "F003",
+      "category": "character",
+      "title": "角色卡 F003",
+      "path": "character/F003.4e469a8.mp3",
+      "sourcePath": "data/audio/character/F003.4e469a8.mp3",
+      "bytes": 1742852
+    },
+    "F004": {
+      "code": "F004",
+      "category": "character",
+      "title": "角色卡 F004",
+      "path": "character/F004.11a2e02.mp3",
+      "sourcePath": "data/audio/character/F004.11a2e02.mp3",
+      "bytes": 1468715
+    },
+    "F005": {
+      "code": "F005",
+      "category": "character",
+      "title": "角色卡 F005",
+      "path": "character/F005.468efe0.mp3",
+      "sourcePath": "data/audio/character/F005.468efe0.mp3",
+      "bytes": 2240297
+    },
+    "F006": {
+      "code": "F006",
+      "category": "character",
+      "title": "角色卡 F006",
+      "path": "character/F006.d3ee196.mp3",
+      "sourcePath": "data/audio/character/F006.d3ee196.mp3",
+      "bytes": 971142
+    },
+    "F007": {
+      "code": "F007",
+      "category": "character",
+      "title": "角色卡 F007",
+      "path": "character/F007.578e84b.mp3",
+      "sourcePath": "data/audio/character/F007.578e84b.mp3",
+      "bytes": 3341252
+    },
+    "F008": {
+      "code": "F008",
+      "category": "character",
+      "title": "角色卡 F008",
+      "path": "character/F008.3beedaf.mp3",
+      "sourcePath": "data/audio/character/F008.3beedaf.mp3",
+      "bytes": 1238450
+    },
+    "F009": {
+      "code": "F009",
+      "category": "character",
+      "title": "角色卡 F009",
+      "path": "character/F009.5e2e617.mp3",
+      "sourcePath": "data/audio/character/F009.5e2e617.mp3",
+      "bytes": 1194452
+    },
+    "F010": {
+      "code": "F010",
+      "category": "character",
+      "title": "角色卡 F010",
+      "path": "character/F010.62511f5.mp3",
+      "sourcePath": "data/audio/character/F010.62511f5.mp3",
+      "bytes": 2635843
+    },
+    "F011": {
+      "code": "F011",
+      "category": "character",
+      "title": "角色卡 F011",
+      "path": "character/F011.0c4f3c1.mp3",
+      "sourcePath": "data/audio/character/F011.0c4f3c1.mp3",
+      "bytes": 1619203
+    },
+    "F012": {
+      "code": "F012",
+      "category": "character",
+      "title": "角色卡 F012",
+      "path": "character/F012.13fbf00.mp3",
+      "sourcePath": "data/audio/character/F012.13fbf00.mp3",
+      "bytes": 2800963
+    },
+    "F013": {
+      "code": "F013",
+      "category": "character",
+      "title": "角色卡 F013",
+      "path": "character/F013.f64fe89.mp3",
+      "sourcePath": "data/audio/character/F013.f64fe89.mp3",
+      "bytes": 1129603
+    },
+    "F014": {
+      "code": "F014",
+      "category": "character",
+      "title": "角色卡 F014",
+      "path": "character/F014.08e6773.mp3",
+      "sourcePath": "data/audio/character/F014.08e6773.mp3",
+      "bytes": 3752323
+    },
+    "F015": {
+      "code": "F015",
+      "category": "character",
+      "title": "角色卡 F015",
+      "path": "character/F015.3043d81.mp3",
+      "sourcePath": "data/audio/character/F015.3043d81.mp3",
+      "bytes": 1245936
+    },
+    "F016": {
+      "code": "F016",
+      "category": "character",
+      "title": "角色卡 F016",
+      "path": "character/F016.80494da.mp3",
+      "sourcePath": "data/audio/character/F016.80494da.mp3",
+      "bytes": 2478878
+    },
+    "F101": {
+      "code": "F101",
+      "category": "character",
+      "title": "角色卡 F101",
+      "path": "character/F101.5222152.mp3",
+      "sourcePath": "data/audio/character/F101.5222152.mp3",
+      "bytes": 3071975
+    },
+    "L1": {
+      "code": "L1",
+      "category": "quest_loss",
+      "title": "任務失敗 L1",
+      "path": "quest_loss/L1.e27e3eb.mp3",
+      "sourcePath": "data/audio/quest_loss/L1.e27e3eb.mp3",
+      "bytes": 861522
+    },
+    "L2": {
+      "code": "L2",
+      "category": "quest_loss",
+      "title": "任務失敗 L2",
+      "path": "quest_loss/L2.3a392be.mp3",
+      "sourcePath": "data/audio/quest_loss/L2.3a392be.mp3",
+      "bytes": 1193454
+    },
+    "L3": {
+      "code": "L3",
+      "category": "quest_loss",
+      "title": "任務失敗 L3",
+      "path": "quest_loss/L3.5267138.mp3",
+      "sourcePath": "data/audio/quest_loss/L3.5267138.mp3",
+      "bytes": 731200
+    },
+    "L4": {
+      "code": "L4",
+      "category": "quest_loss",
+      "title": "任務失敗 L4",
+      "path": "quest_loss/L4.8726ab7.mp3",
+      "sourcePath": "data/audio/quest_loss/L4.8726ab7.mp3",
+      "bytes": 1411841
+    },
+    "L5": {
+      "code": "L5",
+      "category": "quest_loss",
+      "title": "任務失敗 L5",
+      "path": "quest_loss/L5.ca13e56.mp3",
+      "sourcePath": "data/audio/quest_loss/L5.ca13e56.mp3",
+      "bytes": 640095
+    },
+    "L6": {
+      "code": "L6",
+      "category": "quest_loss",
+      "title": "任務失敗 L6",
+      "path": "quest_loss/L6.582e28b.mp3",
+      "sourcePath": "data/audio/quest_loss/L6.582e28b.mp3",
+      "bytes": 668451
+    },
+    "L7": {
+      "code": "L7",
+      "category": "quest_loss",
+      "title": "任務失敗 L7",
+      "path": "quest_loss/L7.8eca6c5.mp3",
+      "sourcePath": "data/audio/quest_loss/L7.8eca6c5.mp3",
+      "bytes": 1596276
+    },
+    "L9": {
+      "code": "L9",
+      "category": "quest_loss",
+      "title": "任務失敗 L9",
+      "path": "quest_loss/L9.53fb4da.mp3",
+      "sourcePath": "data/audio/quest_loss/L9.53fb4da.mp3",
+      "bytes": 370713
+    },
+    "L11": {
+      "code": "L11",
+      "category": "quest_loss",
+      "title": "任務失敗 L11",
+      "path": "quest_loss/L11.4b20b61.mp3",
+      "sourcePath": "data/audio/quest_loss/L11.4b20b61.mp3",
+      "bytes": 1557762
+    },
+    "L12": {
+      "code": "L12",
+      "category": "quest_loss",
+      "title": "任務失敗 L12",
+      "path": "quest_loss/L12.92c688f.mp3",
+      "sourcePath": "data/audio/quest_loss/L12.92c688f.mp3",
+      "bytes": 904002
+    },
+    "L13": {
+      "code": "L13",
+      "category": "quest_loss",
+      "title": "任務失敗 L13",
+      "path": "quest_loss/L13.917c18d.mp3",
+      "sourcePath": "data/audio/quest_loss/L13.917c18d.mp3",
+      "bytes": 351114
+    },
+    "L17": {
+      "code": "L17",
+      "category": "quest_loss",
+      "title": "任務失敗 L17",
+      "path": "quest_loss/L17.4588672.mp3",
+      "sourcePath": "data/audio/quest_loss/L17.4588672.mp3",
+      "bytes": 511361
+    },
+    "L19": {
+      "code": "L19",
+      "category": "quest_loss",
+      "title": "任務失敗 L19",
+      "path": "quest_loss/L19.83c9c2d.mp3",
+      "sourcePath": "data/audio/quest_loss/L19.83c9c2d.mp3",
+      "bytes": 4481922
+    },
+    "L20": {
+      "code": "L20",
+      "category": "quest_loss",
+      "title": "任務失敗 L20",
+      "path": "quest_loss/L20.364c97a.mp3",
+      "sourcePath": "data/audio/quest_loss/L20.364c97a.mp3",
+      "bytes": 2228939
+    },
+    "L21": {
+      "code": "L21",
+      "category": "quest_loss",
+      "title": "任務失敗 L21",
+      "path": "quest_loss/L21.cc3bfbe.mp3",
+      "sourcePath": "data/audio/quest_loss/L21.cc3bfbe.mp3",
+      "bytes": 1201602
+    },
+    "L22": {
+      "code": "L22",
+      "category": "quest_loss",
+      "title": "任務失敗 L22",
+      "path": "quest_loss/L22.81c398c.mp3",
+      "sourcePath": "data/audio/quest_loss/L22.81c398c.mp3",
+      "bytes": 374084
+    },
+    "L23": {
+      "code": "L23",
+      "category": "quest_loss",
+      "title": "任務失敗 L23",
+      "path": "quest_loss/L23.a6061ca.mp3",
+      "sourcePath": "data/audio/quest_loss/L23.a6061ca.mp3",
+      "bytes": 516164
+    },
+    "L24": {
+      "code": "L24",
+      "category": "quest_loss",
+      "title": "任務失敗 L24",
+      "path": "quest_loss/L24.2891508.mp3",
+      "sourcePath": "data/audio/quest_loss/L24.2891508.mp3",
+      "bytes": 486639
+    },
+    "L25": {
+      "code": "L25",
+      "category": "quest_loss",
+      "title": "任務失敗 L25",
+      "path": "quest_loss/L25.103ebd5.mp3",
+      "sourcePath": "data/audio/quest_loss/L25.103ebd5.mp3",
+      "bytes": 4659522
+    },
+    "L26": {
+      "code": "L26",
+      "category": "quest_loss",
+      "title": "任務失敗 L26",
+      "path": "quest_loss/L26.fded2fe.mp3",
+      "sourcePath": "data/audio/quest_loss/L26.fded2fe.mp3",
+      "bytes": 769601
+    },
+    "L27A": {
+      "code": "L27A",
+      "category": "quest_loss",
+      "title": "任務失敗 L27A",
+      "path": "quest_loss/L27A.a4a7a64.mp3",
+      "sourcePath": "data/audio/quest_loss/L27A.a4a7a64.mp3",
+      "bytes": 793108
+    },
+    "L27B": {
+      "code": "L27B",
+      "category": "quest_loss",
+      "title": "任務失敗 L27B",
+      "path": "quest_loss/L27B.a4a7a64.mp3",
+      "sourcePath": "data/audio/quest_loss/L27B.a4a7a64.mp3",
+      "bytes": 793108
+    },
+    "L27C": {
+      "code": "L27C",
+      "category": "quest_loss",
+      "title": "任務失敗 L27C",
+      "path": "quest_loss/L27C.a4a7a64.mp3",
+      "sourcePath": "data/audio/quest_loss/L27C.a4a7a64.mp3",
+      "bytes": 793108
+    },
+    "L28": {
+      "code": "L28",
+      "category": "quest_loss",
+      "title": "任務失敗 L28",
+      "path": "quest_loss/L28.80e9f1e.mp3",
+      "sourcePath": "data/audio/quest_loss/L28.80e9f1e.mp3",
+      "bytes": 1109220
+    },
+    "L29": {
+      "code": "L29",
+      "category": "quest_loss",
+      "title": "任務失敗 L29",
+      "path": "quest_loss/L29.b16f3d5.mp3",
+      "sourcePath": "data/audio/quest_loss/L29.b16f3d5.mp3",
+      "bytes": 223095
+    },
+    "L30": {
+      "code": "L30",
+      "category": "quest_loss",
+      "title": "任務失敗 L30",
+      "path": "quest_loss/L30.b87fa46.mp3",
+      "sourcePath": "data/audio/quest_loss/L30.b87fa46.mp3",
+      "bytes": 1790598
+    },
+    "L31": {
+      "code": "L31",
+      "category": "quest_loss",
+      "title": "任務失敗 L31",
+      "path": "quest_loss/L31.3bdcd06.mp3",
+      "sourcePath": "data/audio/quest_loss/L31.3bdcd06.mp3",
+      "bytes": 1467522
+    },
+    "L32": {
+      "code": "L32",
+      "category": "quest_loss",
+      "title": "任務失敗 L32",
+      "path": "quest_loss/L32.5b14423.mp3",
+      "sourcePath": "data/audio/quest_loss/L32.5b14423.mp3",
+      "bytes": 1031682
+    },
+    "L33": {
+      "code": "L33",
+      "category": "quest_loss",
+      "title": "任務失敗 L33",
+      "path": "quest_loss/L33.c0d5c8f.mp3",
+      "sourcePath": "data/audio/quest_loss/L33.c0d5c8f.mp3",
+      "bytes": 1464395
+    },
+    "L34": {
+      "code": "L34",
+      "category": "quest_loss",
+      "title": "任務失敗 L34",
+      "path": "quest_loss/L34.10a9f68.mp3",
+      "sourcePath": "data/audio/quest_loss/L34.10a9f68.mp3",
+      "bytes": 461619
+    },
+    "L35": {
+      "code": "L35",
+      "category": "quest_loss",
+      "title": "任務失敗 L35",
+      "path": "quest_loss/L35.33413e5.mp3",
+      "sourcePath": "data/audio/quest_loss/L35.33413e5.mp3",
+      "bytes": 433680
+    },
+    "L36": {
+      "code": "L36",
+      "category": "quest_loss",
+      "title": "任務失敗 L36",
+      "path": "quest_loss/L36.6d50e95.mp3",
+      "sourcePath": "data/audio/quest_loss/L36.6d50e95.mp3",
+      "bytes": 827745
+    },
+    "L39": {
+      "code": "L39",
+      "category": "quest_loss",
+      "title": "任務失敗 L39",
+      "path": "quest_loss/L39.161535b.mp3",
+      "sourcePath": "data/audio/quest_loss/L39.161535b.mp3",
+      "bytes": 8901513
+    },
+    "L40": {
+      "code": "L40",
+      "category": "quest_loss",
+      "title": "任務失敗 L40",
+      "path": "quest_loss/L40.1e5c454.mp3",
+      "sourcePath": "data/audio/quest_loss/L40.1e5c454.mp3",
+      "bytes": 1174472
+    },
+    "L41": {
+      "code": "L41",
+      "category": "quest_loss",
+      "title": "任務失敗 L41",
+      "path": "quest_loss/L41.59666dd.mp3",
+      "sourcePath": "data/audio/quest_loss/L41.59666dd.mp3",
+      "bytes": 1150473
+    },
+    "L41A": {
+      "code": "L41A",
+      "category": "quest_loss",
+      "title": "任務失敗 L41A",
+      "path": "quest_loss/L41A.59666dd.mp3",
+      "sourcePath": "data/audio/quest_loss/L41A.59666dd.mp3",
+      "bytes": 1150473
+    },
+    "L42": {
+      "code": "L42",
+      "category": "quest_loss",
+      "title": "任務失敗 L42",
+      "path": "quest_loss/L42.6e6f194.mp3",
+      "sourcePath": "data/audio/quest_loss/L42.6e6f194.mp3",
+      "bytes": 1162952
+    },
+    "L43": {
+      "code": "L43",
+      "category": "quest_loss",
+      "title": "任務失敗 L43",
+      "path": "quest_loss/L43.65d84ea.mp3",
+      "sourcePath": "data/audio/quest_loss/L43.65d84ea.mp3",
+      "bytes": 1031432
+    },
+    "L44": {
+      "code": "L44",
+      "category": "quest_loss",
+      "title": "任務失敗 L44",
+      "path": "quest_loss/L44.aa422fe.mp3",
+      "sourcePath": "data/audio/quest_loss/L44.aa422fe.mp3",
+      "bytes": 708684
+    },
+    "L45": {
+      "code": "L45",
+      "category": "quest_loss",
+      "title": "任務失敗 L45",
+      "path": "quest_loss/L45.b5cf8f6.mp3",
+      "sourcePath": "data/audio/quest_loss/L45.b5cf8f6.mp3",
+      "bytes": 823880
+    },
+    "L46": {
+      "code": "L46",
+      "category": "quest_loss",
+      "title": "任務失敗 L46",
+      "path": "quest_loss/L46.4d8dd2a.mp3",
+      "sourcePath": "data/audio/quest_loss/L46.4d8dd2a.mp3",
+      "bytes": 614793
+    },
+    "L47": {
+      "code": "L47",
+      "category": "quest_loss",
+      "title": "任務失敗 L47",
+      "path": "quest_loss/L47.d847b01.mp3",
+      "sourcePath": "data/audio/quest_loss/L47.d847b01.mp3",
+      "bytes": 479242
+    },
+    "L48": {
+      "code": "L48",
+      "category": "quest_loss",
+      "title": "任務失敗 L48",
+      "path": "quest_loss/L48.336118d.mp3",
+      "sourcePath": "data/audio/quest_loss/L48.336118d.mp3",
+      "bytes": 669511
+    },
+    "L49": {
+      "code": "L49",
+      "category": "quest_loss",
+      "title": "任務失敗 L49",
+      "path": "quest_loss/L49.44a8b0c.mp3",
+      "sourcePath": "data/audio/quest_loss/L49.44a8b0c.mp3",
+      "bytes": 701191
+    },
+    "L51": {
+      "code": "L51",
+      "category": "quest_loss",
+      "title": "任務失敗 L51",
+      "path": "quest_loss/L51.cada3b9.mp3",
+      "sourcePath": "data/audio/quest_loss/L51.cada3b9.mp3",
+      "bytes": 1167162
+    },
+    "L52": {
+      "code": "L52",
+      "category": "quest_loss",
+      "title": "任務失敗 L52",
+      "path": "quest_loss/L52.3131755.mp3",
+      "sourcePath": "data/audio/quest_loss/L52.3131755.mp3",
+      "bytes": 1023318
+    },
+    "LW2": {
+      "code": "LW2",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW2",
+      "path": "w_quest_loss/LW2.a760a85.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW2.a760a85.mp3",
+      "bytes": 1079432
+    },
+    "LW3": {
+      "code": "LW3",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW3",
+      "path": "w_quest_loss/LW3.a15c7b1.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW3.a15c7b1.mp3",
+      "bytes": 771867
+    },
+    "LW4": {
+      "code": "LW4",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW4",
+      "path": "w_quest_loss/LW4.992cc1f.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW4.992cc1f.mp3",
+      "bytes": 948872
+    },
+    "LW5": {
+      "code": "LW5",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW5",
+      "path": "w_quest_loss/LW5.878ab4d.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW5.878ab4d.mp3",
+      "bytes": 3222155
+    },
+    "LW6": {
+      "code": "LW6",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW6",
+      "path": "w_quest_loss/LW6.a15c7b1.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW6.a15c7b1.mp3",
+      "bytes": 771867
+    },
+    "LW7": {
+      "code": "LW7",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW7",
+      "path": "w_quest_loss/LW7.f87e4de.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW7.f87e4de.mp3",
+      "bytes": 991112
+    },
+    "LW8": {
+      "code": "LW8",
+      "category": "w_quest_loss",
+      "title": "LW擴充任務失敗 LW8",
+      "path": "w_quest_loss/LW8.c221ed1.mp3",
+      "sourcePath": "data/audio/w_quest_loss/LW8.c221ed1.mp3",
+      "bytes": 1484552
+    },
+    "Q1": {
+      "code": "Q1",
+      "category": "quest",
+      "title": "任務 Q1",
+      "path": "quest/Q1.3bdf86d.mp3",
+      "sourcePath": "data/audio/quest/Q1.3bdf86d.mp3",
+      "bytes": 854433
+    },
+    "Q2": {
+      "code": "Q2",
+      "category": "quest",
+      "title": "任務 Q2",
+      "path": "quest/Q2.b6a9843.mp3",
+      "sourcePath": "data/audio/quest/Q2.b6a9843.mp3",
+      "bytes": 1040415
+    },
+    "Q4": {
+      "code": "Q4",
+      "category": "quest",
+      "title": "任務 Q4",
+      "path": "quest/Q4.e5f5f25.mp3",
+      "sourcePath": "data/audio/quest/Q4.e5f5f25.mp3",
+      "bytes": 663864
+    },
+    "Q5": {
+      "code": "Q5",
+      "category": "quest",
+      "title": "任務 Q5",
+      "path": "quest/Q5.1e029f4.mp3",
+      "sourcePath": "data/audio/quest/Q5.1e029f4.mp3",
+      "bytes": 515412
+    },
+    "Q6": {
+      "code": "Q6",
+      "category": "quest",
+      "title": "任務 Q6",
+      "path": "quest/Q6.bd7e430.mp3",
+      "sourcePath": "data/audio/quest/Q6.bd7e430.mp3",
+      "bytes": 646350
+    },
+    "Q8": {
+      "code": "Q8",
+      "category": "quest",
+      "title": "任務 Q8",
+      "path": "quest/Q8.4af8c80.mp3",
+      "sourcePath": "data/audio/quest/Q8.4af8c80.mp3",
+      "bytes": 299406
+    },
+    "Q17": {
+      "code": "Q17",
+      "category": "quest",
+      "title": "任務 Q17",
+      "path": "quest/Q17.20eb956.mp3",
+      "sourcePath": "data/audio/quest/Q17.20eb956.mp3",
+      "bytes": 1040832
+    },
+    "Q20": {
+      "code": "Q20",
+      "category": "quest",
+      "title": "任務 Q20",
+      "path": "quest/Q20.e87f322.mp3",
+      "sourcePath": "data/audio/quest/Q20.e87f322.mp3",
+      "bytes": 1053759
+    },
+    "Q23": {
+      "code": "Q23",
+      "category": "quest",
+      "title": "任務 Q23",
+      "path": "quest/Q23.c20ad1d.mp3",
+      "sourcePath": "data/audio/quest/Q23.c20ad1d.mp3",
+      "bytes": 786045
+    },
+    "Q24": {
+      "code": "Q24",
+      "category": "quest",
+      "title": "任務 Q24",
+      "path": "quest/Q24.70a5fb0.mp3",
+      "sourcePath": "data/audio/quest/Q24.70a5fb0.mp3",
+      "bytes": 499149
+    },
+    "Q25": {
+      "code": "Q25",
+      "category": "quest",
+      "title": "任務 Q25",
+      "path": "quest/Q25.52fd8c9.mp3",
+      "sourcePath": "data/audio/quest/Q25.52fd8c9.mp3",
+      "bytes": 1833282
+    },
+    "Q26": {
+      "code": "Q26",
+      "category": "quest",
+      "title": "任務 Q26",
+      "path": "quest/Q26.bf37241.mp3",
+      "sourcePath": "data/audio/quest/Q26.bf37241.mp3",
+      "bytes": 1173855
+    },
+    "Q30": {
+      "code": "Q30",
+      "category": "quest",
+      "title": "任務 Q30",
+      "path": "quest/Q30.f720773.mp3",
+      "sourcePath": "data/audio/quest/Q30.f720773.mp3",
+      "bytes": 1278522
+    },
+    "Q32": {
+      "code": "Q32",
+      "category": "quest",
+      "title": "任務 Q32",
+      "path": "quest/Q32.8dafe1c.mp3",
+      "sourcePath": "data/audio/quest/Q32.8dafe1c.mp3",
+      "bytes": 593808
+    },
+    "Q38": {
+      "code": "Q38",
+      "category": "quest",
+      "title": "任務 Q38",
+      "path": "quest/Q38.f3e1aed.mp3",
+      "sourcePath": "data/audio/quest/Q38.f3e1aed.mp3",
+      "bytes": 222261
+    },
+    "Q39": {
+      "code": "Q39",
+      "category": "quest",
+      "title": "任務 Q39",
+      "path": "quest/Q39.e8c9cef.mp3",
+      "sourcePath": "data/audio/quest/Q39.e8c9cef.mp3",
+      "bytes": 809880
+    },
+    "Q43": {
+      "code": "Q43",
+      "category": "quest",
+      "title": "任務 Q43",
+      "path": "quest/Q43.d1bd113.mp3",
+      "sourcePath": "data/audio/quest/Q43.d1bd113.mp3",
+      "bytes": 1146632
+    },
+    "Q46": {
+      "code": "Q46",
+      "category": "quest",
+      "title": "任務 Q46",
+      "path": "quest/Q46.f51bdf4.mp3",
+      "sourcePath": "data/audio/quest/Q46.f51bdf4.mp3",
+      "bytes": 500400
+    },
+    "Q47": {
+      "code": "Q47",
+      "category": "quest",
+      "title": "任務 Q47",
+      "path": "quest/Q47.a954c44.mp3",
+      "sourcePath": "data/audio/quest/Q47.a954c44.mp3",
+      "bytes": 465372
+    },
+    "Q49": {
+      "code": "Q49",
+      "category": "quest",
+      "title": "任務 Q49",
+      "path": "quest/Q49.ae63f08.mp3",
+      "sourcePath": "data/audio/quest/Q49.ae63f08.mp3",
+      "bytes": 455819
+    },
+    "Q50": {
+      "code": "Q50",
+      "category": "quest",
+      "title": "任務 Q50",
+      "path": "quest/Q50.ab19558.mp3",
+      "sourcePath": "data/audio/quest/Q50.ab19558.mp3",
+      "bytes": 1547912
+    },
+    "Q51": {
+      "code": "Q51",
+      "category": "quest",
+      "title": "任務 Q51",
+      "path": "quest/Q51.374f5ff.mp3",
+      "sourcePath": "data/audio/quest/Q51.374f5ff.mp3",
+      "bytes": 954096
+    },
+    "Q52": {
+      "code": "Q52",
+      "category": "quest",
+      "title": "任務 Q52",
+      "path": "quest/Q52.31ebdf0.mp3",
+      "sourcePath": "data/audio/quest/Q52.31ebdf0.mp3",
+      "bytes": 1342472
+    },
+    "V1": {
+      "code": "V1",
+      "category": "quest_win",
+      "title": "任務勝利 V1",
+      "path": "quest_win/V1.ff44555.mp3",
+      "sourcePath": "data/audio/quest_win/V1.ff44555.mp3",
+      "bytes": 902081
+    },
+    "V2": {
+      "code": "V2",
+      "category": "quest_win",
+      "title": "任務勝利 V2",
+      "path": "quest_win/V2.a20408f.mp3",
+      "sourcePath": "data/audio/quest_win/V2.a20408f.mp3",
+      "bytes": 700560
+    },
+    "V3": {
+      "code": "V3",
+      "category": "quest_win",
+      "title": "任務勝利 V3",
+      "path": "quest_win/V3.8e1f329.mp3",
+      "sourcePath": "data/audio/quest_win/V3.8e1f329.mp3",
+      "bytes": 808960
+    },
+    "V4": {
+      "code": "V4",
+      "category": "quest_win",
+      "title": "任務勝利 V4",
+      "path": "quest_win/V4.c49f5a8.mp3",
+      "sourcePath": "data/audio/quest_win/V4.c49f5a8.mp3",
+      "bytes": 977921
+    },
+    "V5": {
+      "code": "V5",
+      "category": "quest_win",
+      "title": "任務勝利 V5",
+      "path": "quest_win/V5.11d0567.mp3",
+      "sourcePath": "data/audio/quest_win/V5.11d0567.mp3",
+      "bytes": 1507423
+    },
+    "V7": {
+      "code": "V7",
+      "category": "quest_win",
+      "title": "任務勝利 V7",
+      "path": "quest_win/V7.cace889.mp3",
+      "sourcePath": "data/audio/quest_win/V7.cace889.mp3",
+      "bytes": 1186365
+    },
+    "V9": {
+      "code": "V9",
+      "category": "quest_win",
+      "title": "任務勝利 V9",
+      "path": "quest_win/V9.183e89f.mp3",
+      "sourcePath": "data/audio/quest_win/V9.183e89f.mp3",
+      "bytes": 1550603
+    },
+    "V11": {
+      "code": "V11",
+      "category": "quest_win",
+      "title": "任務勝利 V11",
+      "path": "quest_win/V11.9bb92cd.mp3",
+      "sourcePath": "data/audio/quest_win/V11.9bb92cd.mp3",
+      "bytes": 684297
+    },
+    "V12": {
+      "code": "V12",
+      "category": "quest_win",
+      "title": "任務勝利 V12",
+      "path": "quest_win/V12.9a2b082.mp3",
+      "sourcePath": "data/audio/quest_win/V12.9a2b082.mp3",
+      "bytes": 637176
+    },
+    "V13": {
+      "code": "V13",
+      "category": "quest_win",
+      "title": "任務勝利 V13",
+      "path": "quest_win/V13.e66f77c.mp3",
+      "sourcePath": "data/audio/quest_win/V13.e66f77c.mp3",
+      "bytes": 1645122
+    },
+    "V16": {
+      "code": "V16",
+      "category": "quest_win",
+      "title": "任務勝利 V16",
+      "path": "quest_win/V16.8d03d43.mp3",
+      "sourcePath": "data/audio/quest_win/V16.8d03d43.mp3",
+      "bytes": 922272
+    },
+    "V17": {
+      "code": "V17",
+      "category": "quest_win",
+      "title": "任務勝利 V17",
+      "path": "quest_win/V17.6f7308c.mp3",
+      "sourcePath": "data/audio/quest_win/V17.6f7308c.mp3",
+      "bytes": 2242242
+    },
+    "V19": {
+      "code": "V19",
+      "category": "quest_win",
+      "title": "任務勝利 V19",
+      "path": "quest_win/V19.8971561.mp3",
+      "sourcePath": "data/audio/quest_win/V19.8971561.mp3",
+      "bytes": 4291842
+    },
+    "V20": {
+      "code": "V20",
+      "category": "quest_win",
+      "title": "任務勝利 V20",
+      "path": "quest_win/V20.0f6c40c.mp3",
+      "sourcePath": "data/audio/quest_win/V20.0f6c40c.mp3",
+      "bytes": 1081602
+    },
+    "V21": {
+      "code": "V21",
+      "category": "quest_win",
+      "title": "任務勝利 V21",
+      "path": "quest_win/V21.e01f1d1.mp3",
+      "sourcePath": "data/audio/quest_win/V21.e01f1d1.mp3",
+      "bytes": 677441
+    },
+    "V22": {
+      "code": "V22",
+      "category": "quest_win",
+      "title": "任務勝利 V22",
+      "path": "quest_win/V22.fdf7f8b.mp3",
+      "sourcePath": "data/audio/quest_win/V22.fdf7f8b.mp3",
+      "bytes": 1019148
+    },
+    "V23": {
+      "code": "V23",
+      "category": "quest_win",
+      "title": "任務勝利 V23",
+      "path": "quest_win/V23.7600aa6.mp3",
+      "sourcePath": "data/audio/quest_win/V23.7600aa6.mp3",
+      "bytes": 1230150
+    },
+    "V24": {
+      "code": "V24",
+      "category": "quest_win",
+      "title": "任務勝利 V24",
+      "path": "quest_win/V24.ec7b5fe.mp3",
+      "sourcePath": "data/audio/quest_win/V24.ec7b5fe.mp3",
+      "bytes": 489975
+    },
+    "V25": {
+      "code": "V25",
+      "category": "quest_win",
+      "title": "任務勝利 V25",
+      "path": "quest_win/V25.9548901.mp3",
+      "sourcePath": "data/audio/quest_win/V25.9548901.mp3",
+      "bytes": 4576962
+    },
+    "V26": {
+      "code": "V26",
+      "category": "quest_win",
+      "title": "任務勝利 V26",
+      "path": "quest_win/V26.14f11d5.mp3",
+      "sourcePath": "data/audio/quest_win/V26.14f11d5.mp3",
+      "bytes": 800321
+    },
+    "V27A": {
+      "code": "V27A",
+      "category": "quest_win",
+      "title": "任務勝利 V27A",
+      "path": "quest_win/V27A.d2528c5.mp3",
+      "sourcePath": "data/audio/quest_win/V27A.d2528c5.mp3",
+      "bytes": 2953175
+    },
+    "V27B": {
+      "code": "V27B",
+      "category": "quest_win",
+      "title": "任務勝利 V27B",
+      "path": "quest_win/V27B.4bc75ec.mp3",
+      "sourcePath": "data/audio/quest_win/V27B.4bc75ec.mp3",
+      "bytes": 5987654
+    },
+    "V27C": {
+      "code": "V27C",
+      "category": "quest_win",
+      "title": "任務勝利 V27C",
+      "path": "quest_win/V27C.54c5285.mp3",
+      "sourcePath": "data/audio/quest_win/V27C.54c5285.mp3",
+      "bytes": 8713215
+    },
+    "V28": {
+      "code": "V28",
+      "category": "quest_win",
+      "title": "任務勝利 V28",
+      "path": "quest_win/V28.f1b30f1.mp3",
+      "sourcePath": "data/audio/quest_win/V28.f1b30f1.mp3",
+      "bytes": 3295551
+    },
+    "V29": {
+      "code": "V29",
+      "category": "quest_win",
+      "title": "任務勝利 V29",
+      "path": "quest_win/V29.305e387.mp3",
+      "sourcePath": "data/audio/quest_win/V29.305e387.mp3",
+      "bytes": 430761
+    },
+    "V30": {
+      "code": "V30",
+      "category": "quest_win",
+      "title": "任務勝利 V30",
+      "path": "quest_win/V30.1b2652d.mp3",
+      "sourcePath": "data/audio/quest_win/V30.1b2652d.mp3",
+      "bytes": 1490358
+    },
+    "V31": {
+      "code": "V31",
+      "category": "quest_win",
+      "title": "任務勝利 V31",
+      "path": "quest_win/V31.83aa7fa.mp3",
+      "sourcePath": "data/audio/quest_win/V31.83aa7fa.mp3",
+      "bytes": 2713419
+    },
+    "V32A1": {
+      "code": "V32A1",
+      "category": "quest_win",
+      "title": "任務勝利 V32A1",
+      "path": "quest_win/V32A1.2ce0fc8.mp3",
+      "sourcePath": "data/audio/quest_win/V32A1.2ce0fc8.mp3",
+      "bytes": 988707
+    },
+    "V32A2": {
+      "code": "V32A2",
+      "category": "quest_win",
+      "title": "任務勝利 V32A2",
+      "path": "quest_win/V32A2.fbc2f1b.mp3",
+      "sourcePath": "data/audio/quest_win/V32A2.fbc2f1b.mp3",
+      "bytes": 1001217
+    },
+    "V32B1": {
+      "code": "V32B1",
+      "category": "quest_win",
+      "title": "任務勝利 V32B1",
+      "path": "quest_win/V32B1.5ae1a5d.mp3",
+      "sourcePath": "data/audio/quest_win/V32B1.5ae1a5d.mp3",
+      "bytes": 2713419
+    },
+    "V32B2": {
+      "code": "V32B2",
+      "category": "quest_win",
+      "title": "任務勝利 V32B2",
+      "path": "quest_win/V32B2.25b8d98.mp3",
+      "sourcePath": "data/audio/quest_win/V32B2.25b8d98.mp3",
+      "bytes": 1235154
+    },
+    "V33": {
+      "code": "V33",
+      "category": "quest_win",
+      "title": "任務勝利 V33",
+      "path": "quest_win/V33.98723cc.mp3",
+      "sourcePath": "data/audio/quest_win/V33.98723cc.mp3",
+      "bytes": 2302321
+    },
+    "V34": {
+      "code": "V34",
+      "category": "quest_win",
+      "title": "任務勝利 V34",
+      "path": "quest_win/V34.6fbd351.mp3",
+      "sourcePath": "data/audio/quest_win/V34.6fbd351.mp3",
+      "bytes": 1029156
+    },
+    "V35": {
+      "code": "V35",
+      "category": "quest_win",
+      "title": "任務勝利 V35",
+      "path": "quest_win/V35.0ec8074.mp3",
+      "sourcePath": "data/audio/quest_win/V35.0ec8074.mp3",
+      "bytes": 1223478
+    },
+    "V36": {
+      "code": "V36",
+      "category": "quest_win",
+      "title": "任務勝利 V36",
+      "path": "quest_win/V36.31d562d.mp3",
+      "sourcePath": "data/audio/quest_win/V36.31d562d.mp3",
+      "bytes": 1537602
+    },
+    "V37": {
+      "code": "V37",
+      "category": "quest_win",
+      "title": "任務勝利 V37",
+      "path": "quest_win/V37.63a03c2.mp3",
+      "sourcePath": "data/audio/quest_win/V37.63a03c2.mp3",
+      "bytes": 279807
+    },
+    "V38": {
+      "code": "V38",
+      "category": "quest_win",
+      "title": "任務勝利 V38",
+      "path": "quest_win/V38.14900f5.mp3",
+      "sourcePath": "data/audio/quest_win/V38.14900f5.mp3",
+      "bytes": 467457
+    },
+    "V39": {
+      "code": "V39",
+      "category": "quest_win",
+      "title": "任務勝利 V39",
+      "path": "quest_win/V39.e9bd5b8.mp3",
+      "sourcePath": "data/audio/quest_win/V39.e9bd5b8.mp3",
+      "bytes": 3340587
+    },
+    "V40": {
+      "code": "V40",
+      "category": "quest_win",
+      "title": "任務勝利 V40",
+      "path": "quest_win/V40.501386d.mp3",
+      "sourcePath": "data/audio/quest_win/V40.501386d.mp3",
+      "bytes": 510825
+    },
+    "V42": {
+      "code": "V42",
+      "category": "quest_win",
+      "title": "任務勝利 V42",
+      "path": "quest_win/V42.3772761.mp3",
+      "sourcePath": "data/audio/quest_win/V42.3772761.mp3",
+      "bytes": 479692
+    },
+    "V43": {
+      "code": "V43",
+      "category": "quest_win",
+      "title": "任務勝利 V43",
+      "path": "quest_win/V43.e2fd5be.mp3",
+      "sourcePath": "data/audio/quest_win/V43.e2fd5be.mp3",
+      "bytes": 979989
+    },
+    "V44A": {
+      "code": "V44A",
+      "category": "quest_win",
+      "title": "任務勝利 V44A",
+      "path": "quest_win/V44A.8f3d1b0.mp3",
+      "sourcePath": "data/audio/quest_win/V44A.8f3d1b0.mp3",
+      "bytes": 2018802
+    },
+    "V44B": {
+      "code": "V44B",
+      "category": "quest_win",
+      "title": "任務勝利 V44B",
+      "path": "quest_win/V44B.491de81.mp3",
+      "sourcePath": "data/audio/quest_win/V44B.491de81.mp3",
+      "bytes": 1060045
+    },
+    "V45": {
+      "code": "V45",
+      "category": "quest_win",
+      "title": "任務勝利 V45",
+      "path": "quest_win/V45.dc7186f.mp3",
+      "sourcePath": "data/audio/quest_win/V45.dc7186f.mp3",
+      "bytes": 3924512
+    },
+    "V46": {
+      "code": "V46",
+      "category": "quest_win",
+      "title": "任務勝利 V46",
+      "path": "quest_win/V46.685956b.mp3",
+      "sourcePath": "data/audio/quest_win/V46.685956b.mp3",
+      "bytes": 971914
+    },
+    "V47": {
+      "code": "V47",
+      "category": "quest_win",
+      "title": "任務勝利 V47",
+      "path": "quest_win/V47.685956b.mp3",
+      "sourcePath": "data/audio/quest_win/V47.685956b.mp3",
+      "bytes": 971914
+    },
+    "V48": {
+      "code": "V48",
+      "category": "quest_win",
+      "title": "任務勝利 V48",
+      "path": "quest_win/V48.9b669de.mp3",
+      "sourcePath": "data/audio/quest_win/V48.9b669de.mp3",
+      "bytes": 461191
+    },
+    "V49": {
+      "code": "V49",
+      "category": "quest_win",
+      "title": "任務勝利 V49",
+      "path": "quest_win/V49.27f3da1.mp3",
+      "sourcePath": "data/audio/quest_win/V49.27f3da1.mp3",
+      "bytes": 3525277
+    },
+    "V51": {
+      "code": "V51",
+      "category": "quest_win",
+      "title": "任務勝利 V51",
+      "path": "quest_win/V51.fc87c9f.mp3",
+      "sourcePath": "data/audio/quest_win/V51.fc87c9f.mp3",
+      "bytes": 703718
+    },
+    "V52": {
+      "code": "V52",
+      "category": "quest_win",
+      "title": "任務勝利 V52",
+      "path": "quest_win/V52.f9d99f8.mp3",
+      "sourcePath": "data/audio/quest_win/V52.f9d99f8.mp3",
+      "bytes": 3861860
+    },
+    "VW1": {
+      "code": "VW1",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW1",
+      "path": "w_quest_win/VW1.65637c2.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW1.65637c2.mp3",
+      "bytes": 3907592
+    },
+    "VW2": {
+      "code": "VW2",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW2",
+      "path": "w_quest_win/VW2.a2444f0.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW2.a2444f0.mp3",
+      "bytes": 1181961
+    },
+    "VW3": {
+      "code": "VW3",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW3",
+      "path": "w_quest_win/VW3.4329160.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW3.4329160.mp3",
+      "bytes": 3112716
+    },
+    "VW4": {
+      "code": "VW4",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW4",
+      "path": "w_quest_win/VW4.05ffb43.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW4.05ffb43.mp3",
+      "bytes": 1370312
+    },
+    "VW5": {
+      "code": "VW5",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW5",
+      "path": "w_quest_win/VW5.a3c48ac.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW5.a3c48ac.mp3",
+      "bytes": 1151432
+    },
+    "VW6": {
+      "code": "VW6",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW6",
+      "path": "w_quest_win/VW6.4329160.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW6.4329160.mp3",
+      "bytes": 3112716
+    },
+    "VW7": {
+      "code": "VW7",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW7",
+      "path": "w_quest_win/VW7.ab740c8.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW7.ab740c8.mp3",
+      "bytes": 490951
+    },
+    "VW8": {
+      "code": "VW8",
+      "category": "w_quest_win",
+      "title": "VW擴充任務勝利 VW8",
+      "path": "w_quest_win/VW8.e0167c9.mp3",
+      "sourcePath": "data/audio/w_quest_win/VW8.e0167c9.mp3",
+      "bytes": 1152159
+    },
+    "W2": {
+      "code": "W2",
+      "category": "w_quest",
+      "title": "W擴充任務 W2",
+      "path": "w_quest/W2.26d303e.mp3",
+      "sourcePath": "data/audio/w_quest/W2.26d303e.mp3",
+      "bytes": 373531
+    }
+  }
+}
